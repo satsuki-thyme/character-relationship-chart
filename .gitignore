@@ -1,0 +1,54 @@
+.*
+!.gitignore
+!.vscodeignore
+!.vscode/
+
+# Dependencies and generated packages
+node_modules/
+dist/
+build/
+out/
+*.vsix
+*.zip
+*.tgz
+
+# Test output and development captures (curated screenshots live in docs/images/)
+coverage/
+test-results/
+playwright-report/
+verification/
+*.log
+
+# Backups: stem.backup-YYYY-MM-DD-NN.ext, or filename.backup-YYYY-MM-DD-NN
+*.backup-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9][0-9]*.*
+*.backup-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9][0-9]*
+
+# Also exclude legacy dated backups imported from older copies.
+*.[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9][0-9]*.*
+*.[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9][0-9]*
+*.bak
+*.tmp
+*.swp
+*~
+
+# Local configuration and credentials
+.env
+.env.*
+.npmrc
+*.pem
+*.key
+*.code-workspace
+.vscode/*
+!.vscode/launch.json
+.DS_Store
+Thumbs.db
+
+# Personal stories: store outside this repository or in these ignored folders.
+# Reviewed examples/, including example view data, remain shareable.
+/private/
+/data/
+/exports/
+/*.jsonc
+/*.relations.json
+/*.view.json
+/*.svg

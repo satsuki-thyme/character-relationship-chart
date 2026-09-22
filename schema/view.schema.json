@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Character Relationship Chart 表示データ",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "positions": {
+      "type": "object",
+      "maxProperties": 200,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "x",
+          "y",
+          "source"
+        ],
+        "properties": {
+          "x": {
+            "type": "number",
+            "minimum": -20000,
+            "maximum": 20000
+          },
+          "y": {
+            "type": "number",
+            "minimum": -20000,
+            "maximum": 20000
+          },
+          "source": {
+            "type": "string",
+            "maxLength": 100
+          }
+        }
+      }
+    },
+    "layout": {
+      "enum": [
+        "auto",
+        "circle"
+      ]
+    },
+    "configLayout": {
+      "enum": [
+        "auto",
+        "circle"
+      ]
+    },
+    "camera": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y",
+        "scale"
+      ],
+      "properties": {
+        "x": {
+          "type": "number",
+          "minimum": -1000000,
+          "maximum": 1000000
+        },
+        "y": {
+          "type": "number",
+          "minimum": -1000000,
+          "maximum": 1000000
+        },
+        "scale": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 4
+        },
+        "width": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 100000
+        },
+        "height": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 100000
+        }
+      },
+      "dependencies": {
+        "width": [
+          "height"
+        ],
+        "height": [
+          "width"
+        ]
+      }
+    },
+    "ui": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "details": {
+          "type": "boolean"
+        },
+        "focus": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

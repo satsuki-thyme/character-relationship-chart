@@ -1,0 +1,232 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "nodes",
+    "edges"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "maxLength": 2000,
+      "description": "JSON Schema の場所。通常は省略できます。"
+    },
+    "version": {
+      "const": 1,
+      "default": 1
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "図のタイトル。"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 4000,
+      "description": "タイトルの下に表示する説明。"
+    },
+    "layout": {
+      "enum": [
+        "auto",
+        "circle"
+      ],
+      "default": "auto",
+      "description": "auto: 自動配置 / circle: 円形配置。"
+    },
+    "groups": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "\\S",
+            "description": "一意の識別名。日本語も使えます。"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "グループ名。",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+            "description": "#55b8ad のような色コード。"
+          }
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "maxItems": 200,
+      "description": "人物や項目。最大200個。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "\\S",
+            "description": "一意の識別名。日本語も使えます。"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "図に表示する名前。",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "group": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "所属グループの id。"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 4000,
+            "description": "詳細欄に表示する説明。"
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+            "description": "#55b8ad のような色コード。"
+          },
+          "x": {
+            "type": "number",
+            "minimum": -20000,
+            "maximum": 20000,
+            "description": "固定位置のX座標。yと一緒に指定します。"
+          },
+          "y": {
+            "type": "number",
+            "minimum": -20000,
+            "maximum": 20000,
+            "description": "固定位置のY座標。xと一緒に指定します。"
+          },
+          "groups": {
+            "type": "array",
+            "maxItems": 50,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "\\S"
+            },
+            "description": "所属するグループIDの配列。先頭のグループ色を人物枠に使います。groupとの併記はできません。"
+          }
+        },
+        "dependencies": {
+          "x": [
+            "y"
+          ],
+          "y": [
+            "x"
+          ]
+        },
+        "not": {
+          "required": [
+            "group",
+            "groups"
+          ]
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "maxItems": 1000,
+      "description": "人物・項目の関係。最大1000本。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "from",
+          "to"
+        ],
+        "properties": {
+          "from": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "\\S",
+            "description": "一意の識別名。日本語も使えます。"
+          },
+          "to": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "\\S",
+            "description": "一意の識別名。日本語も使えます。"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "線に表示する関係名。"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 4000,
+            "description": "関係の詳しい説明。"
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+            "description": "#55b8ad のような色コード。"
+          },
+          "arrow": {
+            "enum": [
+              "forward",
+              "both",
+              "none"
+            ],
+            "default": "forward",
+            "description": "forward: from→to / both: 双方向 / none: 矢印なし。"
+          },
+          "style": {
+            "enum": [
+              "solid",
+              "dashed",
+              "dotted"
+            ],
+            "default": "solid",
+            "description": "solid: 実線 / dashed: 破線 / dotted: 点線。"
+          },
+          "setId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "\\S",
+            "description": "同じ2人を結ぶ線のセットID。同じIDの線を並行に表示します。矢印の向きは問いません。"
+          },
+          "shape": {
+            "enum": [
+              "auto",
+              "straight",
+              "curved"
+            ],
+            "default": "auto",
+            "description": "auto: 自動 / straight: 直線 / curved: 曲線。同じsetId内で明示する形は統一してください。"
+          }
+        }
+      }
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Character Relationship Chartの設定"
+}

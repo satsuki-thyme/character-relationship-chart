@@ -1,0 +1,112 @@
+{
+  "name": "character-relationship-chart",
+  "displayName": "Character Relationship Chart",
+  "description": "JSON / JSONCから人物相関図を表示し、人物・グループ・関係をGUIで編集するVS Code拡張です。",
+  "version": "0.1.0",
+  "publisher": "local",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Visualization",
+    "Other"
+  ],
+  "keywords": [
+    "相関図",
+    "人物相関図",
+    "relationships",
+    "jsonc",
+    "novel"
+  ],
+  "main": "./src/extension.js",
+  "activationEvents": [
+    "onWebviewPanel:characterRelationshipChart.preview"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    },
+    "virtualWorkspaces": {
+      "supported": true
+    }
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "characterRelationshipChart.open",
+        "title": "相関図を表示",
+        "category": "Character Relationship Chart",
+        "icon": "$(type-hierarchy)"
+      },
+      {
+        "command": "characterRelationshipChart.createSample",
+        "title": "サンプル設定を作成",
+        "category": "Character Relationship Chart"
+      },
+      {
+        "command": "characterRelationshipChart.migrateLegacy",
+        "title": "旧版データをファイルへ移行",
+        "category": "Character Relationship Chart"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "characterRelationshipChart.open",
+          "when": "resourceExtname == .jsonc || resourceFilename =~ /\\.relations\\.json$/",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "characterRelationshipChart.open",
+          "when": "resourceExtname == .jsonc || resourceFilename =~ /\\.relations\\.json$/",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "characterRelationshipChart.open",
+          "when": "resourceExtname == .jsonc || resourceFilename =~ /\\.relations\\.json$/",
+          "group": "navigation"
+        }
+      ]
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": [
+          "*.relations.json",
+          "*.relations.jsonc"
+        ],
+        "url": "./schema/relations.schema.json"
+      },
+      {
+        "fileMatch": [
+          "*.json.view.json",
+          "*.jsonc.view.json"
+        ],
+        "url": "./schema/view.schema.json"
+      }
+    ]
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "check": "node --check src/extension.js && node --check src/config.js && node --check src/webview.js && node --check media/graph.js && node --check media/main.js && node --check src/storage.js && node --check src/edit.js && node --check media/editor.js",
+    "package": "vsce package --out character-relationship-chart.vsix"
+  },
+  "dependencies": {
+    "jsonc-parser": "3.3.1"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/satsuki-thyme/character-relationship-chart.git"
+  },
+  "homepage": "https://github.com/satsuki-thyme/character-relationship-chart#readme",
+  "bugs": {
+    "url": "https://github.com/satsuki-thyme/character-relationship-chart/issues"
+  }
+}
