@@ -18,8 +18,9 @@
 
 ## 画面例
 
-スクリーンショットの追加先は `docs/images/` です。現行版の実機画像はまだ掲載していません。
-[撮影・掲載手順](docs/images/README.md) に従って、公開用サンプルの表示画面と編集画面を追加できます。
+![fig1](./docs/images/fig1.png)
+![fig2](./docs/images/fig2.png)
+![fig3](./docs/images/fig3.png)
 
 ## 必要環境
 
