@@ -1,5 +1,8 @@
 # Character Relationship Chart
 
+- 指揮: 五月タイム
+- 制作: ChatGPT
+
 人物・グループ・関係をJSON / JSONCで管理し、相関図を表示・編集する **デスクトップ版VS Code拡張**です。小説の登場人物、組織、アイデアのつながりを整理できます。
 
 現在はVS Codeが必要です。独立したWebアプリやWeb版VS Code用の拡張ではありません。
