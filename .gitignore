@@ -19,13 +19,7 @@ playwright-report/
 verification/
 *.log
 
-# Backups: stem.backup-YYYY-MM-DD-NN.ext, or filename.backup-YYYY-MM-DD-NN
-*.backup-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9][0-9]*.*
-*.backup-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9][0-9]*
-
 # Also exclude legacy dated backups imported from older copies.
-*.[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9][0-9]*.*
-*.[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9][0-9]*
 *.bak
 *.tmp
 *.swp
