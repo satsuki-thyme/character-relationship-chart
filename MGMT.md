@@ -1,5 +1,7 @@
 # management
 
+Character Relationship Chart
+
 ## task
 
 - [ ] Webアプリへの転用
