@@ -1,5 +1,30 @@
 # 検証結果と実機確認手順
 
+## Web版転用・第1段階（2026-09-23 UTC）
+
+対象: 0.1.0を基にしたUI/VS Code境界分離版。拡張ID・表示名・版数、データ形式は変更していない。作業用コピーで実装・検証し、更新ファイルとVSIXを生成。以下は直接反映前に取得した検証結果。commit/push、公開は行っていない。Dropboxへの反映記録は [stage1-applied.md](dist/character-relationship-chart-stage1-applied.md) に記載する。
+
+環境: Linux、Node.js v24.19.0、npm 11.9.0。Dropboxの現行ソースはダウンロード時にサイズと内容ハッシュを検証して取得した。
+
+| 項目 | 今回の結果 |
+| --- | --- |
+| 変更前の基準 | 既存54テスト成功 |
+| 依存導入 | lockfileを維持して `npm ci --ignore-scripts` 成功 |
+| 構文 | `npm run check` 成功。本番JavaScript10ファイル |
+| 通常テスト | `npm test` 61件成功（既存54＋境界7）、失敗・スキップなし |
+| 境界 | API取得・旧状態消去をアダプターへ隔離。通信順、購読解除、非同期応答の対応付け、破棄時の未完了要求を検証 |
+| 拡張との接続 | 実アダプター＋実extension.js＋模擬VS Code APIでGUI編集・人物ID変更と配置引継ぎ・版競合・保存失敗・SVG保存を検証 |
+| DOM検証 | jsdom 26.1.0の追加7件成功。VS Code APIなしのホスト注入、描画・編集、コメント保持、配置保存/再読込、設定を開く操作、SVG生成、入力保持、古い保存応答、新しい外部変更、不正設定・不正メッセージ・HTML文字列を確認 |
+| 依存関係 | 本番の依存・lockfileは変更なし。jsdomは検証用の別フォルダへ導入し、VSIXに含めない |
+| VSIX | `npm run package` 成功。共有HTML、新しいアダプター・起動スクリプト・テーマCSS、jsonc-parserとLICENSEを含む。開発テスト・管理文書・バックアップを除外 |
+| 維持した処理 | `src/extension.js`、`storage.js`、`config.js`、`edit.js`、`media/graph.js`、Schema、サンプルは取得時から変更していない |
+
+実ブラウザによる画面確認は、提供されたブラウザがローカル検証URLを `ERR_BLOCKED_BY_CLIENT` で拒否したため未実施。ローカルChromiumの起動試行もプロセスが終了した。DOM検証では画面サイズ・ResizeObserver・ダイアログ・一部描画タイミングを模擬しているため、見た目、ドラッグの実操作、明暗テーマの色、CSPの実ブラウザでの適用を確認したとは扱わない。
+
+実際のVS Code本体がないため、VSIX実インストール、Extension Host、Undo、OS別動作は未確認。末尾の実機確認手順を継続して使う。独立Web製品版は未実装。検証用画面とDOM検証の再実行方法は [開発ガイド](docs/DEVELOPMENT.md) を参照。
+
+## 以下は公開準備時の記録（今回の再実行結果とは別）
+
 対象: Character Relationship Chart 0.1.0（2026-09-23）。Linux、Node.js v24.19.0、npm 11.9.0で確認。
 
 ## この版で確認したこと

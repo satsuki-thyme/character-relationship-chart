@@ -1,15 +1,15 @@
 :root {
-  --bg: var(--vscode-editor-background, #171c25);
-  --panel: var(--vscode-sideBar-background, #1c222e);
-  --fg: var(--vscode-editor-foreground, #e6eaf1);
-  --muted: var(--vscode-descriptionForeground, #98a5ba);
-  --border: var(--vscode-panel-border, #364050);
-  --accent: var(--vscode-focusBorder, #69b9ac);
-  --input: var(--vscode-input-background, #232c3b);
-  --line: var(--vscode-descriptionForeground, #98a5ba);
+  --bg: var(--theme-editor-background, #171c25);
+  --panel: var(--theme-sideBar-background, #1c222e);
+  --fg: var(--theme-editor-foreground, #e6eaf1);
+  --muted: var(--theme-descriptionForeground, #98a5ba);
+  --border: var(--theme-panel-border, #364050);
+  --accent: var(--theme-focusBorder, #69b9ac);
+  --input: var(--theme-input-background, #232c3b);
+  --line: var(--theme-descriptionForeground, #98a5ba);
 }
 * { box-sizing: border-box; }
-body { margin: 0; height: 100vh; display: flex; flex-direction: column; background: var(--bg); color: var(--fg); font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif); font-size: 13px; overflow: hidden; }
+body { margin: 0; height: 100vh; display: flex; flex-direction: column; background: var(--bg); color: var(--fg); font-family: var(--theme-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif); font-size: 13px; overflow: hidden; }
 header { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 22px 26px 17px; border-bottom: 1px solid var(--border); }
 .heading { min-width: 0; }
 .eyebrow { color: var(--muted); font-size: 10px; letter-spacing: 2px; font-weight: 600; }
@@ -18,21 +18,21 @@ h1 { margin: 7px 0 5px; font-size: 25px; font-weight: 600; letter-spacing: .02em
 button, select, input { font: inherit; }
 button, select { border: 1px solid var(--border); border-radius: 5px; color: var(--fg); background: var(--input); min-height: 30px; padding: 5px 10px; }
 button { cursor: pointer; white-space: nowrap; }
-button:hover { background: var(--vscode-toolbar-hoverBackground, #344153); }
+button:hover { background: var(--theme-toolbar-hoverBackground, #344153); }
 button:disabled { opacity: .45; cursor: default; }
 button:focus-visible, input:focus-visible, select:focus-visible, #canvas:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.primary { background: var(--vscode-button-background, #226b64); color: var(--vscode-button-foreground, white); border-color: transparent; }
-.primary:hover { background: var(--vscode-button-hoverBackground, #2c857b); }
+.primary { background: var(--theme-button-background, #226b64); color: var(--theme-button-foreground, white); border-color: transparent; }
+.primary:hover { background: var(--theme-button-hoverBackground, #2c857b); }
 .toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 11px 26px; border-bottom: 1px solid var(--border); }
 .search-box { display: flex; align-items: center; gap: 7px; border: 1px solid var(--border); border-radius: 5px; background: var(--input); height: 31px; padding: 0 8px; margin-right: auto; min-width: 150px; }
 .search-box span { font-size: 21px; color: var(--muted); }
-input { width: 156px; background: transparent; border: 0; color: var(--vscode-input-foreground, var(--fg)); padding: 4px 0; min-width: 80px; }
-input::placeholder { color: var(--vscode-input-placeholderForeground, var(--muted)); }
+input { width: 156px; background: transparent; border: 0; color: var(--theme-input-foreground, var(--fg)); padding: 4px 0; min-width: 80px; }
+input::placeholder { color: var(--theme-input-placeholderForeground, var(--muted)); }
 .layout-label { display: flex; align-items: center; gap: 7px; color: var(--muted); }
 .zoom-controls { display: flex; align-items: center; gap: 4px; }
 .zoom-controls button { width: 29px; padding: 0; }
 #zoom { color: var(--muted); text-align: center; width: 43px; font-size: 11px; }
-#error { padding: 9px 26px; color: var(--vscode-errorForeground, #f68c8c); background: var(--vscode-inputValidation-errorBackground, #422626); border-bottom: 1px solid var(--vscode-inputValidation-errorBorder, #984747); max-height: 105px; overflow: auto; white-space: pre-line; line-height: 1.65; }
+#error { padding: 9px 26px; color: var(--theme-errorForeground, #f68c8c); background: var(--theme-inputValidation-errorBackground, #422626); border-bottom: 1px solid var(--theme-inputValidation-errorBorder, #984747); max-height: 105px; overflow: auto; white-space: pre-line; line-height: 1.65; }
 main { display: flex; flex: 1; min-height: 120px; min-width: 0; overflow: hidden; }
 #canvas-wrap { position: relative; flex: 1; min-width: 0; background-image: radial-gradient(var(--border) .65px, transparent .65px); background-size: 22px 22px; }
 #canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
@@ -107,7 +107,7 @@ summary::-webkit-details-marker { display: none; }
 .menu-panel #stats, #storage-file { font-size: 10px; color: var(--muted); overflow-wrap: anywhere; }
 #exit-focus { position: absolute; top: 7px; right: 9px; z-index: 10; opacity: .85; }
 body.focus-mode header, body.focus-mode footer { display: none; }
-#error, #storage-error { position: absolute; z-index: 15; top: 42px; left: 8px; right: 8px; max-height: 120px; overflow: auto; padding: 8px 12px; border: 1px solid var(--vscode-inputValidation-errorBorder, #984747); border-radius: 4px; background: var(--vscode-inputValidation-errorBackground, #422626); color: var(--vscode-errorForeground, #f68c8c); white-space: pre-line; line-height: 1.6; }
+#error, #storage-error { position: absolute; z-index: 15; top: 42px; left: 8px; right: 8px; max-height: 120px; overflow: auto; padding: 8px 12px; border: 1px solid var(--theme-inputValidation-errorBorder, #984747); border-radius: 4px; background: var(--theme-inputValidation-errorBackground, #422626); color: var(--theme-errorForeground, #f68c8c); white-space: pre-line; line-height: 1.6; }
 #storage-error { top: auto; bottom: 33px; }
 body.focus-mode #error { top: 43px; }
 @media (max-width: 950px) and (min-width: 631px) { aside { width: 215px; flex-basis: 215px; } }
@@ -133,7 +133,7 @@ body.focus-mode #error { top: 43px; }
 #edit-close { align-self: start; min-width: 30px; }
 #edit-tabs { display: flex; gap: 5px; padding: 0 20px 12px; border-bottom: 1px solid var(--border); }
 #edit-tabs button { flex: 1; }
-#edit-tabs [aria-pressed=true], .primary { border-color: var(--vscode-button-background, #368b86); background: var(--vscode-button-background, #246a65); color: var(--vscode-button-foreground, #fff); }
+#edit-tabs [aria-pressed=true], .primary { border-color: var(--theme-button-background, #368b86); background: var(--theme-button-background, #246a65); color: var(--theme-button-foreground, #fff); }
 .editor-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 220px minmax(0, 1fr); }
 .editor-list-pane { display: flex; flex-direction: column; padding: 14px 12px; border-right: 1px solid var(--border); min-height: 0; gap: 10px; }
 #edit-list { overflow: auto; min-height: 0; }
@@ -155,7 +155,7 @@ body.focus-mode #error { top: 43px; }
 .edit-note, .edit-memberships small { font-size: 11px; color: var(--muted); line-height: 1.7; margin: 0; }
 .editor-bottom { border-top: 1px solid var(--border); padding: 10px 18px 14px; }
 #edit-message { margin: 0 0 10px; font-size: 11px; min-height: 17px; line-height: 1.6; white-space: pre-line; max-height: 100px; overflow: auto; }
-#edit-message.is-error, .danger { color: var(--vscode-errorForeground, #ed9292); }
+#edit-message.is-error, .danger { color: var(--theme-errorForeground, #ed9292); }
 .editor-actions { display: flex; gap: 7px; align-items: center; }
 #edit-state { flex: 1; font-size: 10px; color: var(--muted); }
 #edit-confirm { padding: 12px 18px; border-top: 1px solid var(--accent); background: var(--input); font-size: 12px; }

@@ -140,7 +140,7 @@ VSIXの作成・手動インストールは [VS Code公式の配布手順](https
 
 旧ID側の内部保存データや開いたタブは、新IDから自動で引き継げません。`旧版データをファイルへ移行` コマンドが対象にするのは、現在の拡張IDの内部保存領域です。ファイル保存に成功した記録だけ削除し、失敗時は元の記録を残します。
 
-VS Code連携は `src/extension.js`、描画計算は `media/graph.js` に分かれています。現時点の配布単位は拡張全体です。構成と今後の分離案は [開発ガイド](docs/DEVELOPMENT.md) にあります。
+VS Code連携は `src/extension.js`、描画計算は `media/graph.js` に分かれています。UIは共通ホストの操作を通じて保存・読込を依頼し、VS Code固有の通信・起動・テーマ連携は `media/vscode-*` が担当します。現時点の配布単位は拡張全体です。構成とWeb版への転用状況は [開発ガイド](docs/DEVELOPMENT.md) と [設計](docs/architecture.md) にあります。
 
 ## 開発・ライセンス
 

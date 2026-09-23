@@ -22,12 +22,14 @@ VS Codeでプロジェクトフォルダを開いてF5を押すと、`.vscode/la
 | `src/config.js` | JSONC解析・検証・表示用データへの正規化。`jsonc-parser` に依存、VS Code非依存 |
 | `src/edit.js` | コメントをできるだけ保ったデータ編集。`config.js`、`jsonc-parser` に依存 |
 | `media/graph.js` | 配置・線の経路・領域計算。VS Code／DOM非依存、CommonJSとブラウザ双方で読める |
-| `media/main.js` | SVG描画、操作、検索、表示状態。DOMと `acquireVsCodeApi()` に依存 |
-| `media/editor.js` | GUIフォームと編集メッセージ。DOMと渡されたAPIに依存 |
-| `media/style.css` | VS Codeテーマと画面幅に対応する表示 |
+| `media/main.js` | SVG描画、操作、検索、表示状態。`RelationsUi(host)` へ注入した共通ホストとDOMに依存 |
+| `media/editor.js` | GUIフォーム、入力保持、編集要求。DOMと共通ホストに依存 |
+| `media/style.css`、`media/ui.html` | 環境共通の表示・画面構造。共通テーマ変数と既定色を使用 |
+| `media/vscode-host.js` | 共通ホスト契約と既存VS Codeメッセージの変換・購読・編集応答管理 |
+| `media/vscode-bootstrap.js`、`media/vscode-theme.css` | VS Code APIの取得・UI起動、テーマ変数の対応付け |
 | `src/extension.js` | コマンド、診断、Webviewメッセージ、VS Code編集API、ファイル監視 |
 | `src/storage.js` | 表示データ検証と保存。保存処理には渡されたVS Code APIを使う |
-| `src/webview.js` | Webview HTMLとCSPの生成。Node.jsのcryptoとリソースURI変換を使う |
+| `src/webview.js` | 共有HTMLの組込みとCSP・資産URIの生成。Node.jsのcrypto/fs/pathを使う |
 | `schema/` | 本体と表示データのJSON Schema |
 | `examples/` | 作品固有の情報を含めない公開用サンプル |
 | `test/` | Node.js標準テスト。VS Code連携部分は模擬API |
@@ -52,11 +54,31 @@ VS Codeでプロジェクトフォルダを開いてF5を押すと、`.vscode/la
 
 `local` は手動VSIX配布用のpublisherです。Marketplace公開には実在するpublisherの登録が必要です。その際もpublisher変更による拡張IDの切り替えを案内してください。現在のVSIX作成・手動インストールにトークンは不要です。
 
-## 本体とVS Code連携の将来の分離
+## Web版への転用・第1段階
 
-公開準備ではファイルの大規模移動や機能削除を行っていません。既に独立している `config.js`・`edit.js`・`graph.js` を共通コアの候補にできます。
+UIとVS Codeの境界を共通ホストの契約で分離しています。契約・起動順・現在の構成・次の段階は [architecture.md](architecture.md) を正本とします。`packages/` と `apps/` への移動やWeb版の提供はまだ行っていません。
 
-次の段階では、画面とホストの境界に `loadConfig`・`saveConfig`・`loadView`・`saveView`・`exportSvg` 相当の入出力インターフェースを設けます。現在のVS Codeメッセージ実装をアダプターとして残し、ブラウザ用のファイル選択／ダウンロード実装を追加する方向です。保存競合、Undo、旧版データ移行の意味が変わるため、別の改修としてテストと配布形態を設計してください。
+`npm test` は既存54件と境界7件の計61件です。共通UIにVS Code依存を戻さない検査、Webviewの資産/CSP、通知・編集結果の対応付け、実アダプターと模擬Extension Hostをつないだ保存・競合・SVG出力を含みます。
+
+DOMの追加検査はjsdom 26.1.0を検証時だけ用意して実行できます。manifest/lockfileや実行時依存には追加していません。
+
+```sh
+npm install --no-save --package-lock=false --ignore-scripts jsdom@26.1.0
+node --test test/ui-dom-check.js
+```
+
+7件でUI描画・編集、VS Code APIなしのホスト注入、保存失敗時の入力保持、古い版の拒否、応答と新しい通知の前後関係、不正データ、SVG生成を確認します。画面サイズ・描画タイミング・ダイアログを一部模擬するため、見た目や実機動作の検証とは別です。検証用依存を除いて配布する際は `npm ci` で通常の依存構成に戻します。
+
+ブラウザで操作するためのローカル検証画面も用意しています。
+
+```sh
+node test/preview.js
+```
+
+- `http://127.0.0.1:8765/vscode`: 本番UI・アダプター・起動処理と、模擬VS Code APIを接続。
+- `http://127.0.0.1:8765/standalone`: 同じUIへ検証専用ホストを注入。VS Code API・アダプターは読み込まない。
+
+両画面とも公開サンプルとメモリー上の一時ファイルだけを使います。検証用ボタンで外部変更・不正な設定・保存失敗を発生させられます。ブラウザ版製品や実際のExtension Hostではありません。`Ctrl+C` で終了します。`test/` はVSIXに同梱しません。
 
 ## 変更時の注意
 

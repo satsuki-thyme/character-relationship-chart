@@ -1,10 +1,10 @@
 /* global document */
 (() => {
   'use strict';
-  window.RelationsEditor = api => {
+  window.RelationsEditor = host => {
     const $ = id => document.getElementById(id), dialog = $('config-editor'), form = $('edit-form');
     const names = { general: '全体', nodes: 'キャラクター', groups: 'グループ', edges: '関係' };
-    let latest, base, kind = 'general', index = null, dirty = false, pending = null, serial = 0, groupOrder = [];
+    let latest, base, kind = 'general', index = null, dirty = false, pending = false, groupOrder = [];
     const el = (tag, text, attrs = {}) => {
       const item = document.createElement(tag); if (text !== undefined) item.textContent = text;
       for (const [k, v] of Object.entries(attrs)) item.setAttribute(k, v); return item;
@@ -148,13 +148,26 @@
       if (kind === 'edges') { value.arrow = get('arrow'); value.style = get('style'); if (get('shape') !== 'auto') value.shape = get('shape'); string('setId'); }
       return value;
     }
-    function submit(action) {
+    async function submit(action) {
       if (pending || stale()) return;
       if (action !== 'delete' && !form.reportValidity()) return;
       const operation = { kind, action, index };
       if (action !== 'delete') operation.value = collect();
-      pending = ++serial; $('edit-confirm').hidden = true; notice('保存しています…'); controls();
-      api.postMessage({ type: 'editConfig', requestId: pending, baseVersion: base.documentVersion, operation });
+      pending = true; $('edit-confirm').hidden = true; notice('保存しています…'); controls();
+      try {
+        const result = await host.editConfig(operation, base.documentVersion);
+        pending = false;
+        if (result.ok) {
+          // A newer host update can arrive while the save promise is settling.
+          if (!latest || latest.documentVersion <= result.documentVersion) latest = { config: result.config, documentVersion: result.documentVersion };
+          if (latest.config) {
+            load(kind, result.index === null ? undefined : result.index);
+            notice('保存しました。相関図に反映されています。');
+          } else { notice('保存後に設定が変更されています。入力を確認し、設定ファイルのエラーを修正してください。', true); controls(); }
+        } else { notice(result.message || '保存できませんでした。', true); controls(); }
+      } catch (error) {
+        pending = false; notice(String(error.message || error), true); controls();
+      }
     }
     form.addEventListener('submit', event => { event.preventDefault(); submit(kind === 'general' || index !== null ? 'save' : 'add'); });
     form.addEventListener('input', () => { dirty = true; controls(); });
@@ -176,22 +189,13 @@
     $('edit-close').addEventListener('click', () => navigate(() => dialog.close()));
     dialog.addEventListener('cancel', event => { event.preventDefault(); navigate(() => dialog.close()); });
     $('edit-config').addEventListener('click', () => open());
-    window.addEventListener('message', event => {
-      const message = event.data;
-      if (message.type === 'update') {
-        latest = { config: message.config, documentVersion: message.documentVersion };
-        $('edit-config').disabled = !latest.config;
-        if (dialog.open && !pending) {
-          if (dirty) { if (stale()) notice('設定が別の場所で変更されました。入力を確認し、「再読込」してから編集してください。', true); controls(); }
-          else if (latest.config) load(kind, index);
-          else { notice('設定にエラーがあります。設定ファイルで修正してください。', true); controls(); }
-        }
-      } else if (message.type === 'editResult' && message.requestId === pending) {
-        pending = null;
-        if (message.ok) {
-          latest = { config: message.config, documentVersion: message.documentVersion }; load(kind, message.index === null ? undefined : message.index);
-          notice('保存しました。相関図に反映されています。');
-        } else { notice(message.message || '保存できませんでした。', true); controls(); }
+    host.onConfig(message => {
+      latest = { config: message.config, documentVersion: message.documentVersion };
+      $('edit-config').disabled = !latest.config;
+      if (dialog.open && !pending) {
+        if (dirty) { if (stale()) notice('設定が別の場所で変更されました。入力を確認し、「再読込」してから編集してください。', true); controls(); }
+        else if (latest.config) load(kind, index);
+        else { notice('設定にエラーがあります。設定ファイルで修正してください。', true); controls(); }
       }
     });
     return { open };

@@ -92,7 +92,7 @@
   },
   "scripts": {
     "test": "node --test test/*.test.js",
-    "check": "node --check src/extension.js && node --check src/config.js && node --check src/webview.js && node --check media/graph.js && node --check media/main.js && node --check src/storage.js && node --check src/edit.js && node --check media/editor.js",
+    "check": "node --check src/extension.js && node --check src/config.js && node --check src/webview.js && node --check media/graph.js && node --check media/main.js && node --check src/storage.js && node --check src/edit.js && node --check media/editor.js && node --check media/vscode-host.js && node --check media/vscode-bootstrap.js",
     "package": "vsce package --out character-relationship-chart.vsix"
   },
   "dependencies": {

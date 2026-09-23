@@ -1,0 +1,20 @@
+/* Map host colors to the shared UI theme; defaults remain in style.css. */
+:root {
+  --theme-button-background: var(--vscode-button-background);
+  --theme-button-foreground: var(--vscode-button-foreground);
+  --theme-button-hoverBackground: var(--vscode-button-hoverBackground);
+  --theme-descriptionForeground: var(--vscode-descriptionForeground);
+  --theme-editor-background: var(--vscode-editor-background);
+  --theme-editor-foreground: var(--vscode-editor-foreground);
+  --theme-errorForeground: var(--vscode-errorForeground);
+  --theme-focusBorder: var(--vscode-focusBorder);
+  --theme-font-family: var(--vscode-font-family);
+  --theme-input-background: var(--vscode-input-background);
+  --theme-input-foreground: var(--vscode-input-foreground);
+  --theme-input-placeholderForeground: var(--vscode-input-placeholderForeground);
+  --theme-inputValidation-errorBackground: var(--vscode-inputValidation-errorBackground);
+  --theme-inputValidation-errorBorder: var(--vscode-inputValidation-errorBorder);
+  --theme-panel-border: var(--vscode-panel-border);
+  --theme-sideBar-background: var(--vscode-sideBar-background);
+  --theme-toolbar-hoverBackground: var(--vscode-toolbar-hoverBackground);
+}

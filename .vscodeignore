@@ -27,6 +27,10 @@ exports/**
 /*.svg
 package-lock.json
 TESTING.md
+MGMT.md
+MGMT-archive.md
+Instructions-for-ChatGPT.md
+docs/architecture.md
 docs/RELEASE.md
 docs/DEVELOPMENT.md
 .gitignore
