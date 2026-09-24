@@ -4,6 +4,7 @@ node_modules/**
 
 test/**
 scripts/**
+web/**
 .vscode/**
 .github/**
 .git/**

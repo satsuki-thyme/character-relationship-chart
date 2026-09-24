@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Character Relationship Chart</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="web.css">
+</head>
+<body>
+  <section class="web-bar" aria-label="ファイルの読込">
+    <div class="web-heading"><strong>Character Relationship Chart</strong><span>読取専用</span></div>
+    <div class="web-actions">
+      <button id="web-open" class="primary" type="button">設定を開く</button>
+      <button id="web-open-view" type="button" disabled>表示データを開く</button>
+      <button id="web-sample" type="button">サンプル</button>
+      <input id="web-files" type="file" accept=".jsonc,.json" multiple hidden aria-label="設定と任意の表示データを選択">
+      <input id="web-view" type="file" accept=".view.json" hidden aria-label="対応する表示データを選択">
+    </div>
+    <p class="web-note">JSONC / JSONを選択、または画面へドロップ。対応する .view.json も読み込めます。<br>内容は端末内で表示します。編集・保存はできず、配置の変更も画面を閉じると消えます。</p>
+    <p id="web-file" aria-live="polite">サンプルを読み込み中…</p>
+  </section>
+  <!-- SHARED_UI -->
+  <noscript>表示にはJavaScriptを有効にしてください。</noscript>
+  <script src="app.js"></script>
+</body>
+</html>

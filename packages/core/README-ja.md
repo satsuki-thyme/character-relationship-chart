@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-VS Code拡張と今後のWebホストで共有するデータ処理をまとめた非公開パッケージです。ファイル・ネットワーク・保存先・DOM・VS Codeの操作は行いません。依存はルートプロジェクトで既に導入する `jsonc-parser` 3.3.1のみです。
+VS Code拡張と読取専用Webホストで共有するデータ処理をまとめた非公開パッケージです。ファイル・ネットワーク・保存先・DOM・VS Codeの操作は行いません。依存はルートプロジェクトで既に導入する `jsonc-parser` 3.3.1のみです。
 
 ```js
 const core = require('./packages/core'); // プロジェクトルートから利用する場合。
@@ -25,6 +25,6 @@ if (!result.issues.length) {
 
 データ形式はversion 1のまま、`nodes`・`groups`・`edges` を維持します。項目の制約は [DATA_FORMAT.md](../../docs/DATA_FORMAT.md) を参照してください。ファイル選択・バイト列の読込と保存・文書の版・競合検知・Undo・エラーの表示は各ホストが担当します。
 
-入口はCommonJSです。Webでの利用時は `jsonc-parser` とともにバンドルできますが、この段階ではWebアプリやブラウザ用バンドルを提供しません。`graph.js` は通常のscriptとしても読み込め、現在の共通UIは `globalThis.RelationsGraph` を使います。`media/graph.js`、`src/config.js`、`src/edit.js` は既存のCommonJS呼び出し側のための互換入口です。
+入口はCommonJSです。読取専用Web版は解析・表示データのモジュールを `jsonc-parser` の公開ESM入口とともにバンドルします。[Web版の説明](../../web/README-ja.md) を参照してください。`graph.js` は通常のscriptとしても読み込め、現在の共通UIは `globalThis.RelationsGraph` を使います。`media/graph.js`、`src/config.js`、`src/edit.js` は既存のCommonJS呼び出し側のための互換入口です。
 
 ルートの `npm test` は、Node.js組み込みモジュール・`process`・`Buffer`・DOM・VS Code APIを持たないJavaScript実行環境で公開入口を検証します。従来の設定・編集・描画計算・保存の回帰テストも継続します。

@@ -2,7 +2,7 @@
 
 [日本語](README-ja.md)
 
-This private package contains the data operations shared by the VS Code extension and a future Web host. It performs no file, network, storage, DOM or VS Code operations. Its only dependency is `jsonc-parser` 3.3.1, already installed by the root project.
+This private package contains the data operations shared by the VS Code extension and the read-only Web host. It performs no file, network, storage, DOM or VS Code operations. Its only dependency is `jsonc-parser` 3.3.1, already installed by the root project.
 
 ```js
 const core = require('./packages/core'); // From the project root.
@@ -25,6 +25,6 @@ if (!result.issues.length) {
 
 The data format remains version 1 with the existing `nodes`, `groups`, and `edges` keys. See [DATA_FORMAT.md](../../docs/DATA_FORMAT.md) for field and operation constraints. Hosts remain responsible for file selection, reading/writing bytes, document revisions, conflict detection, Undo and presentation of errors.
 
-The package entry is CommonJS. A future Web build can bundle it together with `jsonc-parser`; this stage does not ship that application or a browser bundle. `graph.js` also supports direct script loading as `globalThis.RelationsGraph`, which the current shared UI uses. `media/graph.js`, `src/config.js`, and `src/edit.js` are compatibility entry points for existing CommonJS callers.
+The package entry is CommonJS. The read-only Web build bundles the parsing and view-state modules with the published ESM entry of `jsonc-parser`; see [the Web viewer](../../web/README.md). `graph.js` also supports direct script loading as `globalThis.RelationsGraph`, which the current shared UI uses. `media/graph.js`, `src/config.js`, and `src/edit.js` are compatibility entry points for existing CommonJS callers.
 
 `npm test` at the project root covers the public entry point in a JavaScript context without Node built-ins, `process`, `Buffer`, DOM or VS Code APIs, in addition to the existing configuration, editing, geometry and storage regression tests.

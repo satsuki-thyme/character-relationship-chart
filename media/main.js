@@ -4,7 +4,15 @@
   window.RelationsUi = host => {
     const G = RelationsGraph, NS = 'http://www.w3.org/2000/svg';
     const $ = id => document.getElementById(id);
-    const editor = window.RelationsEditor(host);
+    // Omitted capabilities retain the existing full-featured host contract.
+    const capabilities = { edit: true, viewStorage: true, openSource: true, exportSvg: true, ...host.capabilities };
+    const editor = capabilities.edit ? window.RelationsEditor(host) : null;
+    for (const [enabled, ids] of [
+      [capabilities.edit, ['edit-config', 'config-editor']],
+      [capabilities.viewStorage, ['save-view', 'reload-view', 'open-view', 'storage-file', 'storage-status', 'storage-error']],
+      [capabilities.openSource, ['open-source']], [capabilities.exportSvg, ['export']]
+    ]) if (!enabled) for (const id of ids) { $(id).hidden = true; if ('disabled' in $(id)) $(id).disabled = true; }
+    if (!capabilities.edit) $('empty').textContent = '人物・項目がありません。別の設定ファイルを読み込んでください。';
     const svg = $('canvas'), viewport = $('viewport');
     let state = { version: 1 }, graph, positioned = [], paths = [], selected = null, drag = null;
     let camera = { x: 0, y: 0, scale: 1 }, hasCamera = false, pendingFrame = false;
@@ -23,7 +31,7 @@
     function save() {
       const rect = svg.getBoundingClientRect();
       state.version = 1; state.camera = { ...camera, width: rect.width, height: rect.height };
-      host.updateView(state);
+      if (capabilities.viewStorage) host.updateView(state);
     }
     function applyUi() {
       state.ui ||= { details: false, focus: false };
@@ -39,7 +47,7 @@
       lastSize = { width: rect.width, height: rect.height }; save();
     }
     function restoreCamera() {
-      if (!state.camera) { hasCamera = false; if (graph) requestAnimationFrame(() => fit(false)); return; }
+      if (!state.camera) { hasCamera = false; if (graph) requestAnimationFrame(() => { if (!hasCamera) fit(false); }); return; }
       const rect = svg.getBoundingClientRect(), c = state.camera;
       camera = { x: c.x + (c.width ? (rect.width - c.width) / 2 : 0), y: c.y + (c.height ? (rect.height - c.height) / 2 : 0), scale: c.scale };
       hasCamera = true; lastSize = { width: rect.width, height: rect.height }; transform();
@@ -139,7 +147,7 @@
       if (!selected) {
         box.append(el('h2', 'detail-heading', 'つながりを読む'), el('p', 'detail-note', '人物や関係線を選ぶと、ここに詳しい情報を表示します。'));
         const help = el('div', 'detail-help');
-        for (const text of [graph.description, '人物をドラッグして、見やすい位置へ。', '空白をドラッグして、図全体を移動。', '配置・倍率などは、設定の隣の .view.json に自動保存します。2つのファイルを一緒に共有できます。'].filter(Boolean)) help.append(el('p', '', text));
+        for (const text of [graph.description, '人物をドラッグして、見やすい位置へ。', '空白をドラッグして、図全体を移動。', capabilities.viewStorage ? '配置・倍率などは、設定の隣の .view.json に自動保存します。2つのファイルを一緒に共有できます。' : '配置・倍率の変更はこの画面だけに反映され、保存されません。'].filter(Boolean)) help.append(el('p', '', text));
         box.append(help); return;
       }
       if (selected.kind === 'node') {
@@ -148,7 +156,7 @@
         const groups = groupsFor(node), groupLabel = groups.map(g => g.label).join(' / ');
         for (const group of groups) box.append(badge(group.label, group.color));
         box.append(el('h2', 'detail-heading', node.label), el('p', 'detail-note', node.description || '説明はまだありません。'), el('div', 'detail-id', `ID: ${node.id}`));
-        const editButton = el('button', 'detail-edit', 'このキャラクターを編集'); editButton.addEventListener('click', () => editor.open('nodes', node.id)); box.append(editButton);
+        if (editor) { const editButton = el('button', 'detail-edit', 'このキャラクターを編集'); editButton.addEventListener('click', () => editor.open('nodes', node.id)); box.append(editButton); }
         const related = graph.edges.filter(e => e.from === node.id || e.to === node.id);
         box.append(el('div', 'detail-section', `つながり · ${related.length}`));
         for (const edge of related) {
@@ -168,7 +176,7 @@
           button.addEventListener('click', () => select({ kind: 'node', id })); box.append(button);
         }
         box.append(el('p', 'detail-note', edge.description || 'この関係の説明はまだありません。'));
-        const editButton = el('button', 'detail-edit', 'この関係を編集'); editButton.addEventListener('click', () => editor.open('edges', edge.index)); box.append(editButton);
+        if (editor) { const editButton = el('button', 'detail-edit', 'この関係を編集'); editButton.addEventListener('click', () => editor.open('edges', edge.index)); box.append(editButton); }
         box.append(el('div', 'detail-id', `線の形: ${{ auto: '自動', straight: '直線', curved: '曲線' }[edge.shape || 'auto']}`));
         if (edge.setId) box.append(el('div', 'detail-id', `セットID: ${edge.setId}`));
       }
@@ -253,7 +261,7 @@
     });
 
     function exportSvg() {
-      if (!graph || !positioned.length || issueMessages.length) return;
+      if (!capabilities.exportSvg || !graph || !positioned.length || issueMessages.length) return;
       const box = G.bounds(positioned, paths), pad = 50, titleSpace = 54;
       const root = svgEl('svg', { width: Math.ceil(box.width + pad * 2), height: Math.ceil(box.height + pad * 2 + titleSpace), viewBox: `${box.x - pad} ${box.y - pad - titleSpace} ${box.width + pad * 2} ${box.height + pad * 2 + titleSpace}` });
       const bg = getComputedStyle(document.body).backgroundColor, fg = getComputedStyle(document.body).color;
@@ -278,15 +286,17 @@
       }
       host.exportSvg(new XMLSerializer().serializeToString(root));
     }
-    $('open-source').addEventListener('click', () => host.openSource());
+    if (capabilities.openSource) $('open-source').addEventListener('click', () => host.openSource());
     $('fit').addEventListener('click', () => fit());
     $('toggle-details').addEventListener('click', () => setUi('details', !state.ui?.details));
     $('close-details').addEventListener('click', () => setUi('details', false));
     $('focus').addEventListener('click', () => { $('more-menu').open = false; setUi('focus', true); });
     $('exit-focus').addEventListener('click', () => setUi('focus', false));
-    $('open-view').addEventListener('click', () => { save(); host.openView(); });
-    $('save-view').addEventListener('click', () => { save(); host.saveView(); });
-    $('reload-view').addEventListener('click', () => host.reloadView());
+    if (capabilities.viewStorage) {
+      $('open-view').addEventListener('click', () => { save(); host.openView(); });
+      $('save-view').addEventListener('click', () => { save(); host.saveView(); });
+      $('reload-view').addEventListener('click', () => host.reloadView());
+    }
     document.addEventListener('keydown', e => { if ($('config-editor').open) return; if (e.key === 'Escape') { $('more-menu').open = false; if (state.ui?.focus) setUi('focus', false); } });
     document.addEventListener('pointerdown', e => { if (!$('more-menu').contains(e.target)) $('more-menu').open = false; });
     $('zoom-in').addEventListener('click', () => zoom(1.2)); $('zoom-out').addEventListener('click', () => zoom(1 / 1.2));
@@ -303,12 +313,19 @@
     }).observe(svg);
     new MutationObserver(() => { if (graph) render(); }).observe(document.body, { attributes: true, attributeFilter: ['class', 'style'] });
     host.onView(message => {
+      // A different document must not inherit selection, camera or positions.
+      if (message.reset) {
+        if (drag && svg.hasPointerCapture(drag.pointer)) svg.releasePointerCapture(drag.pointer);
+        drag = null; svg.classList.remove('dragging');
+        graph = null; selected = null; $('search').value = '';
+        camera = { x: 0, y: 0, scale: 1 }; hasCamera = false;
+      }
       state = message.viewState || { version: 1 };
       $('storage-file').textContent = message.fileName || '';
       applyUi(); restoreCamera();
       if (graph) { positioned = G.layout(graph, state.layout || graph.layout, state.positions); render(); }
     });
-    host.onStorage(message => {
+    if (capabilities.viewStorage) host.onStorage(message => {
       $('storage-error').hidden = message.status !== 'error';
       $('storage-error').textContent = message.status === 'error' ? `表示データの保存・読込: ${message.message}　「⋯」から保存先を開くか、配置を再読込できます。` : '';
       $('storage-status').textContent = message.status === 'error' ? '表示データ未保存' : message.status === 'pending' ? '配置を保存中…' : message.exists ? '配置をファイルに保存済み' : '操作後に配置を自動保存';
@@ -319,7 +336,7 @@
       $('error').textContent = issueMessages.length ? `${graph ? '直前の有効な図を表示中。' : ''} 設定を確認してください。\n` + issueMessages.slice(0, 5).map(e => `${e.line}行: ${e.message}`).join('\n') : '';
       statusText = issueMessages.length ? '設定エラー' : message.dirty ? '未保存の編集を反映中' : '設定を反映済み';
       $('status').textContent = statusText; $('status').title = message.fileName || '';
-      $('export').disabled = issueMessages.length > 0 || !message.graph?.nodes.length;
+      $('export').disabled = !capabilities.exportSvg || issueMessages.length > 0 || !message.graph?.nodes.length;
       if (!message.graph) return;
       const first = !graph;
       if (drag) {
@@ -337,7 +354,7 @@
       $('legend').replaceChildren(...graph.groups.map(g => badge(g.label, g.color)));
       positioned = G.layout(graph, state.layout, state.positions);
       render(); describeSelection();
-      if (first && !hasCamera) requestAnimationFrame(() => fit(false));
+      if (first && !hasCamera) requestAnimationFrame(() => { if (!hasCamera) fit(false); });
     });
     describeSelection(); host.ready();
   };

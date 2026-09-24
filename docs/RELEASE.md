@@ -4,7 +4,7 @@
 
 ## 公開するソース
 
-README、LICENSE、第三者ライセンス、package.json、package-lock.json、src、media、packages/core、schema、examples、test、docs、TESTING.md、CHANGELOG.md、`.gitignore`、`.vscodeignore`、`.vscode/launch.json` が対象です。
+README、LICENSE、第三者ライセンス、package.json、package-lock.json、src、media、packages/core、web、scripts、schema、examples、test、docs、TESTING.md、CHANGELOG.md、`.gitignore`、`.vscodeignore`、`.vscode/launch.json` が対象です。
 
 `node_modules`、VSIX・ZIP、dist、verification、テスト生成物、`backup-YYYY-MM-DD-NN` 付きバックアップ、ローカル設定、認証ファイル、個人用作品は対象外です。個人データはリポジトリ外か `private/` に置いてください。`.view.json` を一律には除外していません。公開用サンプルの配置を共有する場合は `examples/` 内のものを確認して追加できます。
 
@@ -66,3 +66,11 @@ Marketplace公開は別作業です。現在のpublisherは手動VSIX配布用�
 ## 第2段階のパッケージ確認
 
 `packages/core/` のJavaScriptとpackage.json、および `media/` の共有UI・アダプターがVSIXに必要です。Webviewが読み込む `packages/core/graph.js` の欠落に注意します。`jsonc-parser` とそのLICENSEを従来どおり同梱します。`test/`、`change-details/`、管理文書、coreの説明文書はVSIXに含めません。第2段階の手動検証用VSIXは `dist/character-relationship-chart-stage2.vsix`。公開版数・拡張IDは今回変更していません。
+
+## 第3段階の配布物
+
+- `npm run build:web` で `dist/web/` を生成し、その中身を `character-relationship-chart-web-stage3.zip` にまとめる。ZIPの直下に `index.html` を置く。
+- Web版には `index.html`、`app.js`、`shared.css`、`web.css`、英語と日本語のREADME、プロジェクトとjsonc-parserのLICENSE、サンプルJSONCの9ファイルを含める。VS Codeアダプター・GUIエディター・開発依存・個人データは含めない。
+- ZIPを別の場所へ展開し、オフラインで `index.html` を直接開いて、ファイルの読込・表示操作を確認する。配布物の一部だけを移動しない。
+- `npm run package` で共有UI変更を含むVSIXも作成する。第3段階の手動確認用は `dist/character-relationship-chart-stage3.vsix`。`web/`、`scripts/`、esbuild、Playwright、jsdomはVSIXに含めない。
+- 拡張ID・表示名・版数は第2段階と同じ。両方の配布物と元ソースの内容を照合し、検証範囲を `TESTING.md` に記録する。公開やアップロード先の新設は別途決める。

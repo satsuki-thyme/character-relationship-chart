@@ -5,7 +5,7 @@
 JSONCの解析とコメントを保持した編集に使用します。Microsoft製、MIT License。
 ソース: https://github.com/microsoft/node-jsonc-parser
 
-VSIXには実行時コードと同ライブラリの `LICENSE.md` を同梱します。次の表記も保持してください。
+VSIXには実行時コードと同ライブラリの `LICENSE.md` を同梱します。Web配布物にはバンドルされた実行コードと `jsonc-parser-LICENSE.txt` を同梱します。次の表記も保持してください。
 
 ```text
 The MIT License (MIT)
@@ -32,5 +32,7 @@ SOFTWARE.
 ```
 
 ## 開発用ツール
+
+`esbuild` 0.28.2（MIT）はWeb用のバンドル作成に使用し、lockfileで固定します。esbuild自体とプラットフォーム別バイナリーは配布物に含めません。ソース: https://github.com/evanw/esbuild
 
 `@vscode/vsce` 4.0.0（MIT）はVS Code公式のパッケージ作成ツールです。開発用依存としてlockfileで固定し、VSIXの実行時依存には含めません。開発用の間接依存の条件は、それぞれのパッケージのLICENSEおよびpackage-lock.jsonを参照してください。プロジェクトのMIT Licenseは第三者コードのライセンスを置き換えません。

@@ -1,5 +1,35 @@
 # 検証結果と実機確認手順
 
+## Web版転用・第3段階（2026-09-24 UTC）
+
+対象: 共通コアと共有UIを使う読取専用Web版。保存・編集・Undo・競合管理・本格的なディレクトリ再編は対象外。ホストの提供機能に合わせてUIを制御し、VS Code側は従来の機能を維持する。反映記録は [stage3-applied.md](change-details/character-relationship-chart-stage3-applied.md)。
+
+環境: Linux、Node.js v24.19.0、npm 11.9.0。新しい作業用コピーに依存を導入し、開発用esbuild 0.28.2だけを追加。本番jsonc-parser 3.3.1と既存依存の版数は維持した。jsdom 26.1.0、Playwright、Chromiumは検証専用の別フォルダーを使用。
+
+| 項目 | 第3段階の結果 |
+| --- | --- |
+| 構文 | `npm run check` 成功。既存15＋Web・ビルド3の計18ファイル |
+| 通常テスト | `npm test` 73件成功（第2段階66＋Webホスト7）、失敗・スキップなし |
+| DOMテスト | VS Code版12件＋Web配布物6件、計18件成功、失敗・スキップなし |
+| Webホスト | JSONC・BOM・表示データ、サイズ上限、不正入力・読込失敗時の保持、複数入力の一括検証、最後の読込要求だけの反映、購読解除・解放を検証 |
+| Webの実配布コード | 一時出力したHTML・CSS・バンドルをfile URLからjsdomで読み、実FileReaderで入力を検証。VS Code API、編集処理、ネット通信、ブラウザ保存、ダウンロードAPIを使用しないことを確認 |
+| 実ブラウザ | LinuxのChromium Headless 153.0.8010.0でオフライン起動。6人・8関係のサンプル、実ポインターでのドラッグとクリック、検索、詳細、ズームを確認 |
+| ファイル操作 | ブラウザのファイル入力で任意名のJSONCと対応する表示データを読込。配置・カメラの復元、不正入力での保持、ドロップ、キャッシュ復帰相当のイベント後の読込、再読込でのサンプル復帰を確認 |
+| 表示 | 1280×800と390×780でキャプチャを目視確認。日本語、詳細欄、図だけ表示、狭い画面で横方向にはみ出さないことを確認 |
+| 通信・CSP | 通常操作中のHTTP(S)要求は0件。CSPでインラインスクリプトと接続が拒否されることをブラウザの違反イベントで確認。Webセキュリティを無効化するフラグは使用していない |
+| Web配布 | `npm run build:web` 成功。ZIPは9ファイル。全エントリーが生成物と一致し、別の場所へ展開したZIPのindex.htmlでもオフライン起動を確認 |
+| VSIX | `npm run package` 成功。53ファイル。実行コードと検証したソースが一致し、Web固有ファイル・ビルドツール・テストを除外。展開後のコアで解析・8本の経路計算も成功 |
+| 互換性 | 共通コア5実装ファイルは第2段階と内容一致。データ形式、拡張ID・表示名・版数、本番依存の版数は変更なし |
+
+| 配布物 | バイト数 | SHA-256 |
+| --- | ---: | --- |
+| `dist/character-relationship-chart-web-stage3.zip` | 41987 | `3eef71bcfed97559d1c38e4e2c2f4b089e32e0c5af6532352b1bf5250180adf5` |
+| `dist/character-relationship-chart-stage3.vsix` | 423927 | `16007fb105a97f2296d228016be24bfbf1c62f0d8af5ba09b71538adfc444704` |
+
+最初のWeb起動検証ではjsonc-parserのUMD入口にある動的requireが見つかったため、ビルドを公開ESM入口の選択に修正し、配布物の再検証に成功した。Playwright標準のブラウザ取得は破損したアーカイブで失敗したため、検証専用の別配布Chromiumを使用した。これらの検証用依存とフォントは配布物に含めていない。
+
+未確認: Windows・macOS・Firefox・Safari、デスクトップ版VS Codeの実インストールとExtension Host・Undo。ブラウザの検証はLinuxの上記Chromiumであり、全OS・全ブラウザの動作確認ではない。VS Code側は既存の模擬API・DOM回帰検証まで。再実行方法は [開発ガイド](docs/DEVELOPMENT.md)、利用方法は [Web版README](web/README-ja.md) を参照。
+
 ## Web版転用・第2段階（2026-09-24 UTC）
 
 対象: 第1段階のホスト境界を維持し、解析・編集・描画計算・表示データ検証を `packages/core` へ分離した版。拡張ID・表示名・版数、設定と表示データの形式、本番依存・lockfileは変更していない。クリックとドラッグの区別、エッジラベルの描画順も修正した。Dropboxへの反映記録は [stage2-applied.md](change-details/character-relationship-chart-stage2-applied.md) に記載する。
