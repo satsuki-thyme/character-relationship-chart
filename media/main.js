@@ -8,7 +8,7 @@
     const svg = $('canvas'), viewport = $('viewport');
     let state = { version: 1 }, graph, positioned = [], paths = [], selected = null, drag = null;
     let camera = { x: 0, y: 0, scale: 1 }, hasCamera = false, pendingFrame = false;
-    let nodeEls = new Map(), edgeEls = new Map();
+    let nodeEls = new Map(), edgeEls = new Map(), edgeLabelEls = new Map();
     let statusText = '', issueMessages = [], lastSize;
     const svgEl = (name, attrs = {}, text) => {
       const e = document.createElementNS(NS, name);
@@ -69,7 +69,8 @@
     function groupsFor(node) { return (node.groups || (node.group ? [node.group] : [])).map(id => graph.groups.find(g => g.id === id)).filter(Boolean); }
     function defaultLine() { return getComputedStyle(document.body).getPropertyValue('--line').trim() || '#98a5ba'; }
     function paintEdges() {
-      const layer = $('edges'), defs = $('defs'); layer.replaceChildren(); defs.replaceChildren(); edgeEls = new Map();
+      const layer = $('edges'), labels = $('edge-labels'), defs = $('defs');
+      layer.replaceChildren(); labels.replaceChildren(); defs.replaceChildren(); edgeEls = new Map(); edgeLabelEls = new Map();
       paths = G.routes(positioned, graph.edges);
       for (const route of paths) {
         const edge = route.edge, color = edge.color || defaultLine();
@@ -85,14 +86,21 @@
         if (edge.style !== 'solid') line.setAttribute('stroke-dasharray', edge.style === 'dashed' ? '7 5' : '2 5');
         if (edge.style === 'dotted') line.setAttribute('stroke-linecap', 'round');
         group.append(line, svgEl('path', { class: 'edge-hit', d: route.d }));
+        const activate = event => { if (!drag?.moved) { event.stopPropagation(); select({ kind: 'edge', index: edge.index }); } };
         if (edge.label) {
+          // A separate layer keeps every label above every stroke and arrow.
+          // The edge remains the single keyboard / accessibility control.
+          const labelGroup = svgEl('g', { class: 'edge-label-group', 'data-edge': edge.index, 'aria-hidden': 'true' });
+          labelGroup.append(svgEl('title', {}, `${relationship}${edge.description ? '\n' + edge.description : ''}`));
           const lines = G.wrap(edge.label, 16, 2);
           const width = Math.min(190, Math.max(35, Math.max(...lines.map(s => Array.from(s).reduce((w, c) => w + (c.codePointAt(0) < 128 ? 6.6 : 11), 0))) + 18));
           const height = lines.length * 16 + 8;
-          group.append(svgEl('rect', { class: 'edge-label-bg', x: route.label.x - width / 2, y: route.label.y - height / 2, width, height, rx: 4 }));
-          lines.forEach((text, i) => group.append(svgEl('text', { class: 'edge-label', x: route.label.x, y: route.label.y - (lines.length - 1) * 8 + i * 16 + 4, 'text-anchor': 'middle' }, text)));
+          labelGroup.append(svgEl('rect', { class: 'edge-label-bg', x: route.label.x - width / 2, y: route.label.y - height / 2, width, height, rx: 4 }));
+          lines.forEach((text, i) => labelGroup.append(svgEl('text', { class: 'edge-label', x: route.label.x, y: route.label.y - (lines.length - 1) * 8 + i * 16 + 4, 'text-anchor': 'middle' }, text)));
+          labelGroup.addEventListener('click', activate);
+          labels.append(labelGroup); edgeLabelEls.set(edge.index, labelGroup);
         }
-        group.addEventListener('click', event => { if (!drag?.moved) { event.stopPropagation(); select({ kind: 'edge', index: edge.index }); } });
+        group.addEventListener('click', activate);
         group.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); select({ kind: 'edge', index: edge.index }); } });
         layer.append(group); edgeEls.set(edge.index, group);
       }
@@ -186,8 +194,10 @@
         item.setAttribute('aria-pressed', String(selected?.kind === 'node' && selected.id === id));
       }
       for (const [index, item] of edgeEls) {
-        item.classList.toggle('faded', Boolean(relevant && !relevant.has(index)));
-        item.classList.toggle('selected', selected?.kind === 'edge' && selected.index === index);
+        for (const part of [item, edgeLabelEls.get(index)].filter(Boolean)) {
+          part.classList.toggle('faded', Boolean(relevant && !relevant.has(index)));
+          part.classList.toggle('selected', selected?.kind === 'edge' && selected.index === index);
+        }
         item.setAttribute('aria-pressed', String(selected?.kind === 'edge' && selected.index === index));
       }
       $('stats').textContent = `${graph.nodes.length} 人物・項目 / ${graph.edges.length} 関係${query ? ` / 検索 ${matches.length} 件` : ''}`;
@@ -200,7 +210,7 @@
       svg.setPointerCapture(event.pointerId); svg.classList.add('dragging');
     }
     svg.addEventListener('pointerdown', event => {
-      if (event.button !== 0 || event.target.closest('.edge')) return;
+      if (event.button !== 0 || event.target.closest('.edge, .edge-label-group')) return;
       const p = localPoint(event);
       drag = { type: 'pan', origin: p, x: camera.x, y: camera.y, moved: false, pointer: event.pointerId };
       svg.setPointerCapture(event.pointerId); svg.classList.add('dragging');
@@ -227,8 +237,9 @@
           state.positions ||= {};
           Object.defineProperty(state.positions, finished.node.id, { value: { x: finished.node.x, y: finished.node.y, source: G.signature(original) }, writable: true, configurable: true, enumerable: true });
         }
-        select({ kind: 'node', id: finished.node.id });
-      } else if (!finished.moved) select(null);
+        // Dragging preserves both the current selection and the details mode.
+        if (!finished.moved && event.type === 'pointerup') select({ kind: 'node', id: finished.node.id });
+      } else if (!finished.moved && event.type === 'pointerup') select(null);
       save();
     }
     svg.addEventListener('pointerup', finishDrag); svg.addEventListener('pointercancel', finishDrag);
@@ -244,13 +255,13 @@
     function exportSvg() {
       if (!graph || !positioned.length || issueMessages.length) return;
       const box = G.bounds(positioned, paths), pad = 50, titleSpace = 54;
-      const root = svgEl('svg', { xmlns: NS, width: Math.ceil(box.width + pad * 2), height: Math.ceil(box.height + pad * 2 + titleSpace), viewBox: `${box.x - pad} ${box.y - pad - titleSpace} ${box.width + pad * 2} ${box.height + pad * 2 + titleSpace}` });
+      const root = svgEl('svg', { width: Math.ceil(box.width + pad * 2), height: Math.ceil(box.height + pad * 2 + titleSpace), viewBox: `${box.x - pad} ${box.y - pad - titleSpace} ${box.width + pad * 2} ${box.height + pad * 2 + titleSpace}` });
       const bg = getComputedStyle(document.body).backgroundColor, fg = getComputedStyle(document.body).color;
       root.append(svgEl('title', {}, graph.title), svgEl('desc', {}, graph.description));
       root.append(svgEl('rect', { x: box.x - pad, y: box.y - pad - titleSpace, width: box.width + pad * 2, height: box.height + pad * 2 + titleSpace, fill: bg }));
       root.append(svgEl('text', { x: box.x, y: box.y - pad - 13, fill: fg, 'font-size': 23, 'font-family': 'sans-serif', 'font-weight': 600 }, graph.title));
       root.append($('defs').cloneNode(true));
-      for (const layer of [$('edges'), $('nodes')]) {
+      for (const layer of [$('edges'), $('edge-labels'), $('nodes')]) {
         const clone = layer.cloneNode(true);
         const originals = [layer, ...layer.querySelectorAll('*')], copies = [clone, ...clone.querySelectorAll('*')];
         originals.forEach((original, i) => {
@@ -260,7 +271,7 @@
             if (value && !value.includes('var(')) target.setAttribute(prop, value);
           }
           target.removeAttribute('class'); target.removeAttribute('tabindex'); target.removeAttribute('role'); target.removeAttribute('aria-pressed');
-          target.removeAttribute('aria-label'); target.removeAttribute('data-edge'); target.removeAttribute('id');
+          target.removeAttribute('aria-label'); target.removeAttribute('aria-hidden'); target.removeAttribute('data-edge'); target.removeAttribute('id');
           if (original.classList.contains('selection') || original.classList.contains('edge-hit')) target.remove();
         });
         root.append(clone);

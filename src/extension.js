@@ -1,9 +1,8 @@
 'use strict';
 const vscode = require('vscode');
-const { parseConfig } = require('./config');
-const { editConfig } = require('./edit');
+const { parseConfig, editConfig, normalizeState } = require('../packages/core');
 const { getHtml } = require('./webview');
-const { createStorage, normalizeState, stateUri } = require('./storage');
+const { createStorage, stateUri } = require('./storage');
 const VIEW = 'characterRelationshipChart.preview.v2';
 let finishWrites = async () => {};
 function activate(context) {
@@ -144,7 +143,7 @@ function activate(context) {
       disposed = true; track(flush()); clearTimeout(textTimer); clearTimeout(watchTimer); watcher?.dispose(); panels.delete(key); diagnostics.delete(document.uri);
       for (const handler of handlers) handler.dispose();
     }));
-    watch(); webview.options = { enableScripts: true, localResourceRoots: [vscode.Uri.joinPath(context.extensionUri, 'media')] }; webview.html = getHtml(webview, context.extensionUri, vscode.Uri);
+    watch(); webview.options = { enableScripts: true, localResourceRoots: [vscode.Uri.joinPath(context.extensionUri, 'media'), vscode.Uri.joinPath(context.extensionUri, 'packages', 'core')] }; webview.html = getHtml(webview, context.extensionUri, vscode.Uri);
   }
   context.subscriptions.push(vscode.commands.registerCommand('characterRelationshipChart.open', safe(open)));
   context.subscriptions.push(vscode.commands.registerCommand('characterRelationshipChart.migrateLegacy', safe(async () => { await migration; await migrate(); })));

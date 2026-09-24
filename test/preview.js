@@ -64,7 +64,7 @@ const server = http.createServer(async (request, response) => {
     if (request.method === 'GET' && url.pathname === '/preview.css') {
       response.setHeader('Content-Type', 'text/css'); response.end('body{padding-bottom:38px}#qa-controls{position:fixed;bottom:0;left:0;z-index:1000;background:#fff;color:#111;padding:4px;font:12px sans-serif}'); return;
     }
-    if (request.method === 'GET' && /^\/media\/[\w.-]+$/.test(url.pathname)) {
+    if (request.method === 'GET' && /^\/(?:media\/[\w.-]+|packages\/core\/graph\.js)$/.test(url.pathname)) {
       const file = path.join(base, url.pathname);
       response.setHeader('Content-Type', file.endsWith('.css') ? 'text/css' : 'text/javascript'); response.end(fs.readFileSync(file)); return;
     }

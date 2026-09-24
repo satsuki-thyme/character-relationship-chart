@@ -1,0 +1,11 @@
+{
+  "name": "@character-relationship-chart/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Host-independent configuration, edits, view state and graph calculations.",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "jsonc-parser": "3.3.1"
+  }
+}

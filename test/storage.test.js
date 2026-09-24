@@ -51,3 +51,10 @@ test('portable state excludes absolute source paths and rejects invalid coordina
   assert.throws(()=>normalizeState({...state,uri:'file:///private'}),/未対応/);assert.throws(()=>normalizeState({...state,camera:{x:0,y:0,scale:Infinity}}),/倍率/);
   const legacy=normalizeState({...state,uri:'file:///private'},true);assert.equal(legacy.uri,undefined);
 });
+test('an oversized existing view file blocks migration without deleting legacy state',async()=>{
+  const h=fixture(),existing=JSON.stringify(state).padEnd(200001,' ');
+  h.files.set(stateUri(h.source).path,existing);h.states.set('view:'+h.source.toString(),state);
+  assert.equal((await h.store.migrateLegacy(h.context)).length,1);
+  assert.equal(h.states.size,1);assert.equal(h.deleted.length,0);assert.equal(h.writes.length,0);
+  assert.equal(h.files.get(stateUri(h.source).path),existing);
+});

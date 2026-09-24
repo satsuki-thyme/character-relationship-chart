@@ -8,6 +8,8 @@ scripts/**
 .github/**
 .git/**
 verification/**
+change-details/**
+packages/core/*.md
 test-results/**
 playwright-report/**
 coverage/**

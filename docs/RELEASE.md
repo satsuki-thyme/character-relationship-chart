@@ -4,7 +4,7 @@
 
 ## 公開するソース
 
-README、LICENSE、第三者ライセンス、package.json、package-lock.json、src、media、schema、examples、test、docs、TESTING.md、CHANGELOG.md、`.gitignore`、`.vscodeignore`、`.vscode/launch.json` が対象です。
+README、LICENSE、第三者ライセンス、package.json、package-lock.json、src、media、packages/core、schema、examples、test、docs、TESTING.md、CHANGELOG.md、`.gitignore`、`.vscodeignore`、`.vscode/launch.json` が対象です。
 
 `node_modules`、VSIX・ZIP、dist、verification、テスト生成物、`backup-YYYY-MM-DD-NN` 付きバックアップ、ローカル設定、認証ファイル、個人用作品は対象外です。個人データはリポジトリ外か `private/` に置いてください。`.view.json` を一律には除外していません。公開用サンプルの配置を共有する場合は `examples/` 内のものを確認して追加できます。
 
@@ -62,3 +62,7 @@ Marketplace公開は別作業です。現在のpublisherは手動VSIX配布用�
 ## 初回利用者として確認
 
 バックアップやnode_modulesを含まないソースだけを別ディレクトリへ展開し、READMEの `npm ci` から実行します。作成したVSIXをデスクトップ版VS Codeに入れ、サンプル作成→表示→GUI編集→保存→開き直しまで確認します。検証済み範囲と残りは [TESTING.md](../TESTING.md) を参照してください。
+
+## 第2段階のパッケージ確認
+
+`packages/core/` のJavaScriptとpackage.json、および `media/` の共有UI・アダプターがVSIXに必要です。Webviewが読み込む `packages/core/graph.js` の欠落に注意します。`jsonc-parser` とそのLICENSEを従来どおり同梱します。`test/`、`change-details/`、管理文書、coreの説明文書はVSIXに含めません。第2段階の手動検証用VSIXは `dist/character-relationship-chart-stage2.vsix`。公開版数・拡張IDは今回変更していません。

@@ -15,7 +15,9 @@ function dom() {
   w.SVGElement.prototype.getBoundingClientRect = () => ({ x: 0, y: 0, left: 0, top: 0, width: 1000, height: 680 });
   w.SVGElement.prototype.hasPointerCapture = () => false;
   w.requestAnimationFrame = callback => w.setTimeout(callback, 0);
-  for (const file of ['graph.js', 'editor.js', 'main.js']) w.eval(fs.readFileSync(path.join(base, 'media', file), 'utf8'));
+  for (const file of ['packages/core/graph.js', 'media/editor.js', 'media/main.js']) w.eval(fs.readFileSync(path.join(base, file), 'utf8'));
+  w.SVGElement.prototype.setPointerCapture = function () {};
+  w.SVGElement.prototype.releasePointerCapture = function () {};
   return result;
 }
 const text = '{ // keep this comment\n"title":"図","nodes":[{"id":"a","label":"A"},{"id":"b","label":"B"}],"edges":[{"from":"a","to":"b","label":"仲間"}]}';
@@ -28,8 +30,8 @@ function ui(result) {
     submit() { $('edit-form').dispatchEvent(new w.Event('submit', { bubbles: true, cancelable: true })); }
   };
 }
-async function connected() {
-  const h = harness(), result = dom(), w = result.window, doc = h.document(h.Uri.parse('file:///work/任意名.jsonc'), text);
+async function connected(source = text) {
+  const h = harness(), result = dom(), w = result.window, doc = h.document(h.Uri.parse('file:///work/任意名.jsonc'), source);
   await h.commands.get('characterRelationshipChart.open')(doc.uri);
   const panel = h.created[0], errors = [], states = [];
   let queue = Promise.resolve(), acquired = 0;
@@ -41,6 +43,104 @@ async function connected() {
   await flush();
   return { ...ui(result), h, result, w, doc, panel, errors, states, acquired, flush, async close() { w.dispatchEvent(new w.Event('pagehide')); result.window.close(); await h.dispose(); } };
 }
+function pointer(f, target, type, x, y, pointerId = 1) {
+  const event = new f.w.MouseEvent(type, { bubbles: true, cancelable: true, button: 0, clientX: x, clientY: y });
+  Object.defineProperty(event, 'pointerId', { value: pointerId });
+  target.dispatchEvent(event);
+}
+function gesture(f, index, moved, finish = 'pointerup') {
+  const node = f.w.document.querySelectorAll('.node')[index], canvas = f.$('canvas');
+  pointer(f, node, 'pointerdown', 200, 200);
+  if (moved) pointer(f, canvas, 'pointermove', 250, 230);
+  pointer(f, canvas, finish, moved ? 250 : 200, moved ? 230 : 200);
+}
+const crossed = JSON.stringify({
+  nodes: [{ id: 'a', label: 'A', x: -300, y: 0 }, { id: 'b', label: 'B', x: 300, y: 0 },
+    { id: 'c', label: 'C', x: 0, y: -240 }, { id: 'd', label: 'D', x: 0, y: 240 }],
+  edges: [{ from: 'a', to: 'b', label: 'First', shape: 'straight' },
+    { from: 'c', to: 'd', label: 'Second', shape: 'straight' },
+    { from: 'd', to: 'a', shape: 'curved' }]
+});
+test('dragging saves and reloads node positions without opening details; a subsequent click opens details', async () => {
+  const f = await connected();
+  try {
+    assert.equal(f.$('details').hidden, true);
+    gesture(f, 0, true);
+    f.$('canvas').dispatchEvent(new f.w.MouseEvent('click', { bubbles: true }));
+    f.click('save-view'); await f.flush();
+    assert.equal(f.$('details').hidden, true);
+    const saved = JSON.parse(f.h.files.get(f.doc.uri.toString() + '.view.json'));
+    assert.equal(saved.ui.details, false); assert.ok(Number.isFinite(saved.positions.a.x));
+    const before = f.w.document.querySelector('.node').getAttribute('transform');
+    f.click('reload-view'); await f.flush();
+    assert.equal(f.w.document.querySelector('.node').getAttribute('transform'), before);
+    gesture(f, 0, false); await f.flush();
+    assert.equal(f.$('details').hidden, false); assert.equal(f.$('detail-content').querySelector('h2').textContent, 'A');
+    assert.deepEqual(f.errors, []);
+  } finally { await f.close(); }
+});
+test('dragging another node preserves the current detail and selection; cancellation never activates a node', async () => {
+  const f = await connected();
+  try {
+    gesture(f, 0, false); await f.flush();
+    gesture(f, 1, true); await f.flush();
+    assert.equal(f.$('detail-content').querySelector('h2').textContent, 'A');
+    assert.equal(f.w.document.querySelectorAll('.node')[0].getAttribute('aria-pressed'), 'true');
+    f.click('close-details');
+    gesture(f, 1, false, 'pointercancel'); await f.flush();
+    assert.equal(f.$('details').hidden, true);
+    assert.equal(f.w.document.querySelectorAll('.node')[0].getAttribute('aria-pressed'), 'true');
+    gesture(f, 1, true, 'pointercancel'); await f.flush();
+    assert.equal(f.$('details').hidden, true);
+  } finally { await f.close(); }
+});
+test('small pointer movement remains a click and keyboard selection still opens details', async () => {
+  const f = await connected();
+  try {
+    pointer(f, f.w.document.querySelector('.node'), 'pointerdown', 200, 200);
+    pointer(f, f.$('canvas'), 'pointermove', 202, 201);
+    pointer(f, f.$('canvas'), 'pointerup', 202, 201);
+    assert.equal(f.$('details').hidden, false);
+    f.click('close-details');
+    f.w.document.querySelectorAll('.node')[1].dispatchEvent(new f.w.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    assert.equal(f.$('details').hidden, false); assert.equal(f.$('detail-content').querySelector('h2').textContent, 'B');
+  } finally { await f.close(); }
+});
+test('every edge label and its background paint above every edge, including after drag and selection', async () => {
+  const f = await connected(crossed);
+  try {
+    const checkOrder = () => {
+      const lines = [...f.w.document.querySelectorAll('.edge-line')];
+      const labels = [...f.w.document.querySelectorAll('.edge-label, .edge-label-bg')];
+      assert.equal(lines.length, 3); assert.equal(labels.length, 4);
+      for (const line of lines) for (const label of labels) assert.ok(line.compareDocumentPosition(label) & f.w.Node.DOCUMENT_POSITION_FOLLOWING);
+    };
+    checkOrder();
+    f.w.document.querySelector('.edge-label-bg').dispatchEvent(new f.w.MouseEvent('click', { bubbles: true }));
+    assert.equal(f.$('detail-content').querySelector('h2').textContent, 'First');
+    assert.equal(f.w.document.querySelector('.edge[data-edge="0"]').getAttribute('aria-pressed'), 'true');
+    f.w.document.querySelector('.edge[data-edge="1"]').dispatchEvent(new f.w.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    assert.equal(f.$('detail-content').querySelector('h2').textContent, 'Second');
+    gesture(f, 0, true); await f.flush(); await new Promise(resolve => f.w.setTimeout(resolve, 10));
+    checkOrder();
+    f.fill('search', 'A');
+    const label = f.w.document.querySelectorAll('.edge-label-bg')[1];
+    assert.equal(label.closest('.faded') !== null, true);
+  } finally { await f.close(); }
+});
+test('exported SVG paints all labels above all edge paths and retains arrow markers', async () => {
+  const f = await connected(crossed);
+  try {
+    const target = f.h.Uri.parse('file:///work/layers.svg'); f.h.selections.push(target); f.click('export'); await f.flush();
+    const svg = new f.w.DOMParser().parseFromString(f.h.files.get(target.toString()).toString(), 'image/svg+xml');
+    assert.equal(svg.querySelector('parsererror'), null);
+    const labels = [...svg.querySelectorAll('text')].filter(e => ['First', 'Second'].includes(e.textContent));
+    const lines = [...svg.querySelectorAll('path[marker-end]')];
+    assert.equal(labels.length, 2); assert.equal(lines.length, 3);
+    for (const line of lines) for (const label of labels) assert.ok(line.compareDocumentPosition(label) & f.w.Node.DOCUMENT_POSITION_FOLLOWING);
+    for (const line of lines) assert.ok(svg.querySelector(line.getAttribute('marker-end').slice(4, -1)));
+  } finally { await f.close(); }
+});
 test('shared UI renders and submits through an injected host with no VS Code or message transport', async () => {
   const result = dom(), w = result.window, u = ui(result), callbacks = { config: [], view: [], storage: [] }, calls = [];
   const current = parseConfig(text);

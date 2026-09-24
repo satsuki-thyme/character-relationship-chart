@@ -1,6 +1,6 @@
 # データ仕様（形式version 1）
 
-実装の正本は `src/config.js`（本体データの検証）、`src/storage.js`（表示データ）、`media/graph.js`（座標・線の計算）です。Schemaは `schema/` にあります。アプリ版0.1.0とデータ形式の `version: 1` は別です。
+実装の正本は `packages/core/config.js`（本体データの検証）、`packages/core/view-state.js`（表示データ）、`packages/core/graph.js`（座標・線の計算）です。Schemaは `schema/` にあります。アプリ版0.1.0とデータ形式の `version: 1` は別です。
 
 ## 本体ファイル
 

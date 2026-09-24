@@ -75,7 +75,9 @@ test('Webview composition supplies nonce-protected adapter scripts and local sha
   assert.ok(html.includes(`script-src &#39;nonce-${scripts[0][1]}&#39;`)); assert.doesNotMatch(html, /unsafe-inline/);
   assert.ok(html.includes(fs.readFileSync(path.join(__dirname, '../media/ui.html'), 'utf8')));
   assert.match(html, /vscode-theme\.css/);
-  for (const match of scripts) assert.ok(fs.existsSync(path.join(__dirname, '../media', path.basename(match[2]))));
+  assert.equal(new URL(scripts[0][2]).pathname, '/packages/core/graph.js');
+  for (const match of scripts) assert.ok(fs.existsSync(path.join(__dirname, '..', new URL(match[2]).pathname)));
+
 });
 test('the adapter integrates with extension storage, GUI edits, stale revisions, and SVG export', async () => {
   const h = harness(), f = fixture();
