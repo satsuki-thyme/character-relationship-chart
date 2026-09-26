@@ -4,6 +4,11 @@
   window.RelationsEditor = host => {
     const $ = id => document.getElementById(id), dialog = $('config-editor'), form = $('edit-form');
     const names = { general: '全体', nodes: 'キャラクター', groups: 'グループ', edges: '関係' };
+    const persists = host.capabilities?.persistEdits !== false;
+    if (!persists) {
+      $('edit-save').textContent = '反映';
+      $('editor-description').textContent = '人物・所属・つながりを編集し、閉じてから設定をダウンロード';
+    }
     let latest, base, kind = 'general', index = null, dirty = false, pending = false, groupOrder = [];
     const el = (tag, text, attrs = {}) => {
       const item = document.createElement(tag); if (text !== undefined) item.textContent = text;
@@ -21,7 +26,7 @@
       $('edit-reload').disabled = !!pending;
       $('edit-add').disabled = !!pending || !latest?.config;
       $('edit-close').disabled = !!pending;
-      $('edit-state').textContent = pending ? '保存中…' : stale() ? '設定が変更されています' : dirty ? '未保存の入力あり' : '設定ファイルへ保存';
+      $('edit-state').textContent = pending ? (persists ? '保存中…' : '反映中…') : stale() ? '設定が変更されています' : dirty ? (persists ? '未保存の入力あり' : '未反映の入力あり') : persists ? '設定ファイルへ保存' : 'ページ内の設定へ反映';
     }
     function ask(text, action, label = '破棄して続ける') {
       const box = $('edit-confirm'); box.replaceChildren(el('p', text)); box.hidden = false;
@@ -123,7 +128,7 @@
       const list = base.config[kind] || [];
       index = kind === 'general' ? null : nextIndex !== undefined ? nextIndex : list.length ? 0 : null;
       if (index !== null && !list[index]) index = list.length ? 0 : null;
-      dirty = false; notice('変更は「保存して反映」で設定ファイルに保存されます。'); render();
+      dirty = false; notice(persists ? '変更は「保存して反映」で設定ファイルに保存されます。' : '「反映」で図を更新します。ファイルを残すには編集画面を閉じて「設定をダウンロード」を使ってください。'); render();
     }
     function open(nextKind = 'general', identifier) {
       if (!latest?.config) return;
@@ -153,7 +158,7 @@
       if (action !== 'delete' && !form.reportValidity()) return;
       const operation = { kind, action, index };
       if (action !== 'delete') operation.value = collect();
-      pending = true; $('edit-confirm').hidden = true; notice('保存しています…'); controls();
+      pending = true; $('edit-confirm').hidden = true; notice(persists ? '保存しています…' : '反映しています…'); controls();
       try {
         const result = await host.editConfig(operation, base.documentVersion);
         pending = false;
@@ -162,7 +167,7 @@
           if (!latest || latest.documentVersion <= result.documentVersion) latest = { config: result.config, documentVersion: result.documentVersion };
           if (latest.config) {
             load(kind, result.index === null ? undefined : result.index);
-            notice('保存しました。相関図に反映されています。');
+            notice(persists ? '保存しました。相関図に反映されています。' : '相関図に反映しました。ファイルを残すには「設定をダウンロード」を使ってください。');
           } else { notice('保存後に設定が変更されています。入力を確認し、設定ファイルのエラーを修正してください。', true); controls(); }
         } else { notice(result.message || '保存できませんでした。', true); controls(); }
       } catch (error) {
@@ -193,11 +198,12 @@
       latest = { config: message.config, documentVersion: message.documentVersion };
       $('edit-config').disabled = !latest.config;
       if (dialog.open && !pending) {
-        if (dirty) { if (stale()) notice('設定が別の場所で変更されました。入力を確認し、「再読込」してから編集してください。', true); controls(); }
+        if (message.reset && latest.config) load(kind);
+        else if (dirty) { if (stale()) notice('設定が別の場所で変更されました。入力を確認し、「再読込」してから編集してください。', true); controls(); }
         else if (latest.config) load(kind, index);
         else { notice('設定にエラーがあります。設定ファイルで修正してください。', true); controls(); }
       }
     });
-    return { open };
+    return { open, hasPendingChanges: () => dialog.open && (dirty || pending) };
   };
 })();

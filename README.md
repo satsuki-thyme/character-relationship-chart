@@ -1,17 +1,19 @@
 # Character Relationship Chart
 
-- 指揮: 五月タイム
-- 制作: ChatGPT
+- Concept, Direction & Product Ownership: Satsuki Thyme
+- AI-assisted Engineering: ChatGPT by OpenAI
 
 人物・グループ・関係をJSON / JSONCで管理し、相関図を表示・編集する **デスクトップ版VS Code拡張**です。小説の登場人物、組織、アイデアのつながりを整理できます。
 
-編集・保存に対応するVS Code版に加え、読取専用の最小Web版を提供します。Web版VS Code用の拡張とは別です。
+編集・保存に対応するVS Code版に加え、GUI編集と設定ファイルのダウンロードに対応するWeb版を提供します。Web版VS Code用の拡張とは別です。
 
-## 読取専用Web版
+## Web版
 
-`dist/character-relationship-chart-web-stage3.zip` をすべて展開し、`index.html` をブラウザで開いてください。起動時にサンプルが表示されます。**設定を開く**または画面へのドロップで、UTF-8のJSONC / JSONを読み込めます。任意で対応する `.view.json` も読み込めます。
+`dist/character-relationship-chart-web-stage4.zip` をすべて展開し、`index.html` をブラウザで開いてください。起動時にサンプルが表示されます。**設定を開く**または画面へのドロップで、UTF-8のJSONC / JSONを読み込めます。任意で対応する `.view.json` も読み込めます。
 
-検索・詳細表示・拡大縮小・ドラッグによる一時的な配置変更に対応します。編集・保存・SVG保存・Undo・競合管理はありません。配置変更は画面を閉じると失われます。データを外部に送信せず、利用にVS Code・Node.js・Webサーバー・ネット接続は不要です。詳しくは [Web版の使い方](web/README-ja.md)。このWeb用説明書はWeb配布物に同梱し、VSIXには含めません。
+人物・グループ・関係・全体設定を共通GUIで編集できます。**編集 → 反映 → 編集画面を閉じる → 設定をダウンロード**で、元の名前を基本とするUTF-8の `.jsonc` / `.json` を取得できます。元ファイルへは直接上書きしません。人物・グループのID変更は参照へ追従し、人物削除時には接続する関係も削除します。変更対象外のコメント・整形を可能な範囲で保持します。
+
+検索・詳細・拡大縮小・ドラッグによる一時的な配置変更を維持します。表示データの保存・SVG保存・独自Undo・競合管理・ブラウザ永続保存はありません。配置変更は画面を閉じると失われます。ダウンロード開始後も保存完了は判定できないため、ブラウザの保存先を確認してください。データを外部に送信せず、利用にVS Code・Node.js・Webサーバー・ネット接続は不要です。詳しくは [Web版の使い方](web/README-ja.md)。このWeb用説明書はWeb配布物に同梱し、VSIXには含めません。
 
 ソースから作る場合は `npm ci` → `npm run build:web` を実行し、`dist/web/index.html` を開きます。
 
@@ -134,7 +136,7 @@ VSIXの作成・手動インストールは [VS Code公式の配布手順](https
 - 新規の未保存ファイルは先に名前を付けて保存します。画面外にある図は **全体**、配置を戻す場合は **⋯ → 配置をリセット**を使います。
 - VS Code再起動時に新しい相関図タブは自動復元しません。設定から開き直すと、保存した配置を読み込みます。
 - 書き込み権限のない場所では保存できません。GUIの保存失敗時はテキストエディターに残った未保存内容を確認してください。
-- 拡張はデスクトップ版VS Code向けです。独立Web版は上記の読取専用機能に限定し、Web版VS Code用拡張・共同編集は提供していません。OS別の実機確認状況は [TESTING.md](TESTING.md) を参照してください。
+- 拡張はデスクトップ版VS Code向けです。独立Web版は上記の編集・ダウンロード方式を使い、Web版VS Code用拡張・共同編集は提供していません。OS別の実機確認状況は [TESTING.md](TESTING.md) を参照してください。
 
 ## 拡張機能の識別子と旧版からの切り替え
 
@@ -149,7 +151,7 @@ VSIXの作成・手動インストールは [VS Code公式の配布手順](https
 
 旧ID側の内部保存データや開いたタブは、新IDから自動で引き継げません。`旧版データをファイルへ移行` コマンドが対象にするのは、現在の拡張IDの内部保存領域です。ファイル保存に成功した記録だけ削除し、失敗時は元の記録を残します。
 
-解析・検証・JSONC編集・表示データ・描画計算は `packages/core/` に集約し、VS Code連携は `src/extension.js` と `src/storage.js` に分かれています。UIはホストの提供機能に応じて操作を表示します。VS Code固有の通信・起動・テーマ連携は `media/vscode-*`、読取専用Webホストは `web/host.js` が担当します。配布物はVSIXと静的Web版ZIPです。構成とWeb版への転用状況は [開発ガイド](docs/DEVELOPMENT.md) と [設計](docs/architecture.md) にあります。
+解析・検証・JSONC編集・表示データ・描画計算は `packages/core/` に集約し、VS Code連携は `src/extension.js` と `src/storage.js` に分かれています。UIはホストの提供機能に応じて操作を表示します。VS Code固有の通信・起動・テーマ連携は `media/vscode-*`、Webの読込・メモリー編集・ダウンロードは `web/host.js` が担当します。配布物はVSIXと静的Web版ZIPです。構成とWeb版への転用状況は [開発ガイド](docs/DEVELOPMENT.md) と [設計](docs/architecture.md) にあります。
 
 ## 開発・ライセンス
 

@@ -5,6 +5,7 @@ const fs = require('node:fs/promises'), os = require('node:os'), path = require(
 const { pathToFileURL } = require('node:url');
 const { JSDOM, ResourceLoader, VirtualConsole } = require('jsdom');
 const { buildWeb } = require('../scripts/build-web');
+const { parseConfig } = require('../packages/core/config');
 let output;
 test.before(async () => { output = await fs.mkdtemp(path.join(os.tmpdir(), 'relations-web-')); await buildWeb(output); });
 test.after(async () => { if (output) await fs.rm(output, { recursive: true, force: true }); });
@@ -12,7 +13,7 @@ const text = '{ // retained\n"nodes":[{"id":"a","label":"A"},{"id":"b","label":"
 const pause = () => new Promise(resolve => setTimeout(resolve, 10));
 async function until(check) { for (let i = 0; i < 100; i++) { if (check()) return; await pause(); } assert.fail('Timed out waiting for the built Web page'); }
 async function page() {
-  const errors = [], forbidden = [], assets = [];
+  const errors = [], forbidden = [], assets = [], downloads = [], urls = new Map(), confirms = [];
   class LocalAssets extends ResourceLoader {
     fetch(url, options) {
       assert.ok(url.startsWith(pathToFileURL(output + path.sep).href), 'Unexpected external asset: ' + url);
@@ -24,13 +25,19 @@ async function page() {
     resources: new LocalAssets(), runScripts: 'dangerously', pretendToBeVisual: true, virtualConsole: console,
     beforeParse(w) {
       w.ResizeObserver = class { observe() {} };
+      w.HTMLDialogElement.prototype.showModal = function () { this.open = true; };
+      w.HTMLDialogElement.prototype.close = function () { this.open = false; };
+      w.confirm = text => { confirms.push(text); return false; };
       w.SVGElement.prototype.getBoundingClientRect = () => ({ x: 0, y: 0, left: 0, top: 0, width: 1000, height: 680 });
       w.SVGElement.prototype.setPointerCapture = function () {};
       w.SVGElement.prototype.releasePointerCapture = function () {};
       w.SVGElement.prototype.hasPointerCapture = () => false;
       const block = name => () => { forbidden.push(name); throw new Error('Forbidden: ' + name); };
       for (const name of ['fetch', 'XMLHttpRequest', 'WebSocket', 'showSaveFilePicker']) w[name] = block(name);
-      w.navigator.sendBeacon = block('sendBeacon'); w.URL.createObjectURL = block('download');
+      w.navigator.sendBeacon = block('sendBeacon');
+      w.URL.createObjectURL = blob => { const url = 'blob:local-' + urls.size; urls.set(url, blob); return url; };
+      w.URL.revokeObjectURL = url => urls.delete(url);
+      w.HTMLAnchorElement.prototype.click = function () { downloads.push({ name: this.download, blob: urls.get(this.href) }); };
       w.Storage.prototype.setItem = block('storage');
       Object.defineProperty(w, 'indexedDB', { get: block('indexedDB') });
       w.addEventListener('error', event => errors.push(event.error));
@@ -38,7 +45,8 @@ async function page() {
   });
   const w = dom.window, $ = id => w.document.getElementById(id);
   try { await until(() => w.document.querySelectorAll('.node').length === 6); } catch (error) { const detail = error.message + ': ' + errors.map(e => e.stack || String(e)).join('\n') + ' status=' + $('error')?.textContent; w.close(); throw new Error(detail); }
-  return { dom, w, $, errors, forbidden, assets,
+  return { dom, w, $, errors, forbidden, assets, downloads, confirms,
+    fill(id, value) { $(id).value = value; $(id).dispatchEvent(new w.Event('input', { bubbles: true })); },
     file(name, value) { return new w.File([value], name, { type: 'application/json' }); },
     choose(id, files) { Object.defineProperty($(id), 'files', { value: files, configurable: true }); $(id).dispatchEvent(new w.Event('change')); },
     async source(value = text, name = 'cast.jsonc') { this.choose('web-files', [this.file(name, value)]); await until(() => $('web-file').textContent === name); await pause(); },
@@ -54,12 +62,14 @@ function gesture(f, moved) {
   if (moved) pointer(f, f.$('canvas'), 'pointermove', 250, 230);
   pointer(f, f.$('canvas'), 'pointerup', moved ? 250 : 200, moved ? 230 : 200);
 }
-test('built Web page starts from file URLs without VS Code, network, storage or editing UI', async () => {
+test('built Web page starts offline with shared editing UI and no direct or view storage', async () => {
   const f = await page();
   try {
     assert.equal(f.w.document.querySelectorAll('.edge').length, 8);
-    assert.equal(f.w.acquireVsCodeApi, undefined); assert.equal(f.w.RelationsEditor, undefined);
-    for (const id of ['edit-config', 'config-editor', 'save-view', 'reload-view', 'open-view', 'open-source', 'export', 'storage-status']) {
+    assert.equal(f.w.acquireVsCodeApi, undefined); assert.equal(typeof f.w.RelationsEditor, 'function');
+    assert.equal(f.$('edit-config').disabled, false); assert.equal(f.$('web-download').disabled, false);
+    assert.equal(f.$('edit-save').textContent, '反映');
+    for (const id of ['save-view', 'reload-view', 'open-view', 'open-source', 'export', 'storage-status']) {
       assert.equal(f.$(id).hidden, true, id); assert.equal(f.w.getComputedStyle(f.$(id)).display, 'none', id);
       f.$(id).click();
     }
@@ -72,7 +82,7 @@ test('file picker uses the real FileReader and displays input strings as text', 
     await f.source(text.replace('"A"', '"<img src=x onerror=alert(1)>"'), '<unsafe>.jsonc');
     gesture(f, false);
     assert.equal(f.$('details').hidden, false); assert.match(f.$('detail-content').textContent, /<img src=x/);
-    assert.equal(f.w.document.querySelectorAll('img, .detail-edit').length, 0);
+    assert.equal(f.w.document.querySelectorAll('img').length, 0); assert.equal(f.w.document.querySelectorAll('.detail-edit').length, 1);
     assert.equal(f.$('web-files').value, '');
     assert.equal(f.$('config-editor').open, false);
   } finally { f.close(); }
@@ -106,7 +116,7 @@ test('matching display data restores positions and camera; another source resets
     assert.notEqual(f.$('viewport').getAttribute('transform'), 'translate(90 110) scale(1.4)');
   } finally { f.close(); }
 });
-test('bad input keeps the last valid chart; valid empty JSONC gives a read-only message', async () => {
+test('bad input keeps the last valid chart; valid empty JSONC can be populated using the editor', async () => {
   const f = await page();
   try {
     await f.source();
@@ -115,7 +125,7 @@ test('bad input keeps the last valid chart; valid empty JSONC gives a read-only 
     f.choose('web-files', [f.file('new.jsonc', text), f.file('new.jsonc.view.json', '{broken')]); await pause();
     assert.equal(f.$('web-file').textContent, 'cast.jsonc');
     await f.source('{"nodes":[],"edges":[]}', 'empty.jsonc');
-    assert.equal(f.$('empty').hidden, false); assert.doesNotMatch(f.$('empty').textContent, /編集|追加/);
+    assert.equal(f.$('empty').hidden, false); assert.match(f.$('empty').textContent, /編集/);
     assert.equal(f.$('error').hidden, true);
   } finally { f.close(); }
 });
@@ -127,5 +137,103 @@ test('dropping files loads the pair and cancelled selection leaves the chart alo
     f.w.document.dispatchEvent(event); await until(() => f.$('web-file').textContent.startsWith('drop.jsonc +'));
     assert.equal(event.defaultPrevented, true); assert.equal(f.$('layout').value, 'circle');
     f.choose('web-files', []); await pause(); assert.equal(f.w.document.querySelectorAll('.node').length, 2);
+  } finally { f.close(); }
+});
+
+const editable = '{\r\n\t// keep header\r\n\t"title": "Original",\r\n\t"groups": [{"id":"g1","label":"One"},{"id":"g2","label":"Two"}],\r\n\t"nodes": [\r\n\t\t{"id":"a","label":"A","groups":["g1","g2"]},\r\n\t\t/* keep neighbor */ {"id":"b", "label":"B"}\r\n\t],\r\n\t"edges": [{"from":"a","to":"b","label":"Link"}]\r\n}\r\n';
+const tab = (f, kind) => f.w.document.querySelector(`[data-kind="${kind}"]`).click();
+async function submit(f) {
+  f.$('edit-form').dispatchEvent(new f.w.Event('submit', { bubbles: true, cancelable: true }));
+  await pause(); assert.equal(f.$('edit-message').classList.contains('is-error'), false, f.$('edit-message').textContent);
+}
+async function remove(f) { f.$('edit-delete').click(); f.$('edit-confirm').querySelector('.primary').click(); await pause(); }
+function readBlob(f, blob) { return new Promise((resolve, reject) => { const reader = new f.w.FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsText(blob, 'UTF-8'); }); }
+async function download(f) {
+  const count = f.downloads.length; f.$('web-download').click(); await until(() => f.downloads.length === count + 1);
+  const result = f.downloads.at(-1); return { name: result.name, text: await readBlob(f, result.blob) };
+}
+test('shared Web GUI edits every entity and downloaded JSONC round-trips comments, text and references', async () => {
+  const f = await page();
+  try {
+    await f.source(editable, '人物.jsonc'); f.$('edit-config').click();
+    f.fill('field-title', '日本語の図'); f.fill('field-description', 'Description'); await submit(f);
+    tab(f, 'groups'); f.$('edit-add').click(); f.fill('field-id', 'team'); f.fill('field-label', 'Team'); await submit(f);
+    f.fill('field-id', 'crew'); f.fill('field-label', 'Crew'); await submit(f);
+    tab(f, 'nodes'); f.$('edit-add').click(); f.fill('field-id', 'c'); f.fill('field-label', 'C');
+    for (const id of ['g1', 'crew']) f.w.document.querySelector(`input[name="groups"][value="${id}"]`).click();
+    await submit(f); assert.equal(f.w.document.querySelectorAll('.node').length, 3);
+    tab(f, 'edges'); f.$('edit-add').click(); f.fill('field-from', 'c'); f.fill('field-to', 'b'); f.fill('field-label', 'New'); await submit(f);
+    f.fill('field-label', 'Changed'); f.fill('field-shape', 'curved'); await submit(f);
+    tab(f, 'nodes'); f.$('edit-list').lastElementChild.click(); f.fill('field-id', 'hero'); f.fill('field-label', 'Hero'); await submit(f);
+    tab(f, 'groups'); f.$('edit-list').lastElementChild.click(); f.fill('field-id', 'crew2'); await submit(f);
+    f.$('edit-close').click(); const exported = await download(f), expected = parseConfig(exported.text).config;
+    assert.equal(exported.name, '人物.jsonc'); assert.equal(expected.title, '日本語の図');
+    assert.deepEqual(expected.nodes[2].groups, ['g1', 'crew2']); assert.equal(expected.edges[1].from, 'hero');
+    assert.equal(expected.edges[1].shape, 'curved'); assert.match(exported.text, /\t\/\/ keep header\r\n/);
+    assert.match(exported.text, /\t\t\/\* keep neighbor \*\//);
+    assert.ok(exported.text.includes('\t\t{"id":"a","label":"A","groups":["g1","g2"]}'));
+    assert.equal(exported.text.replace(/\r\n/g, '').includes('\n'), false);
+    assert.equal(f.downloads.length, 1, 'editing itself never downloads');
+    f.w.confirm = () => true; await f.source(exported.text, exported.name);
+    await until(() => f.$('title').textContent === '日本語の図');
+    assert.equal(f.w.document.querySelectorAll('.node').length, 3); assert.match(f.$('legend').textContent, /Crew/);
+    const reexported = await download(f); assert.equal(reexported.text, exported.text);
+    f.$('edit-config').click(); tab(f, 'groups'); f.$('edit-list').lastElementChild.click(); await remove(f);
+    tab(f, 'edges'); f.$('edit-list').lastElementChild.click(); await remove(f);
+    assert.equal(f.w.document.querySelectorAll('.edge').length, 1);
+    tab(f, 'nodes'); f.$('edit-list').firstElementChild.click(); await remove(f);
+    assert.equal(f.w.document.querySelectorAll('.edge').length, 0, 'deleting a node deletes its incident relations');
+    tab(f, 'general'); f.fill('field-title', ''); f.fill('field-description', ''); await submit(f);
+    f.$('edit-close').click(); const final = parseConfig((await download(f)).text).config;
+    assert.deepEqual(final.nodes.find(n => n.id === 'hero').groups, ['g1']);
+    assert.equal(final.title, undefined); assert.equal(final.description, undefined);
+    assert.equal(final.nodes.length, 2); assert.equal(final.groups.length, 2);
+  } finally { f.close(); }
+});
+test('node ID changes retain temporary dragged positions and selected details', async () => {
+  const f = await page();
+  try {
+    await f.source(editable); gesture(f, true); await pause(); gesture(f, false);
+    const transform = f.w.document.querySelector('.node').getAttribute('transform');
+    f.w.document.querySelector('.detail-edit').click(); f.fill('field-id', 'renamed'); await submit(f);
+    assert.equal(f.w.document.querySelector('.node').getAttribute('transform'), transform);
+    assert.match(f.$('detail-content').textContent, /ID: renamed/);
+    assert.equal(f.w.document.querySelectorAll('.node.selected').length, 1);
+    f.$('edit-close').click(); const value = parseConfig((await download(f)).text).config;
+    assert.equal(value.edges[0].from, 'renamed'); assert.deepEqual(value.nodes[0].groups, ['g1', 'g2']);
+  } finally { f.close(); }
+});
+test('invalid edits/imports and download generation failures retain the graph and GUI values', async () => {
+  const f = await page();
+  try {
+    await f.source(editable); f.$('edit-config').click(); tab(f, 'nodes'); f.fill('field-id', 'b'); f.fill('field-label', 'Do not lose this');
+    f.$('edit-form').dispatchEvent(new f.w.Event('submit', { bubbles: true, cancelable: true })); await pause();
+    assert.equal(f.$('edit-message').classList.contains('is-error'), true);
+    assert.equal(f.$('field-label').value, 'Do not lose this'); assert.equal(f.w.document.querySelectorAll('.node').length, 2);
+    f.choose('web-files', [f.file('invalid.jsonc', '{broken')]); await until(() => !f.$('error').hidden);
+    assert.equal(f.$('field-label').value, 'Do not lose this'); assert.equal(f.$('edit-save').disabled, false);
+    f.fill('field-id', 'a'); await submit(f); assert.equal(f.$('error').hidden, true);
+    const create = f.w.URL.createObjectURL; f.w.URL.createObjectURL = () => { throw new Error('generation denied'); };
+    f.$('web-download').click(); await until(() => f.$('web-message').textContent.includes('generation denied'));
+    assert.equal(f.$('field-label').value, 'Do not lose this'); assert.equal(f.$('config-editor').open, true);
+    assert.equal(f.downloads.length, 0); assert.equal(f.$('web-download').disabled, false);
+    f.w.URL.createObjectURL = create; f.$('edit-close').click();
+    assert.equal(parseConfig((await download(f)).text).config.nodes[0].label, 'Do not lose this');
+  } finally { f.close(); }
+});
+test('source replacement protects unsubmitted input and changed text until explicitly discarded', async () => {
+  const f = await page();
+  try {
+    await f.source(); f.$('edit-config').click(); f.fill('field-title', 'Draft');
+    const before = new f.w.Event('beforeunload', { cancelable: true }); f.w.dispatchEvent(before); assert.equal(before.defaultPrevented, true);
+    f.choose('web-files', [f.file('next.jsonc', '{"title":"Next","nodes":[],"edges":[]}')]);
+    await until(() => f.confirms.length === 1);
+    assert.equal(f.$('field-title').value, 'Draft'); assert.equal(f.w.document.querySelectorAll('.node').length, 2);
+    await submit(f); f.$('edit-close').click(); await download(f);
+    f.choose('web-files', [f.file('next.jsonc', text)]); await until(() => f.confirms.length === 2);
+    assert.equal(f.$('title').textContent, 'Draft');
+    f.w.confirm = () => true; await f.source('{"title":"Next","nodes":[],"edges":[]}', 'next.jsonc');
+    assert.equal(f.$('title').textContent, 'Next');
+    const after = new f.w.Event('beforeunload', { cancelable: true }); f.w.dispatchEvent(after); assert.equal(after.defaultPrevented, false);
   } finally { f.close(); }
 });

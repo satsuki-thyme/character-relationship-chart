@@ -344,6 +344,14 @@
         drag = null; svg.classList.remove('dragging');
       }
       graph = message.graph;
+      if (message.rename?.kind === 'nodes') {
+        const { from, to } = message.rename;
+        if (Object.hasOwn(state.positions || {}, from)) {
+          const positions = Object.assign(Object.create(null), state.positions);
+          positions[to] = positions[from]; delete positions[from]; state.positions = positions;
+        }
+        if (selected?.kind === 'node' && selected.id === from) selected.id = to;
+      }
       if (state.configLayout !== graph.layout || !['auto', 'circle'].includes(state.layout)) state.layout = graph.layout;
       state.configLayout = graph.layout; state.positions ||= {};
       const validIds = new Set(graph.nodes.map(n => n.id));
@@ -357,5 +365,6 @@
       if (first && !hasCamera) requestAnimationFrame(() => { if (!hasCamera) fit(false); });
     });
     describeSelection(); host.ready();
+    return { hasPendingEdits: () => editor?.hasPendingChanges() || false };
   };
 })();

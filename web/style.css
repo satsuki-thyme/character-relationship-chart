@@ -18,4 +18,6 @@ body.file-drop main { outline: 3px dashed var(--accent); outline-offset: -5px; }
   .web-bar { padding: 8px; }
   .web-heading strong { font-size: 13px; }
   .web-note { font-size: 10px; }
+  .editor-list-pane { min-width: 0; }
+  #edit-add, .edit-item { white-space: normal; overflow-wrap: anywhere; }
 }

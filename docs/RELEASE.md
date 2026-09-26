@@ -67,10 +67,17 @@ Marketplace公開は別作業です。現在のpublisherは手動VSIX配布用�
 
 `packages/core/` のJavaScriptとpackage.json、および `media/` の共有UI・アダプターがVSIXに必要です。Webviewが読み込む `packages/core/graph.js` の欠落に注意します。`jsonc-parser` とそのLICENSEを従来どおり同梱します。`test/`、`change-details/`、管理文書、coreの説明文書はVSIXに含めません。第2段階の手動検証用VSIXは `dist/character-relationship-chart-stage2.vsix`。公開版数・拡張IDは今回変更していません。
 
-## 第3段階の配布物
+## 第3段階の配布物（当時の記録）
 
 - `npm run build:web` で `dist/web/` を生成し、その中身を `character-relationship-chart-web-stage3.zip` にまとめる。ZIPの直下に `index.html` を置く。
 - Web版には `index.html`、`app.js`、`shared.css`、`web.css`、英語と日本語のREADME、プロジェクトとjsonc-parserのLICENSE、サンプルJSONCの9ファイルを含める。VS Codeアダプター・GUIエディター・開発依存・個人データは含めない。
 - ZIPを別の場所へ展開し、オフラインで `index.html` を直接開いて、ファイルの読込・表示操作を確認する。配布物の一部だけを移動しない。
 - `npm run package` で共有UI変更を含むVSIXも作成する。第3段階の手動確認用は `dist/character-relationship-chart-stage3.vsix`。`web/`、`scripts/`、esbuild、Playwright、jsdomはVSIXに含めない。
 - 拡張ID・表示名・版数は第2段階と同じ。両方の配布物と元ソースの内容を照合し、検証範囲を `TESTING.md` に記録する。公開やアップロード先の新設は別途決める。
+
+## 第4段階の配布物
+
+- `npm run build:web` で `dist/web/` を生成し、直下にindex.htmlがある `dist/character-relationship-chart-web-stage4.zip` を作る。第3段階と同じ9ファイル構成で、app.jsには共有エディターと実coreの編集処理も含む。VS Codeアダプター、開発・検証依存、外部資産は含めない。
+- 展開した配布物をオフラインで開き、GUIの「反映」→編集画面を閉じる→「設定をダウンロード」→実際に得たファイルの再読込を確認する。元ファイルへの直接上書きや表示データの保存は実装しない。
+- `npm run package` で共有UI変更に対応するVSIXを再生成する。手動確認用は `dist/character-relationship-chart-stage4.vsix`。拡張ID・表示名・版数・依存は第3段階と同じ。Web専用ファイルとテストはVSIXへ含めない。
+- 配布物と検証済みソースを照合し、結果は `TESTING.md` と `change-details/` に残す。公開・デプロイ・Marketplace作業はこの段階に含めない。

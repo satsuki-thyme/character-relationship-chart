@@ -36,7 +36,7 @@ VS Codeでプロジェクトフォルダを開いてF5を押すと、`.vscode/la
 | `schema/` | 本体と表示データのJSON Schema |
 | `examples/` | 作品固有の情報を含めない公開用サンプル |
 | `test/` | Node.js標準テスト。VS Code連携部分は模擬API |
-| `web/` | 読取専用Webホスト・起動処理・画面枠。利用者のファイルをFileReaderで読む |
+| `web/` | Webの読込・メモリー編集・設定ダウンロード・起動処理・画面枠。利用者のファイルをFileReaderで読む |
 | `scripts/build-web.js` | HTMLの組込み・ブラウザ用バンドル・配布ファイルの生成 |
 
 外部CDN、Webサーバー、クラウドDB、環境変数、固定のPCパスは実行時に不要です。テストにある `/work/` などのパスは模擬ファイルシステム用です。
@@ -59,11 +59,13 @@ VS Codeでプロジェクトフォルダを開いてF5を押すと、`.vscode/la
 
 `local` は手動VSIX配布用のpublisherです。Marketplace公開には実在するpublisherの登録が必要です。その際もpublisher変更による拡張IDの切り替えを案内してください。現在のVSIX作成・手動インストールにトークンは不要です。
 
-## Web版への転用・第3段階
+## Web版への転用・第4段階
 
-契約・起動順・現在の構成・次の段階は [architecture.md](architecture.md) を正本とします。`packages/core/` と既存UIを使う読取専用Web版を `web/` に追加しました。保存・編集・Undo・競合・全面的なパッケージ分割は行っていません。
+契約・起動順・現在の構成・次の段階は [architecture.md](architecture.md) を正本とします。`packages/core/` と既存UIを使うWeb版で、共通GUI編集と設定ダウンロードに対応しました。元ファイルへの直接上書き・表示データ保存・独自Undo・外部競合管理・永続保存・全面的なパッケージ分割は行っていません。
 
-`npm test` は計73件です。従来の66件にWebホストの読込・検証・順序制御・失敗時の保持・解放を検証する7件を加えています。共通コアと、模擬VS Codeの保存・競合・編集・SVG出力の検証を維持しています。
+`npm test` は計80件です。従来の66件にWebホスト14件を加え、読込・検証・順序制御・解放に加えて、共通編集・参照追従・コメント保持・再読込・ダウンロード生成失敗・入力保護を確認します。共通コアと、模擬VS Codeの保存・競合・編集・SVG出力の検証を維持しています。
+
+Web版は `editConfig` を共通coreへ委譲します。`persistEdits: false` で共有エディターの案内を切り替え、ダウンロードは保持中の文字列から生成します。詳しい契約と入力保護は設計書を参照してください。依存・lockfileは第3段階から変更していません。
 
 Web版の作成と操作は次のとおりです。
 
@@ -74,9 +76,9 @@ npm run build:web
 
 ビルドは [esbuildのJavaScript API](https://esbuild.github.io/api/#build) を使います。jsonc-parserのUMD入口は内部のrequireを静的に解決できないため、`mainFields: ['module', 'main']` で公開ESM入口を選びます。共有HTMLと実コードを束ね、配布物から直接起動して検証します。
 
-jsdomを下記の方法で用意した環境では `npm run test:web` で配布物を一時ディレクトリへ生成して6件のDOM検証を行えます。`node --test test/ui-dom-check.js test/web-dom-check.js` ではVS Code版12件と合わせて18件です。別フォルダーに導入した場合は、その `node_modules` を `NODE_PATH` に指定します。
+jsdomを下記の方法で用意した環境では `npm run test:web` で配布物を一時ディレクトリへ生成して10件のDOM検証を行えます。`node --test test/ui-dom-check.js test/web-dom-check.js` ではVS Code版12件と合わせて22件です。別フォルダーに導入した場合は、その `node_modules` を `NODE_PATH` に指定します。
 
-実ブラウザの検証は、プロジェクト外にPlaywrightと対応するChromiumを用意して `node test/web-browser-check.js` を実行します。必要な場合だけ `CRC_BROWSER_EXECUTABLE`、JSON配列の `CRC_BROWSER_ARGS`、画像出力先の `CRC_CAPTURE_DIR` を指定します。この検証はオフラインのfile URLから起動し、ポインター操作、ファイル読込、狭い画面、CSPを確認します。これらの検証用依存はVSIX・Web配布物に含めません。
+実ブラウザの検証は、プロジェクト外にPlaywrightと対応するChromiumを用意して `node test/web-browser-check.js` を実行します。必要な場合だけ `CRC_BROWSER_EXECUTABLE`、JSON配列の `CRC_BROWSER_ARGS`、画像出力先の `CRC_CAPTURE_DIR` を指定します。この検証はオフラインのfile URLから起動し、ポインター操作、GUI編集・ID変更、ファイル生成失敗、実際のダウンロードと再読込、狭い編集画面、CSPを確認します。これらの検証用依存はVSIX・Web配布物に含めません。
 
 DOMの追加検査はjsdom 26.1.0を検証時だけ用意して実行できます。manifest/lockfileや実行時依存には追加していません。
 
