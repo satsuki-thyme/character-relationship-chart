@@ -14,28 +14,24 @@ Character Relationship Chart
     - [x] 第2段階: 共通コアを分離し、ドラッグ時の詳細表示とエッジラベルの描画順を修正（2026-09-24、検証範囲は `TESTING.md`）
     - [x] 第3段階: 読取専用の最小Web版を実装・検証（2026-09-24、保存・編集・Undo・競合・本格再編は対象外、検証範囲は `TESTING.md`）
     - [x] 第4段階: Web版に共通GUI編集と設定ダウンロードを追加・検証（2026-09-24、直接上書き・表示データ保存・Undo・競合・本格再編は対象外、検証範囲は `TESTING.md`）
-    - [ ] ChatGPTに行程表（`Dropbox\www\studio\character-relationship-chart\docs\PROCESS_CHART.md`）を出してもらう
-    - [ ] プロジェクトを、IDADを参照して進めるよう書き直す内容をChatGPTに作ってもらう
-- [ ] 設定ファイルで変数が使えるようにする
+    - [x] 第5段階: 元設定への直接保存と競合保護を実装・検証（2026-09-28 JST）。自動試験と利用者の実機での通常保存・再読込・外部変更時の保存停止を確認して完了。未確認範囲は `docs/STAGE5_ACCEPTANCE.md`。第6段階は未着手。
+    - [x] プロジェクトを、IDADを参照して進めるよう書き直す内容をChatGPTに作ってもらう
+    - [x] ChatGPTに行程表（`Dropbox\www\studio\character-relationship-chart\docs\PROCESS_CHART.md`）を出してもらう
+
+## assignment
+
+- 設定ファイルで変数が使えるようにする
   - JSONの文字列として特殊な記法 `var(<string>)` とすることで変数の定義と利用ができる
   - 同じ変数に複数回の定義はできない
-- [ ] サンプル設定ファイルの作り替え
+- サンプル設定ファイルの作り替え
   - インラインから改行ありのものへ
-- [ ] 英語化
-  - ``` markdown
-    # language
-
-    - everything except xxx-ja.md: English
-      - documents
-      - menus
-      - commands
-      - comment in code
-      - and others
-    - xxx-ja.md: Japanese
-      - all documents have Japanese version like `README-ja.md`.
-      - translation from original documents.
-    ```
-  - [ ] キャプチャ画像を英語化
-- [ ] VS Codeマーケットプレイス
-  - [ ] 登録方法の調査
-  - [ ] 登録
+- 編集画面の変更
+  - 関係の関係リストをキャラクター名でフィルタできるようにする（インクリメンタルサーチ）
+- 英語化
+  - ドキュメント類
+  - 相関図、編集画面のGUI
+  - コードのなかのコメントなど
+  - キャプチャ画像
+- VS Codeマーケットプレイス
+  - 登録方法の調査
+  - 登録

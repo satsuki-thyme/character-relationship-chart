@@ -21,3 +21,4 @@ body.file-drop main { outline: 3px dashed var(--accent); outline-offset: -5px; }
   .editor-list-pane { min-width: 0; }
   #edit-add, .edit-item { white-space: normal; overflow-wrap: anywhere; }
 }
+#web-message.danger { color: var(--theme-errorForeground, #ed9292); font-weight: 600; }

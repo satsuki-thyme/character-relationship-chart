@@ -36,6 +36,9 @@ Instructions-for-ChatGPT.md
 docs/architecture.md
 docs/RELEASE.md
 docs/DEVELOPMENT.md
+docs/PROCESS_CHART.md
+docs/STAGE5_ACCEPTANCE.md
+docs/STAGE6_PROMPT.md
 .gitignore
 .vscodeignore
 .env

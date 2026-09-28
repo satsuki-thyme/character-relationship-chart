@@ -12,7 +12,7 @@ test.after(async () => { if (output) await fs.rm(output, { recursive: true, forc
 const text = '{ // retained\n"nodes":[{"id":"a","label":"A"},{"id":"b","label":"B"}],"edges":[{"from":"a","to":"b","label":"Together"},{"from":"b","to":"a","label":"Other"}]}';
 const pause = () => new Promise(resolve => setTimeout(resolve, 10));
 async function until(check) { for (let i = 0; i < 100; i++) { if (check()) return; await pause(); } assert.fail('Timed out waiting for the built Web page'); }
-async function page() {
+async function page(setup = () => {}) {
   const errors = [], forbidden = [], assets = [], downloads = [], urls = new Map(), confirms = [];
   class LocalAssets extends ResourceLoader {
     fetch(url, options) {
@@ -41,6 +41,7 @@ async function page() {
       w.Storage.prototype.setItem = block('storage');
       Object.defineProperty(w, 'indexedDB', { get: block('indexedDB') });
       w.addEventListener('error', event => errors.push(event.error));
+      setup(w);
     }
   });
   const w = dom.window, $ = id => w.document.getElementById(id);
@@ -236,4 +237,89 @@ test('source replacement protects unsubmitted input and changed text until expli
     assert.equal(f.$('title').textContent, 'Next');
     const after = new f.w.Event('beforeunload', { cancelable: true }); f.w.dispatchEvent(after); assert.equal(after.defaultPrevented, false);
   } finally { f.close(); }
+});
+
+function directFixture() {
+  const disk = { bytes: Buffer.from(text), permission: 'granted', writes: 0, closes: 0, fail: '', picker: '' };
+  const handle = { kind: 'file', name: 'direct.jsonc',
+    async getFile() { return new File([disk.bytes], this.name); },
+    async requestPermission() { return disk.permission; },
+    async createWritable() {
+      if (disk.fail === 'create') throw new Error('create failed');
+      let bytes;
+      return { async write(value) { disk.writes++; bytes = Buffer.from(value); if (disk.fail === 'write') throw new Error('write failed'); },
+        async close() { disk.closes++; disk.bytes = bytes; }, async abort() {} };
+    }
+  };
+  return { disk, handle, setup(w) {
+    w.TextEncoder = TextEncoder; w.TextDecoder = TextDecoder;
+    Object.defineProperty(w, 'isSecureContext', { value: true });
+    w.FileSystemFileHandle = class { createWritable() {} };
+    w.showOpenFilePicker = async () => {
+      if (disk.picker) throw Object.assign(new Error('picker failed'), { name: disk.picker });
+      return [handle];
+    };
+  } };
+}
+async function openDirect(f) { f.$('web-direct-open').click(); await until(() => f.$('web-file').textContent === 'direct.jsonc'); }
+async function editTitle(f, value) {
+  f.$('edit-config').click(); f.fill('field-title', value); f.$('edit-save').click();
+  await until(() => f.$('title').textContent === value); await pause(); f.$('edit-close').click();
+}
+test('direct-save UI only exposes supported actions and picker cancellation/failure preserves the document', async () => {
+  const fallback = await page();
+  try { assert.equal(fallback.$('web-direct-open').hidden, true); assert.equal(fallback.$('web-save').hidden, true); assert.match(fallback.$('web-save-note').textContent, /直接保存を利用できません/); }
+  finally { fallback.close(); }
+  const native = directFixture(), f = await page(native.setup);
+  try {
+    assert.equal(f.$('web-save').hidden, false); assert.equal(f.$('web-save').disabled, true);
+    for (const name of ['AbortError', 'SecurityError']) {
+      native.disk.picker = name; f.$('web-direct-open').click(); await pause();
+      assert.equal(f.$('web-file').textContent, 'characters.relations.jsonc'); assert.equal(f.$('web-download').disabled, false);
+    }
+    assert.match(f.$('web-message').textContent, /ダウンロード方式/);
+    native.disk.picker = ''; await openDirect(f); assert.equal(f.$('web-save').disabled, false);
+  } finally { f.close(); }
+});
+test('direct save keeps unapplied form input and only clears the applied document dirty state', async () => {
+  const native = directFixture(), f = await page(native.setup);
+  try {
+    await openDirect(f); await editTitle(f, '保存する内容');
+    f.$('edit-config').click(); f.fill('field-title', '未反映の入力');
+    f.$('web-save').click(); await until(() => f.$('web-message').textContent.includes('内容を確認しました'));
+    assert.equal(parseConfig(native.disk.bytes.toString()).config.title, '保存する内容');
+    assert.equal(f.$('field-title').value, '未反映の入力'); assert.equal(f.$('title').textContent, '保存する内容');
+    assert.match(f.$('web-message').textContent, /未反映のフォーム入力は保存していません/);
+    const leave = new f.w.Event('beforeunload', { cancelable: true }); f.w.dispatchEvent(leave); assert.equal(leave.defaultPrevented, true);
+    f.choose('web-files', [f.file('other.jsonc', text)]); await until(() => f.confirms.length === 1);
+    assert.equal(f.$('field-title').value, '未反映の入力'); assert.equal(f.$('web-file').textContent, 'direct.jsonc');
+    f.$('edit-save').click(); await until(() => f.$('title').textContent === '未反映の入力'); await pause(); f.$('edit-close').click();
+    f.$('web-save').click(); await until(() => native.disk.closes === 2); await pause();
+    const cleanLeave = new f.w.Event('beforeunload', { cancelable: true }); f.w.dispatchEvent(cleanLeave); assert.equal(cleanLeave.defaultPrevented, false);
+    f.$('web-sample').click(); await until(() => f.$('web-file').textContent === 'characters.relations.jsonc');
+    assert.equal(f.confirms.length, 1); assert.equal(f.$('web-save').disabled, true);
+  } finally { f.close(); }
+});
+test('conflict, permission denial and write failure preserve chart, draft and download fallback', async () => {
+  for (const fault of ['conflict', 'denied', 'create', 'write']) {
+    const native = directFixture(), f = await page(native.setup);
+    try {
+      await openDirect(f); await editTitle(f, '退避する編集');
+      f.$('edit-config').click(); f.fill('field-title', '入力を保持');
+      if (fault === 'conflict') native.disk.bytes = Buffer.from(text + '\n// external');
+      if (fault === 'denied') native.disk.permission = 'denied';
+      if (['create', 'write'].includes(fault)) native.disk.fail = fault;
+      const before = Buffer.from(native.disk.bytes), nodes = f.w.document.querySelectorAll('.node').length;
+      f.$('web-save').click(); await until(() => f.$('web-message').textContent.includes('退避できます'));
+      assert.deepEqual(native.disk.bytes, before); assert.equal(native.disk.closes, 0);
+      assert.equal(f.$('field-title').value, '入力を保持'); assert.equal(f.$('title').textContent, '退避する編集');
+      assert.equal(f.w.document.querySelectorAll('.node').length, nodes); assert.equal(f.$('web-download').disabled, false);
+      if (fault === 'conflict') { assert.match(f.$('web-message').textContent, /外部で変更/); assert.equal(f.$('web-save').disabled, true); }
+      f.$('edit-save').click(); await until(() => f.$('title').textContent === '入力を保持'); await pause(); f.$('edit-close').click();
+      f.$('web-download').click(); await until(() => f.downloads.length === 1);
+      const out = await new Promise((resolve, reject) => { const r = new f.w.FileReader(); r.onload = () => resolve(r.result); r.onerror = reject; r.readAsText(f.downloads[0].blob); });
+      assert.equal(parseConfig(out).config.title, '入力を保持'); assert.deepEqual(native.disk.bytes, before);
+      const leave = new f.w.Event('beforeunload', { cancelable: true }); f.w.dispatchEvent(leave); assert.equal(leave.defaultPrevented, true);
+    } finally { f.close(); }
+  }
 });

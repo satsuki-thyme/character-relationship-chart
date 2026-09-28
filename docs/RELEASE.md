@@ -75,9 +75,16 @@ Marketplace公開は別作業です。現在のpublisherは手動VSIX配布用�
 - `npm run package` で共有UI変更を含むVSIXも作成する。第3段階の手動確認用は `dist/character-relationship-chart-stage3.vsix`。`web/`、`scripts/`、esbuild、Playwright、jsdomはVSIXに含めない。
 - 拡張ID・表示名・版数は第2段階と同じ。両方の配布物と元ソースの内容を照合し、検証範囲を `TESTING.md` に記録する。公開やアップロード先の新設は別途決める。
 
-## 第4段階の配布物
+## 第4段階の配布物（当時の記録）
 
 - `npm run build:web` で `dist/web/` を生成し、直下にindex.htmlがある `dist/character-relationship-chart-web-stage4.zip` を作る。第3段階と同じ9ファイル構成で、app.jsには共有エディターと実coreの編集処理も含む。VS Codeアダプター、開発・検証依存、外部資産は含めない。
 - 展開した配布物をオフラインで開き、GUIの「反映」→編集画面を閉じる→「設定をダウンロード」→実際に得たファイルの再読込を確認する。元ファイルへの直接上書きや表示データの保存は実装しない。
 - `npm run package` で共有UI変更に対応するVSIXを再生成する。手動確認用は `dist/character-relationship-chart-stage4.vsix`。拡張ID・表示名・版数・依存は第3段階と同じ。Web専用ファイルとテストはVSIXへ含めない。
 - 配布物と検証済みソースを照合し、結果は `TESTING.md` と `change-details/` に残す。公開・デプロイ・Marketplace作業はこの段階に含めない。
+
+## 第5段階の配布物（2026-09-28 JST完了）
+
+- `npm run build:web` 後の `dist/web/` 直下9ファイルを `dist/character-relationship-chart-web-stage5-completed.zip` にまとめる。直接保存機能を含む新しいapp.jsであることを確認する。
+- `npm run package` 後のVSIXを `dist/character-relationship-chart-stage5-completed.vsix` とする。Webファイル・検証依存・工程表・受入手順を除外し、表示名・拡張ID・版数を維持する。
+- ZIPを別の場所へ展開し、全エントリーのバイト一致、オフライン起動を確認する。VSIXの実行コードを検証済みソースと照合する。ハッシュは変更明細に記録し、古い配布物と区別する。
+- 利用者の実機で通常保存・再読込と外部変更時の警告・保存停止を確認し、第5段階の完了判定を記録した。初回の `stage5` 配布物は保存し、今回の `stage5-completed` 配布物とはハッシュで区別する。実行コードは同じで、配布READMEの完了記録だけが変わる。OS・ブラウザ版数と未提示の個別試験を確認済みへ読み替えない。

@@ -36,7 +36,7 @@ VS Codeでプロジェクトフォルダを開いてF5を押すと、`.vscode/la
 | `schema/` | 本体と表示データのJSON Schema |
 | `examples/` | 作品固有の情報を含めない公開用サンプル |
 | `test/` | Node.js標準テスト。VS Code連携部分は模擬API |
-| `web/` | Webの読込・メモリー編集・設定ダウンロード・起動処理・画面枠。利用者のファイルをFileReaderで読む |
+| `web/` | Webの読込・メモリー編集・明示保存・ダウンロード・起動。通常読込はFileReader、直接保存はfile-access.jsのハンドル・生バイト比較 |
 | `scripts/build-web.js` | HTMLの組込み・ブラウザ用バンドル・配布ファイルの生成 |
 
 外部CDN、Webサーバー、クラウドDB、環境変数、固定のPCパスは実行時に不要です。テストにある `/work/` などのパスは模擬ファイルシステム用です。
@@ -59,7 +59,7 @@ VS Codeでプロジェクトフォルダを開いてF5を押すと、`.vscode/la
 
 `local` は手動VSIX配布用のpublisherです。Marketplace公開には実在するpublisherの登録が必要です。その際もpublisher変更による拡張IDの切り替えを案内してください。現在のVSIX作成・手動インストールにトークンは不要です。
 
-## Web版への転用・第4段階
+## Web版への転用・第4段階（当時の記録）
 
 契約・起動順・現在の構成・次の段階は [architecture.md](architecture.md) を正本とします。`packages/core/` と既存UIを使うWeb版で、共通GUI編集と設定ダウンロードに対応しました。元ファイルへの直接上書き・表示データ保存・独自Undo・外部競合管理・永続保存・全面的なパッケージ分割は行っていません。
 
@@ -103,3 +103,25 @@ node test/preview.js
 ## 変更時の注意
 
 本体のデータ仕様を変えたら、Schema・GUI・データ仕様書・サンプルの対応も確認します。保存周辺では外部編集との競合を上書きしないこと、失敗時に未保存内容を残すことを維持してください。実機での確認項目は [TESTING.md](../TESTING.md) にあります。
+
+## 第5段階の開発・検証
+
+直接保存は `web/file-access.js` と `web/host.js` に閉じ込めた。`npm run check` は新ファイルを含む19ファイル、`npm test` は96件。通常のWeb読込・GUI・ダウンロードを維持し、共有coreとVS Codeの保存処理は変更していない。本番依存、lockfile、名称・識別子・版数も維持する。
+
+```sh
+npm run check
+npm test
+npm run test:web
+node --test test/ui-dom-check.js test/web-dom-check.js
+npm run build:web
+node test/web-browser-check.js
+node test/web-save-browser-check.js
+node test/web-native-file-check.js
+npm run package
+```
+
+DOM試験はjsdom 26.1.0を外部に用意し、必要に応じて `NODE_PATH` を指定する。Web13件と共有UI12件、計25件。ブラウザ試験もPlaywrightを検証用に用意し、既存の `CRC_BROWSER_EXECUTABLE` / `CRC_BROWSER_ARGS` を使用する。`CRC_CAPTURE_DIR` は任意の画像保存先。実行時依存へは追加しない。
+
+`web-save.test.js` は生バイト競合、保存途中の外部変更、権限・読込・write・close・abort・読戻し失敗、結果不明時の停止、保存中の追加編集／二重保存／切替、取消・解放・不正UTF-8を検証する。`web-save-browser-check.js` は実ブラウザのGUIを模擬ハンドルへ接続するため、OSファイル選択やネイティブ書込成功の証明にはならない。`web-native-file-check.js` はテスト用一時ファイルのネイティブAPI読込・書込を試す。選択の代わりにCDPドラッグから得たネイティブハンドルをテスト内だけで渡し、成功・拒否を区別して出力する。今回の環境では拒否となり、元ファイルと編集中内容の保持を確認した。
+
+利用者の通常保存・再読込・外部変更時の保存停止の報告を自動試験と照合し、第5段階を完了とした。実機環境の詳細と個別試験の未確認範囲は [STAGE5_ACCEPTANCE.md](STAGE5_ACCEPTANCE.md) に残す。完了記録を含む配布物は `stage5-completed` 名で再生成する。第6段階開始前に、対象ソースが第5段階の成果物に一致しているか確認し、利用者の差分を保護する。

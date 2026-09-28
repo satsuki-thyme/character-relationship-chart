@@ -13,13 +13,16 @@
     <div class="web-heading"><strong>Character Relationship Chart</strong><span>Web版</span></div>
     <div class="web-actions">
       <button id="web-open" class="primary" type="button">設定を開く</button>
+      <button id="web-direct-open" type="button" hidden>直接保存用に開く</button>
       <button id="web-open-view" type="button" disabled>表示データを開く</button>
       <button id="web-sample" type="button">サンプル</button>
+      <button id="web-save" type="button" hidden disabled>保存</button>
       <button id="web-download" type="button" disabled>設定をダウンロード</button>
       <input id="web-files" type="file" accept=".jsonc,.json" multiple hidden aria-label="設定と任意の表示データを選択">
       <input id="web-view" type="file" accept=".view.json" hidden aria-label="対応する表示データを選択">
     </div>
-    <p class="web-note">JSONC / JSONを選択、または画面へドロップ。対応する .view.json も読み込めます。<br>「編集」→「反映」の後、設定をダウンロードできます。元ファイルには上書きせず、配置の変更は保存しません。内容は外部へ送信しません。</p>
+    <p class="web-note">JSONC / JSONを選択、または画面へドロップ。対応する .view.json も読み込めます。<br>「編集」→「反映」の後、編集画面を閉じて保存・ダウンロードします。未反映の入力や配置の変更は保存しません。内容は外部へ送信しません。</p>
+    <p id="web-save-note" class="web-note"></p>
     <p id="web-file" aria-live="polite">サンプルを読み込み中…</p>
     <p id="web-message" class="web-note" role="status"></p>
   </section>

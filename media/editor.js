@@ -7,7 +7,7 @@
     const persists = host.capabilities?.persistEdits !== false;
     if (!persists) {
       $('edit-save').textContent = '反映';
-      $('editor-description').textContent = '人物・所属・つながりを編集し、閉じてから設定をダウンロード';
+      $('editor-description').textContent = '人物・所属・つながりを編集し、閉じてから設定を保存・ダウンロード';
     }
     let latest, base, kind = 'general', index = null, dirty = false, pending = false, groupOrder = [];
     const el = (tag, text, attrs = {}) => {
@@ -128,7 +128,7 @@
       const list = base.config[kind] || [];
       index = kind === 'general' ? null : nextIndex !== undefined ? nextIndex : list.length ? 0 : null;
       if (index !== null && !list[index]) index = list.length ? 0 : null;
-      dirty = false; notice(persists ? '変更は「保存して反映」で設定ファイルに保存されます。' : '「反映」で図を更新します。ファイルを残すには編集画面を閉じて「設定をダウンロード」を使ってください。'); render();
+      dirty = false; notice(persists ? '変更は「保存して反映」で設定ファイルに保存されます。' : '「反映」で図を更新します。編集画面を閉じて「保存」または「設定をダウンロード」を使ってください。'); render();
     }
     function open(nextKind = 'general', identifier) {
       if (!latest?.config) return;
@@ -167,7 +167,7 @@
           if (!latest || latest.documentVersion <= result.documentVersion) latest = { config: result.config, documentVersion: result.documentVersion };
           if (latest.config) {
             load(kind, result.index === null ? undefined : result.index);
-            notice(persists ? '保存しました。相関図に反映されています。' : '相関図に反映しました。ファイルを残すには「設定をダウンロード」を使ってください。');
+            notice(persists ? '保存しました。相関図に反映されています。' : '相関図に反映しました。ファイルを残すには利用可能な「保存」または「設定をダウンロード」を使ってください。');
           } else { notice('保存後に設定が変更されています。入力を確認し、設定ファイルのエラーを修正してください。', true); controls(); }
         } else { notice(result.message || '保存できませんでした。', true); controls(); }
       } catch (error) {

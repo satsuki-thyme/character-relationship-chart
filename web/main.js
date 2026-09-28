@@ -1,39 +1,75 @@
 'use strict';
 const { createWebHost } = require('./host');
+const { supportsDirectSave } = require('./file-access');
 const sample = require('../examples/characters.relations.jsonc');
 window.RelationsGraph = require('../packages/core/graph');
 require('../media/editor');
 require('../media/main');
 
 const $ = id => document.getElementById(id);
-const host = createWebHost({ confirmReplace: () => !hasChanges() || window.confirm('このページには編集した内容があります。必要な内容を反映・ダウンロード済みか確認してください。破棄して別の設定を開きますか？') });
+const directSave = supportsDirectSave(window);
+const host = createWebHost({ confirmReplace: () => !hasChanges() || window.confirm('このページには編集した内容があります。必要な内容を反映・保存またはダウンロード済みか確認してください。破棄して別の設定を開きますか？') });
 const ui = window.RelationsUi(host);
-function hasChanges() { return host.hasEdits() || ui.hasPendingEdits(); }
+function hasChanges() { return host.hasEdits() || ui.hasPendingEdits() || host.getSaveState().saving; }
 function warnOnLeave(event) { if (hasChanges()) { event.preventDefault(); event.returnValue = ''; } }
 function syncLeaveWarning() {
   window.removeEventListener('beforeunload', warnOnLeave);
   if (hasChanges()) window.addEventListener('beforeunload', warnOnLeave);
 }
 host.onConfig(message => { $('web-download').disabled = !message.config; syncLeaveWarning(); });
+function syncSave() {
+  const state = host.getSaveState();
+  $('web-direct-open').hidden = $('web-save').hidden = !directSave;
+  $('web-save').disabled = !state.available || state.saving;
+  $('web-save').textContent = state.saving ? '保存中…' : '保存';
+  for (const id of ['web-open', 'web-direct-open', 'web-sample']) $(id).disabled = state.saving;
+  $('web-save-note').textContent = state.blocked
+    ? '直接保存を停止しています。編集結果をダウンロードして退避し、元ファイルを確認して開き直してください。'
+    : state.available ? '「保存」は開いた元ファイルを更新します。「設定をダウンロード」は編集結果のコピーを出力します。'
+      : directSave ? '元ファイルを更新するには「直接保存用に開く」を使ってください。通常の読込・ドロップ・サンプルではダウンロードを使えます。'
+        : 'この環境では直接保存を利用できません。「設定をダウンロード」で編集結果を保存できます。';
+  syncLeaveWarning();
+}
+host.onSaveState(syncSave); syncSave();
 for (const type of ['input', 'change', 'click']) $('config-editor').addEventListener(type, syncLeaveWarning);
-async function open(files) {
-  const result = await host.openFiles(files);
+function opened(result) {
   if (result.ok) {
     $('web-file').textContent = result.fileName + (result.viewName ? ` + ${result.viewName}` : '');
     $('web-open-view').disabled = false;
-    $('web-message').textContent = '';
+    $('web-message').textContent = ''; $('web-message').classList.remove('danger');
     syncLeaveWarning();
-  }
+  } else if (result.message) $('web-message').textContent = result.message;
 }
+async function open(files) { opened(await host.openFiles(files)); }
 function sampleFile() {
   return new File([sample], 'characters.relations.jsonc', { type: 'application/json' });
 }
 $('web-open').addEventListener('click', () => $('web-files').click());
+$('web-direct-open').addEventListener('click', async () => {
+  if (host.getSaveState().saving) return;
+  $('web-direct-open').disabled = true;
+  try {
+    const [handle] = await window.showOpenFilePicker({ multiple: false,
+      types: [{ description: '相関図の設定（JSONC / JSON）', accept: { 'application/json': ['.jsonc', '.json'] } }] });
+    if (handle) opened(await host.openHandle(handle));
+  } catch (error) {
+    if (error.name !== 'AbortError') $('web-message').textContent = '直接保存用に開けませんでした。「設定を開く」で読み込んでダウンロード方式を使えます。現在の編集内容は保持しています。';
+  } finally { syncSave(); }
+});
 $('web-open-view').addEventListener('click', () => $('web-view').click());
+$('web-save').addEventListener('click', async () => {
+  const result = await host.saveConfig();
+  $('web-message').classList.toggle('danger', !result.ok);
+  $('web-message').textContent = result.ok
+    ? `「${result.fileName}」を保存し、内容を確認しました。${result.dirty ? '保存中に反映された新しい編集は未保存です。' : ''}${ui.hasPendingEdits() ? '未反映のフォーム入力は保存していません。' : ''}`
+    : `${result.message || '保存できませんでした。'} 編集内容はこのページに残っています。「設定をダウンロード」で退避できます。`;
+  syncSave();
+});
 $('web-download').addEventListener('click', async () => {
   if (ui.hasPendingEdits()) { $('web-message').textContent = '編集画面の入力を反映してからダウンロードしてください。'; return; }
   $('web-download').disabled = true;
   const result = await host.downloadConfig();
+  $('web-message').classList.toggle('danger', !result.ok);
   $('web-download').disabled = false;
   $('web-message').textContent = result.ok ? `「${result.fileName}」のダウンロードを開始しました。ブラウザの保存先を確認してください。` : `ダウンロードできませんでした: ${result.message} 編集内容はこのページに残っています。もう一度試してください。`;
 });
