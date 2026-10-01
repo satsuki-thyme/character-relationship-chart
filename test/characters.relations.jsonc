@@ -17,7 +17,7 @@
   // id は人物を識別する名前、label は図に表示する名前です。
   // x と y を両方指定すると、その座標に固定できます。
   "nodes": [
-    { "id": "alto", "label": "アルト", "groups": ["party", "explorers"], "description": "主人公。失踪した師匠を探す剣士。" },
+    { "id": "alto", "label": "アルトa", "groups": ["party", "explorers"], "description": "主人公。失踪した師匠を探す剣士。" },
     { "id": "lina", "label": "リナ", "groups": ["party", "explorers"], "description": "幼なじみの魔法使い。アルトには言えない秘密がある。" },
     { "id": "kai", "label": "カイ", "group": "party", "description": "旅の案内役。かつて王都の騎士団に所属していた。" },
     { "id": "elna", "label": "エルナ", "group": "court", "description": "王女。身分を隠して一行と接触する。" },
