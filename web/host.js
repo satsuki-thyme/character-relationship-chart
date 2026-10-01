@@ -1,7 +1,7 @@
 'use strict';
 const { parseConfig, LIMITS } = require('../packages/core/config');
 const { editConfig: editText } = require('../packages/core/edit');
-const { parseState, VIEW_LIMITS } = require('../packages/core/view-state');
+const { parseState, normalizeState, encodeState, VIEW_LIMITS } = require('../packages/core/view-state');
 const { writableHandle, openOriginal, writeOriginal } = require('./file-access');
 
 function readLocalFile(file) {
@@ -31,10 +31,14 @@ function downloadLocalFile(text, fileName) {
 }
 
 function createWebHost({ readText = readLocalFile, downloadText = downloadLocalFile, confirmReplace = () => true } = {}) {
-  const configListeners = new Set(), viewListeners = new Set(), saveListeners = new Set();
+  const configListeners = new Set(), viewListeners = new Set(), saveListeners = new Set(), viewSaveListeners = new Set();
   let serial = 0, version = 0, current = null, disposed = false;
   let documentText = '', originalText = '';
   let target = null, saving = false;
+  let viewState = normalizeState({ version: 1 }), originalView = encodeState(viewState);
+  let viewTarget = null, viewSaving = false, viewDirty = false, viewHasFile = false, initializingView = false;
+  const busy = () => saving || viewSaving;
+  const viewName = () => current ? current.fileName + '.view.json' : '';
   const subscribe = (set, callback) => { set.add(callback); return () => set.delete(callback); };
   const emit = (set, message) => { for (const callback of set) callback(message); };
   const isView = file => /\.view\.json$/i.test(file.name);
@@ -48,17 +52,28 @@ function createWebHost({ readText = readLocalFile, downloadText = downloadLocalF
     emit(configListeners, { config: current?.config, issues, fileName, documentVersion: version });
     return { ok: false };
   }
-  function saveState() { return { available: !!target && !target.blocked, saving, blocked: !!target?.blocked }; }
-  const notifySave = () => emit(saveListeners, saveState());
-  async function openFiles(input, handle = null) {
-    if (saving) return { ok: false, message: '保存中は設定を切り替えられません。完了を待ってください。' };
+  function saveState() { return { available: !!target && !target.blocked, saving: busy(), blocked: !!target?.blocked }; }
+  function viewSaveState() { return { available: !!viewTarget && !viewTarget.blocked, saving: viewSaving, busy: busy(),
+    blocked: !!viewTarget?.blocked, dirty: viewDirty, hasFile: viewHasFile, fileName: viewName() }; }
+  const notifySave = () => { emit(saveListeners, saveState()); emit(viewSaveListeners, viewSaveState()); };
+  async function checkViewTarget(handle, snapshot) {
+    if (!writableHandle(handle)) throw new Error('この表示データの保存先は直接保存に対応していません。');
+    if (handle === target?.handle || (target && typeof handle.isSameEntry === 'function' && await handle.isSameEntry(target.handle))) {
+      throw new Error('設定本体を表示データの保存先にはできません。');
+    }
+    if (snapshot.file.name !== viewName()) throw new Error(`表示データの保存先は「${viewName()}」を選択してください。`);
+  }
+  async function openFiles(input, handle = null, viewHandle = null) {
+    if (busy()) return { ok: false, message: '保存中は設定・表示データを切り替えられません。完了を待ってください。' };
     const request = ++serial;
     if (disposed) return { stale: true };
     let source;
     try {
       const snapshot = handle ? await openOriginal(handle) : null;
+      const viewSnapshot = viewHandle ? await openOriginal(viewHandle, VIEW_LIMITS.text) : null;
       if (disposed || request !== serial) return { stale: true };
-      const files = snapshot ? [snapshot.file] : Array.from(input);
+      if (viewSnapshot) await checkViewTarget(viewHandle, viewSnapshot);
+      const files = snapshot ? [snapshot.file] : viewSnapshot ? [viewSnapshot.file] : Array.from(input);
       if (!files.length || files.length > 2) throw new Error('設定ファイル1つと、任意で対応する .view.json を選択してください。');
       for (const file of files) check(file, LIMITS.text);
       const sources = files.filter(file => !isView(file)), views = files.filter(isView);
@@ -71,7 +86,7 @@ function createWebHost({ readText = readLocalFile, downloadText = downloadLocalF
         check(view, VIEW_LIMITS.text);
         if (view.name !== sourceName + '.view.json') throw new Error(`表示データは「${sourceName}.view.json」を選択してください。`);
       }
-      const [text, viewText] = await Promise.all([source ? (snapshot ? snapshot.text : readText(source)) : null, view ? readText(view) : null]);
+      const [text, viewText] = await Promise.all([source ? (snapshot ? snapshot.text : readText(source)) : null, view ? (viewSnapshot ? viewSnapshot.text : readText(view)) : null]);
       if (disposed || request !== serial) return { stale: true };
       if (source && typeof text !== 'string') throw new Error('設定を文字列として読み込めませんでした。');
       const parsed = source ? parseConfig(text) : current;
@@ -80,15 +95,19 @@ function createWebHost({ readText = readLocalFile, downloadText = downloadLocalF
       })), sourceName);
       // Parse both inputs before publishing either: an invalid sidecar must not
       // replace the current document or mix its layout with a new document.
-      const viewState = view ? parseState(viewText) : { version: 1 };
-      if (source && current && !confirmReplace()) return { cancelled: true };
+      const loadedView = view ? parseState(viewText) : normalizeState({ version: 1 });
+      if (current && ((source && !confirmReplace('source')) || (!source && viewDirty && !confirmReplace('view')))) return { cancelled: true };
       if (disposed || request !== serial) return { stale: true };
       if (source) {
         documentText = originalText = text;
         target = snapshot && writableHandle(handle) ? { handle, baseline: snapshot.bytes, blocked: false } : null;
         current = { ...parsed, fileName: sourceName, issues: [], documentVersion: ++version, dirty: false };
       }
-      emit(viewListeners, { viewState, fileName: view?.name || '', reset: !!source });
+      viewState = loadedView; originalView = encodeState(viewState); viewDirty = false; viewHasFile = !!view;
+      viewTarget = viewSnapshot ? { handle: viewHandle, baseline: viewSnapshot.bytes, blocked: false } : null;
+      initializingView = true;
+      // The UI may enrich/prune its copy; never share mutable host state.
+      emit(viewListeners, { viewState: normalizeState(viewState), fileName: view?.name || '', reset: !!source });
       emit(configListeners, { ...current, reset: !!source });
       notifySave();
       return { ok: true, fileName: sourceName, viewName: view?.name || '' };
@@ -106,7 +125,16 @@ function createWebHost({ readText = readLocalFile, downloadText = downloadLocalF
       // Commit only a validated result. Successful edits supersede pending reads.
       documentText = next.text; serial++;
       current = { ...parsed, fileName: current.fileName, documentVersion: ++version, dirty: documentText !== originalText };
+      const positions = Object.assign(Object.create(null), viewState.positions);
+      if (next.rename?.kind === 'nodes' && Object.hasOwn(positions, next.rename.from)) {
+        positions[next.rename.to] = positions[next.rename.from]; delete positions[next.rename.from];
+      }
+      const ids = new Set(current.config.nodes.map(node => node.id));
+      for (const id of Object.keys(positions)) if (!ids.has(id)) delete positions[id];
+      viewState = normalizeState({ ...viewState, positions });
+      viewDirty = encodeState(viewState) !== originalView;
       emit(configListeners, { ...current, rename: next.rename });
+      notifySave();
       return { ok: true, config: current.config, documentVersion: version, index: next.index };
     } catch (error) { return { ok: false, message: String(error.message || error) }; }
   }
@@ -120,7 +148,7 @@ function createWebHost({ readText = readLocalFile, downloadText = downloadLocalF
   }
   async function saveConfig() {
     if (disposed || !current || !target) return { ok: false, message: '元ファイルへ保存できません。「設定をダウンロード」を使ってください。' };
-    if (saving) return { ok: false, message: '保存中です。完了を待ってください。' };
+    if (busy()) return { ok: false, message: '保存中です。完了を待ってください。' };
     if (target.blocked) return { ok: false, status: 'blocked', message: '直接保存を停止しています。編集結果をダウンロードして退避し、元ファイルを確認して開き直してください。' };
     const savingTarget = target, text = documentText, fileName = current.fileName;
     saving = true; serial++; notifySave(); // Invalidate reads begun before Save.
@@ -137,15 +165,76 @@ function createWebHost({ readText = readLocalFile, downloadText = downloadLocalF
       return { ok: true, fileName, dirty: current.dirty };
     } finally { saving = false; if (!disposed) notifySave(); }
   }
+  function updateView(value, { initialize = false } = {}) {
+    try {
+      if (disposed || !current) throw new Error('先に設定ファイルを読み込んでください。');
+      const next = normalizeState(value), text = encodeState(next);
+      if (initialize && initializingView) originalView = text;
+      else if (text !== encodeState(viewState)) serial++; // supersede slow reads, not saves
+      initializingView = false; viewState = next; viewDirty = text !== originalView;
+      notifySave(); return { ok: true };
+    } catch (error) { return { ok: false, message: String(error.message || error) }; }
+  }
+  async function downloadView() {
+    try {
+      if (disposed || !current) throw new Error('先に設定ファイルを読み込んでください。');
+      const fileName = viewName().split(/[\\/]/).pop().replace(/[\u0000-\u001f\u007f]/g, '') || 'characters.relations.jsonc.view.json';
+      await downloadText(encodeState(viewState), fileName);
+      return { ok: true, fileName };
+    } catch (error) { return { ok: false, message: String(error.message || error) }; }
+  }
+  async function writeView(savingTarget, text) {
+    const result = await writeOriginal(savingTarget.handle, savingTarget.baseline, text,
+      () => !disposed && viewTarget === savingTarget, VIEW_LIMITS.text);
+    if (disposed) return { ok: false, status: 'disposed' };
+    if (!result.ok) { savingTarget.blocked = !!result.blocked; return result; }
+    savingTarget.baseline = result.bytes; originalView = text; viewHasFile = true;
+    viewDirty = encodeState(viewState) !== text;
+    return { ok: true, fileName: viewName(), dirty: viewDirty };
+  }
+  async function saveView() {
+    if (disposed || !current || !viewTarget) return { ok: false, message: '表示データの保存先を選択してください。ダウンロードでも退避できます。' };
+    if (busy()) return { ok: false, message: '保存中です。完了を待ってください。' };
+    if (viewTarget.blocked) return { ok: false, status: 'blocked', message: '表示データの直接保存を停止しています。ダウンロードで退避して、保存先を確認して開き直してください。' };
+    const savingTarget = viewTarget, text = encodeState(viewState);
+    viewSaving = true; serial++; notifySave();
+    try { return await writeView(savingTarget, text); }
+    finally { viewSaving = false; if (!disposed) notifySave(); }
+  }
+  async function saveViewAs(pickHandle) {
+    if (disposed || !current) return { ok: false, message: '先に設定ファイルを読み込んでください。' };
+    if (busy()) return { ok: false, message: '保存中です。完了を待ってください。' };
+    const text = encodeState(viewState), fileName = viewName();
+    viewSaving = true; serial++; notifySave();
+    try {
+      // Invoke the picker in the original button activation. We neither look
+      // for a neighbour of the config handle nor adopt nonempty targets here.
+      const handle = await pickHandle(fileName);
+      if (disposed) return { ok: false, status: 'disposed' };
+      const snapshot = await openOriginal(handle, VIEW_LIMITS.text);
+      await checkViewTarget(handle, snapshot);
+      if (disposed) return { ok: false, status: 'disposed' };
+      if (snapshot.bytes.length) return { ok: false, status: 'existing', message: '中身のある既存ファイルには書き込みません。「表示データを直接保存用に開く」で読み込んでから編集・保存してください。' };
+      viewTarget = { handle, baseline: snapshot.bytes, blocked: false };
+      return await writeView(viewTarget, text);
+    } catch (error) { return { ok: false, status: error.name === 'AbortError' ? 'cancelled' : 'error', message: String(error.message || error) }; }
+    finally { viewSaving = false; if (!disposed) notifySave(); }
+  }
   return {
-    capabilities: Object.freeze({ edit: true, persistEdits: false, viewStorage: false, openSource: false, exportSvg: false }),
+    capabilities: Object.freeze({ edit: true, persistEdits: false, viewStorage: false, viewCapture: true, openSource: false, exportSvg: false }),
     onConfig: callback => subscribe(configListeners, callback),
     onView: callback => subscribe(viewListeners, callback),
     onSaveState: callback => subscribe(saveListeners, callback),
+    onViewSaveState: callback => subscribe(viewSaveListeners, callback),
     getSaveState: saveState,
-    ready() {}, openFiles: input => openFiles(input), openHandle: handle => openFiles(null, handle), editConfig, downloadConfig, saveConfig,
+    getViewSaveState: viewSaveState, getViewState: () => normalizeState(viewState),
+    ready() {}, openFiles: input => openFiles(input), openHandle: handle => openFiles(null, handle),
+    openViewHandle: handle => openFiles(null, null, handle), editConfig, downloadConfig, saveConfig,
+    updateView, downloadView, saveView, saveViewAs,
     hasEdits: () => !!current?.dirty,
-    dispose() { disposed = true; serial++; configListeners.clear(); viewListeners.clear(); saveListeners.clear(); current = target = null; documentText = originalText = ''; }
+    hasViewEdits: () => viewDirty,
+    dispose() { disposed = true; serial++; configListeners.clear(); viewListeners.clear(); saveListeners.clear(); viewSaveListeners.clear();
+      current = target = viewTarget = null; documentText = originalText = ''; viewState = normalizeState({ version: 1 }); }
   };
 }
 module.exports = { createWebHost };

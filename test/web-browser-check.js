@@ -25,7 +25,7 @@ const { parseConfig } = require('../packages/core/config');
     assert.equal(await page.locator('.edge').count(), 8);
     for (const id of ['config-editor', 'save-view', 'reload-view', 'open-view', 'open-source', 'export']) assert.equal(await page.locator('#' + id).isVisible(), false);
     assert.equal(await page.locator('#edit-config').isEnabled(), true); assert.equal(await page.locator('#web-download').isEnabled(), true);
-    report.checks.push('offline file-URL startup, sample, shared editor and no direct/view saving');
+    report.checks.push('offline file-URL startup, sample, shared editor and explicit separate view controls');
     if (capture) await page.screenshot({ path: path.join(capture, 'web-desktop.png') });
 
     const first = page.locator('.node').first(), before = await first.getAttribute('transform'), box = await first.boundingBox();
@@ -43,6 +43,7 @@ const { parseConfig } = require('../packages/core/config');
 
     const input = (name, text) => ({ name, mimeType: 'application/json', buffer: Buffer.from(text) });
     const data = '{ // comment\n"nodes":[{"id":"a","label":"A"},{"id":"b","label":"B"}],"edges":[{"from":"a","to":"b","label":"Together"}]}';
+    page.once('dialog', dialog => dialog.accept()); // discard the earlier view gestures
     await page.locator('#web-files').setInputFiles(input('任意名.jsonc', data));
     await page.waitForFunction(() => document.getElementById('web-file').textContent === '任意名.jsonc');
     assert.equal(await page.locator('.node').count(), 2); assert.equal(await page.locator('#search').inputValue(), '');
@@ -124,6 +125,7 @@ const { parseConfig } = require('../packages/core/config');
     await page.locator('#close-details').click(); await page.locator('#focus').click();
     assert.equal(await page.locator('.web-bar').isVisible(), false); await page.locator('#exit-focus').click();
     assert.equal(await page.locator('.web-bar').isVisible(), true);
+    page.once('dialog', dialog => dialog.accept()); // explicit discard of focus/details changes
     await page.reload(); await page.waitForFunction(() => document.querySelectorAll('.node').length === 6);
     assert.equal(await page.locator('#details').isVisible(), false);
     assert.equal(await page.evaluate(() => localStorage.length), 0);

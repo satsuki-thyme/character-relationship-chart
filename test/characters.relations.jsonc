@@ -1,0 +1,42 @@
+{
+  // 公開用の架空サンプルです。特定の作品・実在人物のデータではありません。
+  // コピーしてから編集してください。開いている相関図に自動で反映されます。
+  "version": 1,
+  "title": "星明かりの旅",
+  "description": "旅の仲間と、王都で交差する思い。",
+  "layout": "auto", // auto: 自動配置 / circle: 円形配置
+
+  // groups で複数所属できます。先頭のグループ色を人物枠に使います。
+  "groups": [
+    { "id": "party", "label": "旅の仲間", "color": "#55b8ad" },
+    { "id": "court", "label": "王都", "color": "#c29de8" },
+    { "id": "guild", "label": "商人ギルド", "color": "#e4b66a" },
+    { "id": "explorers", "label": "探索隊", "color": "#78aee8" }
+  ],
+
+  // id は人物を識別する名前、label は図に表示する名前です。
+  // x と y を両方指定すると、その座標に固定できます。
+  "nodes": [
+    { "id": "alto", "label": "アルト", "groups": ["party", "explorers"], "description": "主人公。失踪した師匠を探す剣士。" },
+    { "id": "lina", "label": "リナ", "groups": ["party", "explorers"], "description": "幼なじみの魔法使い。アルトには言えない秘密がある。" },
+    { "id": "kai", "label": "カイ", "group": "party", "description": "旅の案内役。かつて王都の騎士団に所属していた。" },
+    { "id": "elna", "label": "エルナ", "group": "court", "description": "王女。身分を隠して一行と接触する。" },
+    { "id": "noah", "label": "ノア", "group": "court", "description": "近衛騎士。カイの元同僚。" },
+    { "id": "mira", "label": "ミラ", "group": "guild", "description": "情報に通じた商人。王都と一行の両方に顔が利く。" }
+  ],
+
+  // setId: 同じ2人を結ぶ線に同じIDを付けると、並行に表示します。
+  // arrow: forward（片方向）/ both（双方向）/ none（矢印なし）
+  // shape: auto（自動）/ straight（直線）/ curved（曲線）
+  // style: solid（実線）/ dashed（破線）/ dotted（点線）
+  "edges": [
+    { "from": "alto", "to": "lina", "label": "幼なじみ", "setId": "alto-lina", "shape": "straight", "arrow": "none" },
+    { "from": "lina", "to": "alto", "label": "ひそかな好意", "setId": "alto-lina", "color": "#e797b0", "style": "dashed" },
+    { "from": "alto", "to": "kai", "label": "信頼", "arrow": "both" },
+    { "from": "elna", "to": "alto", "label": "捜索を依頼", "shape": "curved", "color": "#c29de8" },
+    { "from": "noah", "to": "elna", "label": "護衛" },
+    { "from": "kai", "to": "noah", "label": "かつての同僚", "arrow": "none", "style": "dashed" },
+    { "from": "mira", "to": "alto", "label": "情報を提供", "color": "#e4b66a", "style": "dotted" },
+    { "from": "mira", "to": "elna", "label": "取引", "arrow": "both", "color": "#e4b66a" }
+  ]
+}

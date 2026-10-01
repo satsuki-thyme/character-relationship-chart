@@ -17,7 +17,7 @@
     let state = { version: 1 }, graph, positioned = [], paths = [], selected = null, drag = null;
     let camera = { x: 0, y: 0, scale: 1 }, hasCamera = false, pendingFrame = false;
     let nodeEls = new Map(), edgeEls = new Map(), edgeLabelEls = new Map();
-    let statusText = '', issueMessages = [], lastSize;
+    let statusText = '', issueMessages = [], lastSize, initializingView = false;
     const svgEl = (name, attrs = {}, text) => {
       const e = document.createElementNS(NS, name);
       for (const [key, value] of Object.entries(attrs)) e.setAttribute(key, String(value));
@@ -28,10 +28,22 @@
       const e = document.createElement(tag); if (className) e.className = className;
       if (text !== undefined) e.textContent = text; return e;
     };
-    function save() {
+    function save(initialize = false) {
       const rect = svg.getBoundingClientRect();
-      state.version = 1; state.camera = { ...camera, width: rect.width, height: rect.height };
-      if (capabilities.viewStorage) host.updateView(state);
+      state.version = 1; state.camera = { ...camera };
+      if (rect.width > 0 && rect.height > 0) Object.assign(state.camera, { width: rect.width, height: rect.height });
+      // Persist the complete rendered arrangement. Saving only dragged nodes
+      // reruns auto-layout around those pins on reload and moves other nodes.
+      // Keep live drag overrides separate so config edits retain their layout
+      // behavior; every snapshot uses the original config-coordinate signature.
+      const positions = Object.create(null), originals = new Map((graph?.nodes || []).map(node => [node.id, node]));
+      for (const node of positioned) {
+        const original = originals.get(node.id);
+        if (original) positions[node.id] = { x: node.x, y: node.y, source: G.signature(original) };
+      }
+      const snapshot = { ...state, positions };
+      if (capabilities.viewStorage) return host.updateView(snapshot);
+      if (capabilities.viewCapture) return host.updateView(snapshot, { initialize });
     }
     function applyUi() {
       state.ui ||= { details: false, focus: false };
@@ -61,7 +73,8 @@
       const rect = svg.getBoundingClientRect(), box = G.bounds(positioned, paths);
       const scale = Math.max(0.01, Math.min(1.35, (rect.width - 90) / (box.width + 50), (rect.height - 85) / (box.height + 50)));
       camera = { x: rect.width / 2 - (box.x + box.width / 2) * scale, y: rect.height / 2 - (box.y + box.height / 2) * scale, scale };
-      hasCamera = true; lastSize = { width: rect.width, height: rect.height }; transform(); if (persist) save();
+      hasCamera = true; lastSize = { width: rect.width, height: rect.height }; transform();
+      if (persist) save(); else if (capabilities.viewCapture) save(true);
     }
     function zoom(factor, center) {
       const rect = svg.getBoundingClientRect(); const point = center || { x: rect.width / 2, y: rect.height / 2 };
@@ -147,7 +160,7 @@
       if (!selected) {
         box.append(el('h2', 'detail-heading', 'つながりを読む'), el('p', 'detail-note', '人物や関係線を選ぶと、ここに詳しい情報を表示します。'));
         const help = el('div', 'detail-help');
-        for (const text of [graph.description, '人物をドラッグして、見やすい位置へ。', '空白をドラッグして、図全体を移動。', capabilities.viewStorage ? '配置・倍率などは、設定の隣の .view.json に自動保存します。2つのファイルを一緒に共有できます。' : '配置・倍率の変更はこの画面だけに反映され、保存されません。'].filter(Boolean)) help.append(el('p', '', text));
+        for (const text of [graph.description, '人物をドラッグして、見やすい位置へ。', '空白をドラッグして、図全体を移動。', capabilities.viewStorage ? '配置・倍率などは、設定の隣の .view.json に自動保存します。2つのファイルを一緒に共有できます。' : capabilities.viewCapture ? '配置・倍率・表示状態は「表示データをダウンロード」または明示的な保存で .view.json に持ち出せます。設定本体と一緒に保管してください。' : '配置・倍率の変更はこの画面だけに反映され、保存されません。'].filter(Boolean)) help.append(el('p', '', text));
         box.append(help); return;
       }
       if (selected.kind === 'node') {
@@ -211,14 +224,14 @@
       $('stats').textContent = `${graph.nodes.length} 人物・項目 / ${graph.edges.length} 関係${query ? ` / 検索 ${matches.length} 件` : ''}`;
     }
     function beginNodeDrag(event, node) {
-      if (event.button !== 0) return;
+      if (event.button !== 0 || drag) return;
       event.preventDefault(); event.stopPropagation();
       const p = localPoint(event), w = worldPoint(p);
       drag = { type: 'node', node, origin: p, dx: node.x - w.x, dy: node.y - w.y, moved: false, pointer: event.pointerId };
       svg.setPointerCapture(event.pointerId); svg.classList.add('dragging');
     }
     svg.addEventListener('pointerdown', event => {
-      if (event.button !== 0 || event.target.closest('.edge, .edge-label-group')) return;
+      if (event.button !== 0 || drag || event.target.closest('.node, .edge, .edge-label-group')) return;
       const p = localPoint(event);
       drag = { type: 'pan', origin: p, x: camera.x, y: camera.y, moved: false, pointer: event.pointerId };
       svg.setPointerCapture(event.pointerId); svg.classList.add('dragging');
@@ -235,7 +248,7 @@
         if (!pendingFrame) { pendingFrame = true; requestAnimationFrame(() => { pendingFrame = false; if (graph) { paintEdges(); highlight(); } }); }
       }
     });
-    function finishDrag(event) {
+    function finishDrag(event, persist = true) {
       if (!drag || event.pointerId !== drag.pointer) return;
       const finished = drag; drag = null; svg.classList.remove('dragging');
       if (svg.hasPointerCapture(event.pointerId)) svg.releasePointerCapture(event.pointerId);
@@ -248,9 +261,20 @@
         // Dragging preserves both the current selection and the details mode.
         if (!finished.moved && event.type === 'pointerup') select({ kind: 'node', id: finished.node.id });
       } else if (!finished.moved && event.type === 'pointerup') select(null);
-      save();
+      if (persist) save();
     }
+    function cancelDrag(persist = true) {
+      if (drag) finishDrag({ pointerId: drag.pointer, type: 'cancel' }, persist);
+    }
+    // A captured gesture can end without a pointerup (capture loss, tab change
+    // or navigation). Clear and release it once, retaining any moved position
+    // but never interpreting cancellation as a click or a background pan.
     svg.addEventListener('pointerup', finishDrag); svg.addEventListener('pointercancel', finishDrag);
+    svg.addEventListener('lostpointercapture', finishDrag);
+    window.addEventListener('pointerup', finishDrag); window.addEventListener('pointercancel', finishDrag);
+    window.addEventListener('blur', () => cancelDrag());
+    window.addEventListener('pagehide', () => cancelDrag());
+    document.addEventListener('visibilitychange', () => { if (document.hidden) cancelDrag(); });
     svg.addEventListener('wheel', event => { event.preventDefault(); zoom(Math.exp(-Math.max(-100, Math.min(100, event.deltaY)) * .0025), localPoint(event)); }, { passive: false });
     svg.addEventListener('keydown', event => {
       if (event.key === 'Escape') select(null);
@@ -313,11 +337,11 @@
     }).observe(svg);
     new MutationObserver(() => { if (graph) render(); }).observe(document.body, { attributes: true, attributeFilter: ['class', 'style'] });
     host.onView(message => {
+      initializingView = true;
+      cancelDrag(false); // The host has already published a new view; do not overwrite it.
       // A different document must not inherit selection, camera or positions.
       if (message.reset) {
-        if (drag && svg.hasPointerCapture(drag.pointer)) svg.releasePointerCapture(drag.pointer);
-        drag = null; svg.classList.remove('dragging');
-        graph = null; selected = null; $('search').value = '';
+        graph = null; positioned = []; paths = []; selected = null; $('search').value = '';
         camera = { x: 0, y: 0, scale: 1 }; hasCamera = false;
       }
       state = message.viewState || { version: 1 };
@@ -339,10 +363,13 @@
       $('export').disabled = !capabilities.exportSvg || issueMessages.length > 0 || !message.graph?.nodes.length;
       if (!message.graph) return;
       const first = !graph;
-      if (drag) {
-        if (svg.hasPointerCapture(drag.pointer)) svg.releasePointerCapture(drag.pointer);
-        drag = null; svg.classList.remove('dragging');
-      }
+      // VS Code also republishes an unchanged config on panel visibility and
+      // source-save events. Keep the rendered arrangement in that case: live
+      // positions contain drag overrides, not every auto-layout coordinate.
+      // A real graph/layout change still uses the existing layout rules.
+      const sameGraph = !first && JSON.stringify(graph) === JSON.stringify(message.graph);
+      const previousLayout = state.layout;
+      cancelDrag(false);
       graph = message.graph;
       if (message.rename?.kind === 'nodes') {
         const { from, to } = message.rename;
@@ -360,11 +387,13 @@
       $('title').textContent = graph.title; $('title').title = graph.title; $('description').textContent = graph.description;
       $('empty').hidden = graph.nodes.length !== 0;
       $('legend').replaceChildren(...graph.groups.map(g => badge(g.label, g.color)));
-      positioned = G.layout(graph, state.layout, state.positions);
+      if (!sameGraph || previousLayout !== state.layout) positioned = G.layout(graph, state.layout, state.positions);
       render(); describeSelection();
-      if (first && !hasCamera) requestAnimationFrame(() => { if (!hasCamera) fit(false); });
+      if (!hasCamera) requestAnimationFrame(() => { if (!hasCamera) fit(false); });
+      else if (capabilities.viewCapture) save(first || initializingView);
+      initializingView = false;
     });
     describeSelection(); host.ready();
-    return { hasPendingEdits: () => editor?.hasPendingChanges() || false };
+    return { hasPendingEdits: () => editor?.hasPendingChanges() || false, captureView: () => save() };
   };
 })();

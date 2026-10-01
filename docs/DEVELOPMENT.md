@@ -125,3 +125,53 @@ DOM試験はjsdom 26.1.0を外部に用意し、必要に応じて `NODE_PATH` �
 `web-save.test.js` は生バイト競合、保存途中の外部変更、権限・読込・write・close・abort・読戻し失敗、結果不明時の停止、保存中の追加編集／二重保存／切替、取消・解放・不正UTF-8を検証する。`web-save-browser-check.js` は実ブラウザのGUIを模擬ハンドルへ接続するため、OSファイル選択やネイティブ書込成功の証明にはならない。`web-native-file-check.js` はテスト用一時ファイルのネイティブAPI読込・書込を試す。選択の代わりにCDPドラッグから得たネイティブハンドルをテスト内だけで渡し、成功・拒否を区別して出力する。今回の環境では拒否となり、元ファイルと編集中内容の保持を確認した。
 
 利用者の通常保存・再読込・外部変更時の保存停止の報告を自動試験と照合し、第5段階を完了とした。実機環境の詳細と個別試験の未確認範囲は [STAGE5_ACCEPTANCE.md](STAGE5_ACCEPTANCE.md) に残す。完了記録を含む配布物は `stage5-completed` 名で再生成する。第6段階開始前に、対象ソースが第5段階の成果物に一致しているか確認し、利用者の差分を保護する。
+
+## 第6段階の開発・検証（2026-10-01 JST）
+
+現在は表示データの捕捉・UTF-8ダウンロード・明示保存に対応する。core・Schema・VS Codeホスト・本番依存・lockfile・名称・識別子・0.1.0を維持した。ホスト契約と二つの保存状態は [architecture.md](architecture.md) に記録する。第5段階完了版との照合では27対象中、実装・テスト・完了記録25対象が一致し、MGMTと工程表にはユーザーの更新があった。取得したユーザー差分 `.gitignore`、`MGMT.md`、工程表、`prompt/STAGE6_PROMPT.md` を保持した。
+
+```sh
+npm run check
+npm test
+npm run test:web
+node --test test/ui-dom-check.js test/web-dom-check.js
+node test/web-browser-check.js
+node test/web-save-browser-check.js
+node test/web-view-browser-check.js
+node test/web-view-native-check.js
+npm run build:web
+npm run package
+```
+
+通常116件、Web DOM19件、共有UI込み31件。`test/web-view.test.js` は表示データの往復・命名・別基準・競合・権限・各書込段階の失敗・保持・非同期競合・UTF-8を検証する。ブラウザの7表示操作群は実Chromiumの入力・描画・実ダウンロードと模擬ハンドルでの保存・障害を組み合わせる。`web-view-native-check.js` はネイティブファイルハンドルをCDPのドロップで得て選択だけを橋渡しする。read・permission・writeはネイティブのまま試し、成功／拒否を区別して記録する。今回、ネイティブ読込と拒否時保護を確認したが、保存成功は実機確認待ち。
+
+jsdom26.1.0、Playwright、検証用Chromiumはプロジェクト外で用意する。本番依存へ追加しない。`CRC_BROWSER_EXECUTABLE`、`CRC_BROWSER_ARGS`、`CRC_CAPTURE_DIR` は従来の任意指定を使う。Linuxコンテナーでは起動用にno-sandbox、no-zygote、single-process、SwiftShader等が必要だった。Webセキュリティは無効化していない。日本語フォントは検証環境にのみ置き、配布物へ含めない。
+
+配布物は `dist/character-relationship-chart-web-stage6.zip` と `dist/character-relationship-chart-stage6.vsix`。直接反映できない場合は取得時82ソースのSHA-256を守るWindows反映補助を提供する。`.git` を要求し、差分が増えた場合は反映前に停止する。バックアップ・commit/push・削除による置換は行わない。反映用補助のPowerShell7/Linux試験とWindows5.1／選択ダイアログの未確認は区別する。
+
+第6段階の実機確認とソース反映が終わるまで第7段階には進まない。次工程の実行指示は [STAGE7_PROMPT.md](STAGE7_PROMPT.md)。
+
+再開時の記録更新では [TESTING.md](../TESTING.md) の根拠ログ表を使い、試験実行・既存ログ照合・配布物照合・実機報告を分ける。0バイトのログは結果として採用しない。ネイティブ表示APIは `verification/stage6/web-view-native-check.json` を参照し、権限拒否時の保持を正常保存の成功へ読み替えない。実機報告は [STAGE6_ACCEPTANCE.md](STAGE6_ACCEPTANCE.md) の記入欄へ追記する。
+
+## 第6段階不具合の再発防止試験（2026-10-01 JST）
+
+`test/stage6-regression-dom-check.js` はjsdomで全座標・カメラ・配置方式・表示状態の往復、固定座標署名・人物ID・別設定・未反映フォーム保持、取得喪失／ページ状態切替／複数ポインターを検証する。`test/stage6-regression-browser-check.js` は実Chromiumで全座標を実ダウンロードJSONと照合し、復元、A/B/C連続ドラッグ、背景パン、ネイティブcapture解放、タブ／ページ復帰を確認する。VS Code側は本番UI／アダプターと拡張を模擬APIのHTTP fixtureへ接続し、保存／再読込を検証する。実Extension Hostとは区別する。
+
+```sh
+node --test test/ui-dom-check.js test/web-dom-check.js test/stage6-regression-dom-check.js
+node test/stage6-regression-browser-check.js
+```
+
+ブラウザ試験の実行ファイル・起動引数は従来の `CRC_BROWSER_EXECUTABLE` / `CRC_BROWSER_ARGS` を利用する。`CRC_WEB_DIR` を指定すると、再ビルドせず指定した展開済みWeb配布物を検査する。VS Code fixtureはローカル8765番を使う。検証専用依存・フォントは配布しない。Webセキュリティを無効にする起動引数は使用しない。実機再確認は報告書末尾の今回分に絞る。
+
+
+## VS Code再表示の回帰（2026-10-01 JST）
+
+`test/stage6-vscode-redisplay-dom-check.js` は実UI・アダプター・拡張と模擬VS Codeを接続し、実拡張が登録したpanel view-state callbackを発火する。保存JSON、ライブ配置、表示ファイルを開く、同一設定の再通知、再保存、再読込、close/reopenを別々に比較する。変更した設定・ID・固定座標・リセットの既存規則も確認する。
+
+```sh
+node --test test/ui-dom-check.js test/web-dom-check.js test/stage6-regression-dom-check.js test/stage6-vscode-redisplay-dom-check.js
+node test/stage6-vscode-redisplay-browser-check.js
+```
+
+DOMは検証用jsdom、ブラウザは検証用Playwright／Chromiumを外部に用意する。既存の `CRC_BROWSER_EXECUTABLE` / `CRC_BROWSER_ARGS` / `CRC_CAPTURE_DIR` を使用可能。ブラウザ試験の `CRC_SHARED_UI_MAIN` は原コードとの比較用であり製品オプションではない。実Chromiumと実Extension Host／Windows実機を区別する。配布と同版数導入確認は [追加修正記録](../change-details/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-ja.md)。

@@ -2,7 +2,7 @@
 
 [日本語](README-ja.md)
 
-This is the completed Stage 5 Web editor (2026-09-28 JST). Automated checks and user-reported desktop direct saving, reopening and external-change blocking have been verified. Extract the entire distribution ZIP and open `index.html` in a desktop browser with JavaScript, FileReader, ResizeObserver, dialog and Blob-download support. Keep the included files together. VS Code, Node.js, a Web server and an Internet connection are not required to use the built application.
+This is the implemented and automatically tested Stage 6 Web editor (2026-10-01 JST). View download and explicit view-file saving are included; the user reported successful main save operations on Windows 11 / Chrome 154 / HTTPS, while layout restoration and consecutive dragging fixes still need desktop rechecking. Stage 5 config saving, reopening and external-change blocking remain completed based on user reports. Extract the entire distribution ZIP and open `index.html` in a desktop browser with JavaScript, FileReader, ResizeObserver, dialog and Blob-download support. Keep the included files together. VS Code, Node.js, a Web server and an Internet connection are not required to use the built application.
 
 The sample opens on startup. Choose **設定を開く** to read one UTF-8 `.jsonc` or `.json` file, or drop it onto the page. You may select/drop its matching display file at the same time. To load display data later, choose **表示データを開く**. The display filename must be the complete source filename plus `.view.json`, for example `cast.jsonc.view.json` for `cast.jsonc`. Files in sibling folders are never read automatically. Choose the same file again to reload changes made outside the application.
 
@@ -10,11 +10,11 @@ Use **編集** to edit people, groups, relations and general settings with the s
 
 The shared core preserves existing editing semantics: multiple group memberships, references following person/group ID changes, incident relations removed with a person, and group memberships cleared when a group is deleted. General title/description can be added, changed or cleared. Untouched comments, line endings and indentation are preserved where possible. Inserting/deleting entries can reformat neighboring spans; this is not a whole-document JSON conversion. A `.json` input keeps its extension and the same JSONC-compatible content accepted by the extension.
 
-Search, click a node or edge for details, drag nodes or the canvas, zoom, switch layouts, or choose chart-only display. Dragging a node does not open details. All edge labels remain above the edge lines. Renaming a person also retains its temporary dragged position and selection. Layout changes remain temporary: closing/reloading the page or selecting another source discards them. Opening a source resets the previous selection, search and layout; a matching display file restores its saved layout.
+Search, click a node or edge for details, drag nodes or the canvas, zoom, switch layouts, or choose chart-only display. Dragging a node does not open details. All edge labels remain above the edge lines. Renaming a person also retains its temporary dragged position and selection. Layout changes stay in memory until explicitly saved/downloaded: closing/reloading the page or selecting another source discards unexported changes. Opening a source resets the previous selection, search and layout; a matching display file restores its saved layout.
 
 Invalid data, read errors and invalid edits keep the last valid chart and preserve form input. Source and optional display data are accepted together only when both are valid. Multiple sources, mismatched display filenames and oversized inputs are rejected. Failed downloads retain the in-memory document for retry. A source replacement asks before discarding applied edits or an open form draft. This confirmation remains relevant after a download, because the application cannot verify that the browser saved it. Page closing/reloading requests a browser warning when edits remain, but browsers do not always show it. Confirm direct-save completion or the download destination before leaving.
 
-There is no `.view.json` saving/downloading, SVG download, Web Undo/Redo, continuous file watching, localStorage or IndexedDB persistence. Content stays in page memory until explicitly saved or downloaded and is not uploaded. The application includes no external resources, telemetry or network requests. Its Content Security Policy also blocks network connections. Refreshing starts with the sample again.
+There is no SVG download, Web Undo/Redo, continuous file watching, localStorage or IndexedDB persistence. Content stays in page memory until explicitly saved or downloaded and is not uploaded. The application includes no external resources, telemetry or network requests. Its Content Security Policy also blocks network connections. Refreshing starts with the sample again.
 
 ## Direct saving in supported environments
 
@@ -38,3 +38,21 @@ npm run build:web
 Open `dist/web/index.html`. `web/index.html` is a build template. esbuild is a development dependency only. The build bundles the actual shared core, `jsonc-parser`, shared UI and GUI editor; it includes no VS Code adapter. The existing extension remains in `src/` and `media/`. Dependency versions are unchanged from Stage 3.
 
 The distribution includes the project MIT license, `jsonc-parser`'s MIT license, and the sample JSONC. See the repository's `TESTING.md` for the tested environment and remaining limitations.
+
+## Save and restore display data
+
+Choose **表示データをダウンロード** to export positions, camera translation/zoom, viewport size, layout and detail/chart-only flags as UTF-8 version-1 view JSON using the shared core. Search, selection, source data and unapplied form input are excluded. Save/export the config separately. Keep `cast.jsonc` with `cast.jsonc.view.json`, or `cast.json` with `cast.json.view.json`; the complete source extension is retained. Correct any browser-added filename suffix before importing the pair.
+
+On supported browsers, **表示データを直接保存用に開く** explicitly selects and reads an existing matching sidecar, then **表示データを保存** updates only that file. **表示データの新規保存先を選ぶ** uses `showSaveFilePicker` and accepts only a matching new/empty file. A nonempty selection is refused: open it through the existing-view path first. The API does not identify whether a zero-byte target was just created or already existed. An empty file created by the picker is not automatically deleted after a later failure. No sibling path is discovered from the config handle.
+
+Config and view targets, byte baselines and dirty states are independent. Source replacement resets the previous view/target even for the same name. View-only replacement checks unapplied view changes and keeps the config target and editor draft; ordinary view import removes its direct-save target. Pairing uses complete filenames and person IDs, so intentionally select the correct pair for different folders/works with identical names. Person rename/deletion follows the position keys, and changed fixed config coordinates win.
+
+View writes reuse Stage 5 raw-byte comparisons before commit and byte-exact readback verification. Conflicts/permissions/write failures keep config, view and input available for download. Uncertain close/readback stops that target; there is no automatic resend. A verified snapshot clears only its matching view changes; newer changes remain dirty. A download never clears dirty state. The two files are not saved as one transaction. Compare-and-commit is not atomic; the final comparison/close window cannot exclude external writers. No autosave, handle persistence or browser storage is added. Unsupported browsers retain both downloads and shared editing.
+
+Initial Stage 6 verification: 116 Node tests, 31 DOM tests, 7 real-browser view groups and 13 existing browser groups passed. Handle-double success/fault tests do not certify native disk writing. Native external-file reading and denial protection passed; headless native pickers returned AbortError and write permission was denied. Desktop native view save/reopen/conflict acceptance remains pending.
+
+References: [save picker](https://developer.mozilla.org/en-US/docs/Web/API/Window/showSaveFilePicker), [file identity](https://developer.mozilla.org/en-US/docs/Web/API/FileSystemHandle/isSameEntry), [File System Access specification](https://wicg.github.io/file-system-access/).
+
+## Stage 6 fixes (2026-10-01 JST)
+
+View snapshots retain every rendered person position, including automatic placement. Version 1, names and keys are unchanged, and older sparse position files remain readable. Positions absent from an old file cannot be recovered: arrange the chart and save it again with this build. Capture loss, tab changes and page exit finish node/canvas gestures without activating a click. After renaming person IDs, save the view file separately as well. Stage 7 remains unstarted.

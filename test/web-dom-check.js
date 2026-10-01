@@ -6,6 +6,7 @@ const { pathToFileURL } = require('node:url');
 const { JSDOM, ResourceLoader, VirtualConsole } = require('jsdom');
 const { buildWeb } = require('../scripts/build-web');
 const { parseConfig } = require('../packages/core/config');
+const { parseState, encodeState } = require('../packages/core/view-state');
 let output;
 test.before(async () => { output = await fs.mkdtemp(path.join(os.tmpdir(), 'relations-web-')); await buildWeb(output); });
 test.after(async () => { if (output) await fs.rm(output, { recursive: true, force: true }); });
@@ -88,7 +89,7 @@ test('file picker uses the real FileReader and displays input strings as text', 
     assert.equal(f.$('config-editor').open, false);
   } finally { f.close(); }
 });
-test('Web drag, click, search and zoom stay temporary and all labels remain above edges', async () => {
+test('Web view changes require discard confirmation and labels remain above edges', async () => {
   const f = await page();
   try {
     await f.source(); const before = f.w.document.querySelector('.node').getAttribute('transform');
@@ -99,6 +100,9 @@ test('Web drag, click, search and zoom stay temporary and all labels remain abov
     f.$('search').value = 'missing'; f.$('search').dispatchEvent(new f.w.Event('input'));
     assert.equal(f.w.document.querySelectorAll('.node.faded').length, 2);
     for (const line of f.w.document.querySelectorAll('.edge-line')) for (const label of f.w.document.querySelectorAll('.edge-label, .edge-label-bg')) assert.ok(line.compareDocumentPosition(label) & f.w.Node.DOCUMENT_POSITION_FOLLOWING);
+    f.$('web-sample').click(); await until(() => f.confirms.length === 1);
+    assert.equal(f.w.document.querySelectorAll('.node').length, 2);
+    f.w.confirm = () => true;
     f.$('web-sample').click(); await until(() => f.w.document.querySelectorAll('.node').length === 6);
     assert.equal(f.$('search').value, ''); assert.equal(f.$('details').hidden, true);
     assert.equal(f.w.document.querySelectorAll('.selected').length, 0);
@@ -322,4 +326,116 @@ test('conflict, permission denial and write failure preserve chart, draft and do
       const leave = new f.w.Event('beforeunload', { cancelable: true }); f.w.dispatchEvent(leave); assert.equal(leave.defaultPrevented, true);
     } finally { f.close(); }
   }
+});
+
+async function downloadValue(f, button = 'web-view-download') {
+  const count = f.downloads.length; f.$(button).click(); await until(() => f.downloads.length > count);
+  const download = f.downloads.at(-1);
+  const text = await new Promise((resolve, reject) => { const reader = new f.w.FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsText(download.blob, 'UTF-8'); });
+  return { name: download.name, text };
+}
+function displayFixture() {
+  const config = directFixture(), sidecar = directFixture(); sidecar.handle.name = 'direct.jsonc.view.json';
+  sidecar.disk.bytes = Buffer.from(encodeState({ version: 1, positions: { a: { x: 321, y: 123, source: ',' } },
+    camera: { x: 90, y: 110, scale: 1.4, width: 1000, height: 680 }, ui: { details: false, focus: false } }));
+  const f = { config, sidecar, selected: config.handle, newTarget: null };
+  f.setup = w => { config.setup(w); w.showOpenFilePicker = async () => [f.selected];
+    w.showSaveFilePicker = async options => { assert.equal(options.suggestedName, 'direct.jsonc.view.json'); return f.newTarget || sidecar.handle; }; };
+  return f;
+}
+test('view download captures positions, camera, layout and UI; download preserves dirty state and no writer is needed', async () => {
+  const f = await page();
+  try {
+    await f.source(); f.$('layout').value = 'circle'; f.$('layout').dispatchEvent(new f.w.Event('change')); gesture(f, true); f.$('zoom-in').click(); f.$('toggle-details').click();
+    const position = f.w.document.querySelector('.node').getAttribute('transform'), camera = f.$('viewport').getAttribute('transform');
+    const output = await downloadValue(f), saved = parseState(output.text);
+    assert.equal(output.name, 'cast.jsonc.view.json'); assert.equal(saved.layout, 'circle'); assert.equal(saved.ui.details, true); assert.ok(saved.positions.a);
+    assert.match(f.$('web-view-status').textContent, /未保存の変更/);
+    f.$('zoom-out').click(); f.$('toggle-details').click();
+    f.choose('web-view', [f.file(output.name, output.text)]); await until(() => f.confirms.length === 1);
+    assert.notEqual(f.$('viewport').getAttribute('transform'), camera);
+    f.w.confirm = () => true; f.choose('web-view', [f.file(output.name, output.text)]); await until(() => f.$('web-file').textContent.includes('.view.json')); await pause();
+    assert.equal(f.w.document.querySelector('.node').getAttribute('transform'), position); assert.equal(f.$('viewport').getAttribute('transform'), camera);
+    assert.equal(f.$('layout').value, 'circle'); assert.equal(f.$('details').hidden, false);
+    assert.match(f.$('web-view-status').textContent, /変更なし/); assert.equal(f.$('web-view-save').hidden, true); assert.equal(f.$('web-view-save-as').hidden, true);
+  } finally { f.close(); }
+});
+test('view-only replacement retains config and unsubmitted draft; node rename is exported under the new ID', async () => {
+  const f = await page();
+  try {
+    await f.source(); gesture(f, true); f.$('edit-config').click(); f.w.document.querySelector('[data-kind="nodes"]').click();
+    f.fill('field-id', 'hero'); f.$('edit-save').click(); await until(() => f.w.document.querySelector('.node').getAttribute('aria-label') === 'A'); await pause();
+    f.fill('field-label', '未反映の人物名'); const output = await downloadValue(f);
+    assert.ok(parseState(output.text).positions.hero); assert.equal(parseState(output.text).positions.a, undefined);
+    f.w.confirm = () => true; f.choose('web-view', [f.file(output.name, output.text)]); await pause();
+    assert.equal(f.$('field-label').value, '未反映の人物名'); assert.equal(f.$('config-editor').open, true);
+    assert.equal(f.w.document.querySelector('.node .name').textContent, 'A');
+    assert.equal(f.$('web-file').textContent, 'cast.jsonc + cast.jsonc.view.json');
+  } finally { f.close(); }
+});
+test('existing view target is explicit, verified save affects only sidecar and keeps the form draft', async () => {
+  const native = displayFixture(), f = await page(native.setup);
+  try {
+    await openDirect(f); await pause(); native.selected = native.sidecar.handle;
+    f.$('web-direct-view-open').click(); await until(() => f.$('web-file').textContent.includes('.view.json')); await pause();
+    assert.equal(f.w.document.querySelector('.node').getAttribute('transform'), 'translate(321 123)');
+    assert.equal(native.sidecar.disk.writes, 0); f.$('zoom-in').click(); await editTitle(f, '反映済みの設定');
+    f.$('edit-config').click(); f.fill('field-title', '未反映の入力');
+    f.$('web-view-save').click(); await until(() => native.sidecar.disk.closes === 1); await pause();
+    assert.match(f.$('web-message').textContent, /内容を確認しました/); assert.match(f.$('web-view-status').textContent, /変更なし/);
+    assert.equal(native.config.disk.bytes.toString(), text); assert.equal(parseState(native.sidecar.disk.bytes.toString()).camera.scale, 1.4 * 1.2);
+    assert.equal(f.$('field-title').value, '未反映の入力'); assert.match(f.$('status').textContent, /未保存/);
+  } finally { f.close(); }
+});
+test('new view target refuses existing bytes; an empty explicit target saves and selection cancellation preserves work', async () => {
+  const native = displayFixture(), f = await page(native.setup);
+  try {
+    await openDirect(f); f.$('zoom-in').click();
+    f.$('web-view-save-as').click(); await until(() => f.$('web-message').textContent.includes('中身のある既存ファイル'));
+    assert.equal(native.sidecar.disk.writes, 0); assert.equal(f.$('web-view-save').disabled, true);
+    const blank = directFixture(); blank.handle.name = 'direct.jsonc.view.json'; blank.disk.bytes = Buffer.alloc(0); native.newTarget = blank.handle;
+    f.$('web-view-save-as').click(); await until(() => blank.disk.closes === 1); await pause();
+    assert.match(f.$('web-message').textContent, /内容を確認しました/); assert.equal(f.$('web-view-save').disabled, false);
+    const saved = parseState(blank.disk.bytes.toString());
+    assert.deepEqual(Object.keys(saved.positions), ['a', 'b']);
+    [...f.w.document.querySelectorAll('.node')].forEach((node, i) => {
+      const position = saved.positions[['a', 'b'][i]];
+      assert.equal(node.getAttribute('transform'), `translate(${position.x} ${position.y})`);
+      assert.equal(position.source, ',');
+    });
+    assert.equal(native.config.disk.writes, 0);
+    f.$('zoom-in').click(); f.w.showSaveFilePicker = async () => { throw Object.assign(new Error('cancel'), { name: 'AbortError' }); };
+    f.$('web-view-save-as').click(); await pause(); assert.match(f.$('web-view-status').textContent, /未保存/);
+    f.$('web-view-save').click(); await until(() => blank.disk.closes === 2); assert.equal(native.sidecar.disk.closes, 0);
+  } finally { f.close(); }
+});
+test('view conflict/permission/write failure preserves config, positions, camera, draft and view download', async () => {
+  for (const fault of ['conflict', 'denied', 'write']) {
+    const native = displayFixture(), f = await page(native.setup);
+    try {
+      await openDirect(f); native.selected = native.sidecar.handle; f.$('web-direct-view-open').click(); await until(() => f.$('web-file').textContent.includes('.view.json')); await pause();
+      f.$('zoom-in').click(); f.$('edit-config').click(); f.fill('field-title', '保持する入力');
+      if (fault === 'conflict') native.sidecar.disk.bytes = Buffer.from(native.sidecar.disk.bytes.toString().replace('321', '322'));
+      if (fault === 'denied') native.sidecar.disk.permission = 'denied'; if (fault === 'write') native.sidecar.disk.fail = 'write';
+      const original = Buffer.from(native.sidecar.disk.bytes), camera = f.$('viewport').getAttribute('transform');
+      f.$('web-view-save').click(); await until(() => f.$('web-message').textContent.includes('退避できます'));
+      assert.deepEqual(native.sidecar.disk.bytes, original); assert.equal(native.config.disk.bytes.toString(), text); assert.equal(native.sidecar.disk.closes, 0);
+      assert.equal(f.$('field-title').value, '保持する入力'); assert.equal(f.$('viewport').getAttribute('transform'), camera); assert.equal(f.$('web-save').disabled, false);
+      if (fault === 'conflict') assert.equal(f.$('web-view-save').disabled, true);
+      const output = await downloadValue(f); assert.equal(parseState(output.text).positions.a.x, 321); assert.equal(parseState(output.text).camera.scale, 1.4 * 1.2);
+      assert.match(f.$('web-view-status').textContent, /未保存/);
+    } finally { f.close(); }
+  }
+});
+test('view capture records focus state and fixed-coordinate signatures without changing the config', async () => {
+  const f = await page();
+  try {
+    await f.source('{"nodes":[{"id":"a","label":"A","x":100,"y":200}],"edges":[]}'); gesture(f, true); f.$('focus').click();
+    const output = await downloadValue(f), saved = parseState(output.text);
+    assert.equal(saved.ui.focus, true); assert.equal(saved.positions.a.source, '100,200');
+    f.$('exit-focus').click(); f.w.confirm = () => true;
+    f.choose('web-files', [f.file('cast.jsonc', '{"nodes":[{"id":"a","label":"A","x":400,"y":500}],"edges":[]}'), f.file(output.name, output.text)]);
+    await until(() => f.w.document.querySelector('.node').getAttribute('transform') === 'translate(400 500)');
+    assert.equal(f.w.document.body.classList.contains('focus-mode'), true); f.$('exit-focus').click();
+  } finally { f.close(); }
 });

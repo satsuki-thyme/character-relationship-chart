@@ -10,14 +10,15 @@ function fixture(readText = f => Promise.resolve(f.text), options = {}) {
   host.onConfig(value => configs.push(value)); host.onView(value => views.push(value)); host.ready();
   return { host, configs, views, downloads };
 }
-test('Web host reads shared JSONC and exposes memory editing without file or view storage', async () => {
+test('Web host reads shared JSONC and exposes memory editing and explicit view capture', async () => {
   const f = fixture(), input = file('任意名.jsonc', '\uFEFF' + source), original = { ...input };
   const result = await f.host.openFiles([input]);
   assert.equal(result.ok, true); assert.equal(result.fileName, input.name);
   assert.deepEqual(f.configs[0].graph, parseConfig(input.text).graph);
   assert.equal(f.views[0].reset, true); assert.deepEqual(input, original);
-  for (const key of ['updateView', 'saveView', 'reloadView', 'exportSvg', 'openSource', 'openView']) assert.equal(f.host[key], undefined);
-  assert.deepEqual(f.host.capabilities, { edit: true, persistEdits: false, viewStorage: false, openSource: false, exportSvg: false });
+  for (const key of ['reloadView', 'exportSvg', 'openSource', 'openView']) assert.equal(f.host[key], undefined);
+  assert.equal(typeof f.host.updateView, 'function'); assert.equal(typeof f.host.saveView, 'function');
+  assert.deepEqual(f.host.capabilities, { edit: true, persistEdits: false, viewStorage: false, viewCapture: true, openSource: false, exportSvg: false });
 });
 test('Web source and matching view are validated atomically; invalid data retains the current document', async () => {
   const f = fixture(); await f.host.openFiles([file('old.jsonc', source)]);

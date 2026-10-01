@@ -6,6 +6,10 @@ function supportsDirectSave(scope = globalThis) {
   return scope.isSecureContext === true && typeof scope.showOpenFilePicker === 'function'
     && typeof scope.FileSystemFileHandle?.prototype?.createWritable === 'function';
 }
+function supportsViewSaveAs(scope = globalThis) {
+  return scope.isSecureContext === true && typeof scope.showSaveFilePicker === 'function'
+    && typeof scope.FileSystemFileHandle?.prototype?.createWritable === 'function';
+}
 function writableHandle(handle) {
   return handle?.kind === 'file' && typeof handle.getFile === 'function'
     && typeof handle.createWritable === 'function' && typeof handle.requestPermission === 'function';
@@ -13,22 +17,22 @@ function writableHandle(handle) {
 function equalBytes(a, b) {
   return a.length === b.length && a.every((value, i) => value === b[i]);
 }
-async function readOriginal(handle) {
+async function readOriginal(handle, limit = LIMITS.text) {
   const file = await handle.getFile();
-  if (file.size > LIMITS.text * 4) throw new Error('元ファイルが大きすぎるため確認できません。');
+  if (file.size > limit * 4) throw new Error('元ファイルが大きすぎるため確認できません。');
   const bytes = new Uint8Array(await file.arrayBuffer());
   return { file, bytes };
 }
-async function openOriginal(handle) {
-  const snapshot = await readOriginal(handle);
+async function openOriginal(handle, limit = LIMITS.text) {
+  const snapshot = await readOriginal(handle, limit);
   // Preserve BOM and reject lossy decoding on the direct-write path.
   return { ...snapshot, text: new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(snapshot.bytes) };
 }
-async function writeOriginal(handle, baseline, text, isActive) {
+async function writeOriginal(handle, baseline, text, isActive, limit = LIMITS.text) {
   let stream, phase = 'permission', blocked = false;
   const active = () => { if (!isActive()) throw new Error('保存処理を中断しました。'); };
   async function unchanged() {
-    const { bytes } = await readOriginal(handle); active();
+    const { bytes } = await readOriginal(handle, limit); active();
     if (!equalBytes(bytes, baseline)) {
       const error = new Error('元ファイルが外部で変更されています。上書きを停止しました。');
       error.conflict = true; throw error;
@@ -49,7 +53,7 @@ async function writeOriginal(handle, baseline, text, isActive) {
     phase = 'write'; await stream.write(bytes); active();
     phase = 'read'; await unchanged();
     phase = 'close'; await stream.close(); stream = null; active();
-    phase = 'verify'; const saved = await readOriginal(handle); active();
+    phase = 'verify'; const saved = await readOriginal(handle, limit); active();
     if (!equalBytes(saved.bytes, bytes)) throw new Error('保存後に読み戻した内容が一致しません。');
     return { ok: true, status: 'saved', bytes };
   } catch (error) {
@@ -63,4 +67,4 @@ async function writeOriginal(handle, baseline, text, isActive) {
       : String(error.message || error) };
   }
 }
-module.exports = { supportsDirectSave, writableHandle, openOriginal, writeOriginal };
+module.exports = { supportsDirectSave, supportsViewSaveAs, writableHandle, openOriginal, writeOriginal };

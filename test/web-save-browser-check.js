@@ -46,12 +46,14 @@ const { parseConfig } = require('../packages/core/config');
     const saved = await page.evaluate(() => disk.text), config = parseConfig(saved).config;
     assert.equal(config.title, '保存する相関図'); assert.deepEqual(config.nodes[0].groups, ['crew', 'g2']); assert.equal(config.edges[0].from, 'hero'); assert.equal(config.edges[0].label, '友情');
     assert.ok(saved.startsWith('\uFEFF')); assert.match(saved, /\t\/\/ keep コメント\r\n/); assert.equal(saved.replace(/\r\n/g, '').includes('\n'), false);
-    assert.equal(await page.evaluate(() => { const e = new Event('beforeunload', { cancelable: true }); dispatchEvent(e); return e.defaultPrevented; }), false);
+    // Config saving cannot mark the renamed IDs in the view snapshot as saved.
+    assert.equal(await page.evaluate(() => { const e = new Event('beforeunload', { cancelable: true }); dispatchEvent(e); return e.defaultPrevented; }), true);
+    assert.match(await page.locator('#web-view-status').textContent(), /未保存/);
     report.checks.push('applied general/person/group/relation edits, references, multiple membership, exact JSONC and verified dirty clearing (handle double)');
     if (capture) await page.screenshot({ path: path.join(capture, 'stage5-saved.png') });
 
-    // Reopen the saved bytes, then create a new applied edit and a live draft.
-    await page.locator('#web-direct-open').click();
+    // Reopen the saved bytes, explicitly discarding the unsaved view snapshot.
+    page.once('dialog', d => d.accept()); await page.locator('#web-direct-open').click();
     await page.locator('#edit-config').click(); await tab('general'); await page.locator('#field-title').fill('退避する編集'); await apply();
     await page.locator('#field-title').fill('未反映の入力');
     // A modal prevents physical clicks on the outer Save button; dispatching a

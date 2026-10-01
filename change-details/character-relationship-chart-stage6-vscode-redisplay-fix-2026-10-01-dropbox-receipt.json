@@ -1,0 +1,830 @@
+{
+  "record_date": "2026-10-01",
+  "timezone": "Asia/Tokyo",
+  "destination_root": "/www/studio/character-relationship-chart",
+  "provider_namespace": "466153749",
+  "status": "All 18 files covered by this receipt and 11 renamed original backups are saved and hash-verified.",
+  "stage6_status": "修正済み・実機再確認待ち",
+  "counts": {
+    "updated_existing_files": 11,
+    "new_files_before_this_receipt": 7,
+    "completed_files_before_this_receipt": 18,
+    "preserved_original_backups": 11,
+    "verified_content_hashes_before_this_receipt": 29,
+    "total_files_including_this_receipt": 19
+  },
+  "backup_policy": {
+    "date_zone": "Asia/Tokyo",
+    "method": "Rename the actual original file within the same directory to an unused backup name; verify original content hash before creating updated original path.",
+    "pre_update_checks": "Original raw bytes/SHA-256 and current file metadata ID/revision checked; existing backups inspected and unused names confirmed.",
+    "failures_observed": 0,
+    "original_versions": [
+      {
+        "relative_path": "MGMT.md",
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjBw",
+        "content_hash": "538f59a10de326dd037d700515f096a6155489cc6d03da0419bd3693387ad022",
+        "sha256": "c42aac3d143063e311c9b57a71a3d9150392c62e9fd434435d5da52997f3c9e6",
+        "verified": true
+      },
+      {
+        "relative_path": "docs/PROCESS_CHART.md",
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjCA",
+        "content_hash": "a3002ade0366383005b5b8e2132bc083dc211dff2382dbfcea4e6a11c96e750f",
+        "sha256": "e5099291bac2688604e9d25acfa418fa4627de30c7579616e8cb3e006f32a239",
+        "verified": true
+      },
+      {
+        "relative_path": "docs/STAGE6_ACCEPTANCE.md",
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjCQ",
+        "content_hash": "8aec70cfffeec3b2364bda0d7d819adfd709aa1ad79023e90647c69d6b1bd8e1",
+        "sha256": "117624f73909c327dd1bb47da3ea2dd4c5aa29cfc8077f44016822af7d12a5e6",
+        "verified": true
+      },
+      {
+        "relative_path": "TESTING.md",
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjBg",
+        "content_hash": "beaf1ac5a3ff77011d2d0b01f64910deaefb637459aa922951d9e7fb7cff4cce",
+        "sha256": "55c2f938313273150888628197383fd6f3200c406fe3abc623db8dcdf0ec72ec",
+        "verified": true
+      },
+      {
+        "relative_path": "docs/DEVELOPMENT.md",
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjAw",
+        "content_hash": "56802af3d6ee806dfcd5adaf5022bca3c9906eccdc15d6e0c9a935b4296818bd",
+        "sha256": "5d869004c314850cda9ecd57f54b160184f044f0f2c5f012496503c852b1c143",
+        "verified": true
+      },
+      {
+        "relative_path": "docs/architecture.md",
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjAg",
+        "content_hash": "1b9e56b4cc1523e9dc2db64107ef08928c909a2a93dfd42940629d355337b761",
+        "sha256": "0030d90c8eeecb9b4640bfca782946c0c84ad9293d9a07615a6f4302189d599e",
+        "verified": true
+      },
+      {
+        "relative_path": "README.md",
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKi_g",
+        "content_hash": "8378a25d375c106f69d921df78caea24a9ded2d30aec47fec6ea7eeff82adaf3",
+        "sha256": "6ca850a7fd51f6dbe61405f60df6eaac370c2c5c57df3a2a917e29b9ee1aee35",
+        "verified": true
+      },
+      {
+        "relative_path": "CHANGELOG.md",
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjBA",
+        "content_hash": "33bac0bc40b92979b678832b100dc1ce7cc02f60fe30ef18b3a94c56992f6870",
+        "sha256": "88b8c42e8b672bf9c2bbd726f122431933f3aa8f9866d2d0b768d7a92a03281d",
+        "verified": true
+      },
+      {
+        "relative_path": "docs/STAGE6_PHYSICAL_DEVICE_CHECK.md",
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjQQ",
+        "content_hash": "873bc1ca8255c7b546d6a8f1a56d181705b4267bcf65b5a9cf8b1e223b72a70c",
+        "sha256": "73cc0d2c4836295cbd92b4e5b28240ceea9c1d781fad4e401aad59ac824232f9",
+        "verified": true
+      },
+      {
+        "relative_path": "media/main.js",
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKi-g",
+        "content_hash": "d2aa5463ec0fc8feca1aa4be0a08e623c486b5266bfcf4f747abbf4348c0a604",
+        "sha256": "b48e7031e942af7c58c26b779fc5554b514eaef30de8220ffc90099357a711c6",
+        "verified": true
+      },
+      {
+        "relative_path": ".vscodeignore",
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKi_Q",
+        "content_hash": "b62f2d651277469a92df32f6f0d74dd0b4ea1d7eaf56b5be2c3c3bb22d82d035",
+        "sha256": "b9f6d4564b999afbd5b23d499cae8cf1d9293a2a0d01976bc086a86912755699",
+        "verified": true
+      }
+    ]
+  },
+  "files": [
+    {
+      "relative_path": "MGMT.md",
+      "new_sha256": "f9ae36a50ae5cfeb19a3f4b0278707e2fb4468762184922e59869da809071ffe",
+      "new_content_hash": "8af5cff84b5f58b24d6e8dd8ecc0a37e3b573a43b41c9d33f6e65b860448b2c9",
+      "size": 3746,
+      "backup": {
+        "file": {
+          "size": 3563
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjBw",
+        "modified_time": "2026-10-01T04:16:15Z",
+        "name": "MGMT.backup-2026-10-01-02.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/MGMT.backup-2026-10-01-02.md",
+        "path_display": "/www/studio/character-relationship-chart/MGMT.backup-2026-10-01-02.md"
+      },
+      "backup_verified": true,
+      "original_content_hash": "538f59a10de326dd037d700515f096a6155489cc6d03da0419bd3693387ad022",
+      "saved": {
+        "file": {
+          "size": 3746
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjWw",
+        "modified_time": "2026-10-01T04:16:19Z",
+        "name": "MGMT.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/MGMT.md",
+        "path_display": "/www/studio/character-relationship-chart/MGMT.md"
+      }
+    },
+    {
+      "relative_path": "docs/PROCESS_CHART.md",
+      "new_sha256": "ca83949cb96df38ad95ef3398c25af8023f1efd26e2fb1adc590b9d96191da36",
+      "new_content_hash": "a1d40f1ce1123c5d8e40c53689b34f2476daf2ab546bb5fe2eaafe868c953623",
+      "size": 27273,
+      "backup": {
+        "file": {
+          "size": 24741
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjCA",
+        "modified_time": "2026-10-01T04:16:22Z",
+        "name": "PROCESS_CHART.backup-2026-10-01-02.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/docs/PROCESS_CHART.backup-2026-10-01-02.md",
+        "path_display": "/www/studio/character-relationship-chart/docs/PROCESS_CHART.backup-2026-10-01-02.md"
+      },
+      "backup_verified": true,
+      "original_content_hash": "a3002ade0366383005b5b8e2132bc083dc211dff2382dbfcea4e6a11c96e750f",
+      "saved": {
+        "file": {
+          "size": 27273
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjXA",
+        "modified_time": "2026-10-01T04:16:27Z",
+        "name": "PROCESS_CHART.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/docs/PROCESS_CHART.md",
+        "path_display": "/www/studio/character-relationship-chart/docs/PROCESS_CHART.md"
+      }
+    },
+    {
+      "relative_path": "docs/STAGE6_ACCEPTANCE.md",
+      "new_sha256": "5379c6b625af11072f76471d0b3ac873249d3c1d440cd05dd5877b5c5150ffe6",
+      "new_content_hash": "e5ceb55baf6c8e37ab9af24d6e26d2551ce6289ed120793e232baeb1e61c62d2",
+      "size": 8751,
+      "backup": {
+        "file": {
+          "size": 7134
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjCQ",
+        "modified_time": "2026-10-01T04:16:31Z",
+        "name": "STAGE6_ACCEPTANCE.backup-2026-10-01-02.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/docs/STAGE6_ACCEPTANCE.backup-2026-10-01-02.md",
+        "path_display": "/www/studio/character-relationship-chart/docs/STAGE6_ACCEPTANCE.backup-2026-10-01-02.md"
+      },
+      "backup_verified": true,
+      "original_content_hash": "8aec70cfffeec3b2364bda0d7d819adfd709aa1ad79023e90647c69d6b1bd8e1",
+      "saved": {
+        "file": {
+          "size": 8751
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjXQ",
+        "modified_time": "2026-10-01T04:16:35Z",
+        "name": "STAGE6_ACCEPTANCE.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/docs/STAGE6_ACCEPTANCE.md",
+        "path_display": "/www/studio/character-relationship-chart/docs/STAGE6_ACCEPTANCE.md"
+      }
+    },
+    {
+      "relative_path": "TESTING.md",
+      "new_sha256": "262b3c7ec3141e1838e641fe564e39f955ce7ceeddf521a16eec7f813a97a98d",
+      "new_content_hash": "508daa2d6d3e8cc5b4d8d358a96e6027614512bc5c26b9b74acb02e524e78f99",
+      "size": 48422,
+      "backup": {
+        "file": {
+          "size": 44911
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjBg",
+        "modified_time": "2026-10-01T04:16:38Z",
+        "name": "TESTING.backup-2026-10-01-02.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/TESTING.backup-2026-10-01-02.md",
+        "path_display": "/www/studio/character-relationship-chart/TESTING.backup-2026-10-01-02.md"
+      },
+      "backup_verified": true,
+      "original_content_hash": "beaf1ac5a3ff77011d2d0b01f64910deaefb637459aa922951d9e7fb7cff4cce",
+      "saved": {
+        "file": {
+          "size": 48422
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjXg",
+        "modified_time": "2026-10-01T04:16:43Z",
+        "name": "TESTING.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/TESTING.md",
+        "path_display": "/www/studio/character-relationship-chart/TESTING.md"
+      }
+    },
+    {
+      "relative_path": "docs/DEVELOPMENT.md",
+      "new_sha256": "33b9059daa9ede5017f7c3d5c6d2df59cc8f0e53c0163ee773f162905808c9a4",
+      "new_content_hash": "f96dbc535653a76d8525aa7732c50ca1186c7c5cecc4a9185b9626b1fbb44942",
+      "size": 17681,
+      "backup": {
+        "file": {
+          "size": 16495
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjAw",
+        "modified_time": "2026-10-01T04:16:45Z",
+        "name": "DEVELOPMENT.backup-2026-10-01-02.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/docs/DEVELOPMENT.backup-2026-10-01-02.md",
+        "path_display": "/www/studio/character-relationship-chart/docs/DEVELOPMENT.backup-2026-10-01-02.md"
+      },
+      "backup_verified": true,
+      "original_content_hash": "56802af3d6ee806dfcd5adaf5022bca3c9906eccdc15d6e0c9a935b4296818bd",
+      "saved": {
+        "file": {
+          "size": 17681
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjXw",
+        "modified_time": "2026-10-01T04:16:48Z",
+        "name": "DEVELOPMENT.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/docs/DEVELOPMENT.md",
+        "path_display": "/www/studio/character-relationship-chart/docs/DEVELOPMENT.md"
+      }
+    },
+    {
+      "relative_path": "docs/architecture.md",
+      "new_sha256": "c79c30c46b69595eb8b6084df9564138086a106f5f607656414e516cf12b79f3",
+      "new_content_hash": "aa38026b50d3516c0dac072653b3c57eed884f456512424323c5d5bbca645bda",
+      "size": 25771,
+      "backup": {
+        "file": {
+          "size": 24717
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjAg",
+        "modified_time": "2026-10-01T04:16:51Z",
+        "name": "architecture.backup-2026-10-01-02.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/docs/architecture.backup-2026-10-01-02.md",
+        "path_display": "/www/studio/character-relationship-chart/docs/architecture.backup-2026-10-01-02.md"
+      },
+      "backup_verified": true,
+      "original_content_hash": "1b9e56b4cc1523e9dc2db64107ef08928c909a2a93dfd42940629d355337b761",
+      "saved": {
+        "file": {
+          "size": 25771
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjYA",
+        "modified_time": "2026-10-01T04:16:55Z",
+        "name": "architecture.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/docs/architecture.md",
+        "path_display": "/www/studio/character-relationship-chart/docs/architecture.md"
+      }
+    },
+    {
+      "relative_path": "README.md",
+      "new_sha256": "52629e6df9ae365a3c6cb31b791fdcf9e2310734bf5f3a0f65c48c3e4d48dba2",
+      "new_content_hash": "fe589e53e42263950a865788310cdc38a33fa8f91bd9ba6fd4ec3af695f19190",
+      "size": 18339,
+      "backup": {
+        "file": {
+          "size": 17241
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKi_g",
+        "modified_time": "2026-10-01T04:16:58Z",
+        "name": "README.backup-2026-10-01-02.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/README.backup-2026-10-01-02.md",
+        "path_display": "/www/studio/character-relationship-chart/README.backup-2026-10-01-02.md"
+      },
+      "backup_verified": true,
+      "original_content_hash": "8378a25d375c106f69d921df78caea24a9ded2d30aec47fec6ea7eeff82adaf3",
+      "saved": {
+        "file": {
+          "size": 18339
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjYQ",
+        "modified_time": "2026-10-01T04:17:04Z",
+        "name": "README.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/README.md",
+        "path_display": "/www/studio/character-relationship-chart/README.md"
+      }
+    },
+    {
+      "relative_path": "CHANGELOG.md",
+      "new_sha256": "cc6c04392b310dc80896938e8b2b31e8a7a46e733c59e2f4dc6384133a2292c8",
+      "new_content_hash": "0cfbd4d61145b503dcccf9d4259b81461c0eebd5f12ed1ff2e2aba2772d19365",
+      "size": 7042,
+      "backup": {
+        "file": {
+          "size": 6237
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjBA",
+        "modified_time": "2026-10-01T04:17:07Z",
+        "name": "CHANGELOG.backup-2026-10-01-02.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/CHANGELOG.backup-2026-10-01-02.md",
+        "path_display": "/www/studio/character-relationship-chart/CHANGELOG.backup-2026-10-01-02.md"
+      },
+      "backup_verified": true,
+      "original_content_hash": "33bac0bc40b92979b678832b100dc1ce7cc02f60fe30ef18b3a94c56992f6870",
+      "saved": {
+        "file": {
+          "size": 7042
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjYg",
+        "modified_time": "2026-10-01T04:17:12Z",
+        "name": "CHANGELOG.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/CHANGELOG.md",
+        "path_display": "/www/studio/character-relationship-chart/CHANGELOG.md"
+      }
+    },
+    {
+      "relative_path": "docs/STAGE6_PHYSICAL_DEVICE_CHECK.md",
+      "new_sha256": "b087abb4abc76dde5582d7bd3382d7de47ad6d664fff787ad5e1cfe90deeac90",
+      "new_content_hash": "cea37c505b364367c5cbb0e15edf46d26a2325cdcbcce436156e6ea71340c00d",
+      "size": 7432,
+      "backup": {
+        "file": {
+          "size": 4787
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjQQ",
+        "modified_time": "2026-10-01T04:17:15Z",
+        "name": "STAGE6_PHYSICAL_DEVICE_CHECK.backup-2026-10-01-03.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/docs/STAGE6_PHYSICAL_DEVICE_CHECK.backup-2026-10-01-03.md",
+        "path_display": "/www/studio/character-relationship-chart/docs/STAGE6_PHYSICAL_DEVICE_CHECK.backup-2026-10-01-03.md"
+      },
+      "backup_verified": true,
+      "original_content_hash": "873bc1ca8255c7b546d6a8f1a56d181705b4267bcf65b5a9cf8b1e223b72a70c",
+      "saved": {
+        "file": {
+          "size": 7432
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjYw",
+        "modified_time": "2026-10-01T04:17:20Z",
+        "name": "STAGE6_PHYSICAL_DEVICE_CHECK.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/docs/STAGE6_PHYSICAL_DEVICE_CHECK.md",
+        "path_display": "/www/studio/character-relationship-chart/docs/STAGE6_PHYSICAL_DEVICE_CHECK.md"
+      }
+    },
+    {
+      "relative_path": "media/main.js",
+      "new_sha256": "1bad960562dc60ce8d5ca1b413bfda83f0ceaec6d9e460e07cd563cdd68ad3a9",
+      "new_content_hash": "beff49cc519ba0b585a81440e644d3e2cc55642a6e85f39ceaa88b3e86989984",
+      "size": 30103,
+      "backup": {
+        "file": {
+          "size": 29611
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKi-g",
+        "modified_time": "2026-10-01T04:17:23Z",
+        "name": "main.backup-2026-10-01-02.js",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/media/main.backup-2026-10-01-02.js",
+        "path_display": "/www/studio/character-relationship-chart/media/main.backup-2026-10-01-02.js"
+      },
+      "backup_verified": true,
+      "original_content_hash": "d2aa5463ec0fc8feca1aa4be0a08e623c486b5266bfcf4f747abbf4348c0a604",
+      "saved": {
+        "file": {
+          "size": 30103
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjZA",
+        "modified_time": "2026-10-01T04:17:28Z",
+        "name": "main.js",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/media/main.js",
+        "path_display": "/www/studio/character-relationship-chart/media/main.js"
+      }
+    },
+    {
+      "relative_path": ".vscodeignore",
+      "new_sha256": "95d1258ecc85862f331a60724320f96e7a73aeaa14c23fadb0d443f64cfd3c0c",
+      "new_content_hash": "e545fe80b07236f6d5ee8f11c7c7e2716fd5c01c5e5d1fca4f1f5e0d83b4b638",
+      "size": 1514,
+      "backup": {
+        "file": {
+          "size": 1383
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKi_Q",
+        "modified_time": "2026-10-01T04:17:31Z",
+        "name": ".vscodeignore.backup-2026-10-01-02",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/.vscodeignore.backup-2026-10-01-02",
+        "path_display": "/www/studio/character-relationship-chart/.vscodeignore.backup-2026-10-01-02"
+      },
+      "backup_verified": true,
+      "original_content_hash": "b62f2d651277469a92df32f6f0d74dd0b4ea1d7eaf56b5be2c3c3bb22d82d035",
+      "saved": {
+        "file": {
+          "size": 1514
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjZQ",
+        "modified_time": "2026-10-01T04:17:35Z",
+        "name": ".vscodeignore",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/.vscodeignore",
+        "path_display": "/www/studio/character-relationship-chart/.vscodeignore"
+      }
+    },
+    {
+      "relative_path": "test/stage6-vscode-redisplay-dom-check.js",
+      "new_sha256": "a12f7120f23255e05a5c29ad118e0efda77f76274ed6cd39009eaedd4641c906",
+      "new_content_hash": "aef569d5aaaed5c4c18b650af20047fdfa6b7215fdc5241ccaf57aa20b1c1ae4",
+      "size": 10015,
+      "saved": {
+        "file": {
+          "size": 10015
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjZg",
+        "modified_time": "2026-10-01T04:17:38Z",
+        "name": "stage6-vscode-redisplay-dom-check.js",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/test/stage6-vscode-redisplay-dom-check.js",
+        "path_display": "/www/studio/character-relationship-chart/test/stage6-vscode-redisplay-dom-check.js"
+      }
+    },
+    {
+      "relative_path": "test/stage6-vscode-redisplay-browser-check.js",
+      "new_sha256": "d98fa897af069f5cbafbcb9293b3620986f58931678ad621b69aaef16b25d5c9",
+      "new_content_hash": "dbde5d43bed5bd60e1fdbf7b1d77ba19b092e8b3254911bb546b80a1a3708b10",
+      "size": 9261,
+      "saved": {
+        "file": {
+          "size": 9261
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjZw",
+        "modified_time": "2026-10-01T04:17:41Z",
+        "name": "stage6-vscode-redisplay-browser-check.js",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/test/stage6-vscode-redisplay-browser-check.js",
+        "path_display": "/www/studio/character-relationship-chart/test/stage6-vscode-redisplay-browser-check.js"
+      }
+    },
+    {
+      "relative_path": "dist/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01.vsix",
+      "new_sha256": "e0ead4c9bf2ce8c4ed1f726c01f37bc93c061de556b337670ded900dfc15d226",
+      "new_content_hash": "0ecb0087185584f99f5214822e5d021ca79042a910a34c6718f0919530caf5df",
+      "size": 429005,
+      "saved": {
+        "file": {
+          "size": 429005
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjaA",
+        "modified_time": "2026-10-01T04:17:45Z",
+        "name": "character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01.vsix",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/dist/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01.vsix",
+        "path_display": "/www/studio/character-relationship-chart/dist/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01.vsix"
+      }
+    },
+    {
+      "relative_path": "dist/character-relationship-chart-web-stage6-vscode-redisplay-fix-2026-10-01.zip",
+      "new_sha256": "244760a4767a46e8bbaa4f6ffe4ebc670590359055cea214f33eca8a32cb1539",
+      "new_content_hash": "641984f25336187e98f2ee21f7f9c49620469de7d64a62b0ea7aee62f576b6d2",
+      "size": 60372,
+      "saved": {
+        "file": {
+          "size": 60372
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjaQ",
+        "modified_time": "2026-10-01T04:17:50Z",
+        "name": "character-relationship-chart-web-stage6-vscode-redisplay-fix-2026-10-01.zip",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/dist/character-relationship-chart-web-stage6-vscode-redisplay-fix-2026-10-01.zip",
+        "path_display": "/www/studio/character-relationship-chart/dist/character-relationship-chart-web-stage6-vscode-redisplay-fix-2026-10-01.zip"
+      }
+    },
+    {
+      "relative_path": "dist/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-SHA256SUMS.txt",
+      "new_sha256": "12221523679d53ab38a92fb2398e2babf84aae71eb41bffe2f5af867aa067b1f",
+      "new_content_hash": "6c826530bd2c84abdb0894bfbc0ce35924d65e1dc183045f7677604bd278ab16",
+      "size": 281,
+      "saved": {
+        "file": {
+          "size": 281
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjag",
+        "modified_time": "2026-10-01T04:17:54Z",
+        "name": "character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-SHA256SUMS.txt",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/dist/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-SHA256SUMS.txt",
+        "path_display": "/www/studio/character-relationship-chart/dist/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-SHA256SUMS.txt"
+      }
+    },
+    {
+      "relative_path": "verification/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01.zip",
+      "new_sha256": "a226d44fbe0d7cb7e1c52bb261516e752d8bfb6a56c135104aeab253e96b15a9",
+      "new_content_hash": "5307002c2d74ce6b5dae3dfa2935f55e774c00ad11b91411697e200c61274393",
+      "size": 458503,
+      "saved": {
+        "file": {
+          "size": 458503
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjaw",
+        "modified_time": "2026-10-01T04:18:04Z",
+        "name": "character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01.zip",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/verification/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01.zip",
+        "path_display": "/www/studio/character-relationship-chart/verification/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01.zip"
+      }
+    },
+    {
+      "relative_path": "change-details/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-ja.md",
+      "size": 18146,
+      "new_sha256": "afa81414ebd205a5d2b8959ebdf98e493d436125b302ad524ba7f19b5ce13f64",
+      "new_content_hash": "116b97942cc9db300cd0a1fbc52cde2ed8ef0b9d45ee3f3d22f71259afca95d0",
+      "saved": {
+        "file": {
+          "size": 18146
+        },
+        "file_id": "id:pdXqx4wRBdMAAAAAAAKjbA",
+        "modified_time": "2026-10-01T04:25:24Z",
+        "name": "character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-ja.md",
+        "object_type": "file",
+        "path": "ns:466153749//www/studio/character-relationship-chart/change-details/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-ja.md",
+        "path_display": "/www/studio/character-relationship-chart/change-details/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-ja.md"
+      }
+    }
+  ],
+  "saved_content_hash_verifications": [
+    {
+      "path_display": "/www/studio/character-relationship-chart/MGMT.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/MGMT.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjWw",
+      "kind": "updated/new",
+      "content_hash": "8af5cff84b5f58b24d6e8dd8ecc0a37e3b573a43b41c9d33f6e65b860448b2c9",
+      "size": 3746,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/MGMT.backup-2026-10-01-02.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/MGMT.backup-2026-10-01-02.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjBw",
+      "kind": "backup",
+      "content_hash": "538f59a10de326dd037d700515f096a6155489cc6d03da0419bd3693387ad022",
+      "size": 3563,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/docs/PROCESS_CHART.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/docs/PROCESS_CHART.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjXA",
+      "kind": "updated/new",
+      "content_hash": "a1d40f1ce1123c5d8e40c53689b34f2476daf2ab546bb5fe2eaafe868c953623",
+      "size": 27273,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/docs/PROCESS_CHART.backup-2026-10-01-02.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/docs/PROCESS_CHART.backup-2026-10-01-02.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjCA",
+      "kind": "backup",
+      "content_hash": "a3002ade0366383005b5b8e2132bc083dc211dff2382dbfcea4e6a11c96e750f",
+      "size": 24741,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/docs/STAGE6_ACCEPTANCE.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/docs/STAGE6_ACCEPTANCE.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjXQ",
+      "kind": "updated/new",
+      "content_hash": "e5ceb55baf6c8e37ab9af24d6e26d2551ce6289ed120793e232baeb1e61c62d2",
+      "size": 8751,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/docs/STAGE6_ACCEPTANCE.backup-2026-10-01-02.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/docs/STAGE6_ACCEPTANCE.backup-2026-10-01-02.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjCQ",
+      "kind": "backup",
+      "content_hash": "8aec70cfffeec3b2364bda0d7d819adfd709aa1ad79023e90647c69d6b1bd8e1",
+      "size": 7134,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/TESTING.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/TESTING.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjXg",
+      "kind": "updated/new",
+      "content_hash": "508daa2d6d3e8cc5b4d8d358a96e6027614512bc5c26b9b74acb02e524e78f99",
+      "size": 48422,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/TESTING.backup-2026-10-01-02.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/TESTING.backup-2026-10-01-02.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjBg",
+      "kind": "backup",
+      "content_hash": "beaf1ac5a3ff77011d2d0b01f64910deaefb637459aa922951d9e7fb7cff4cce",
+      "size": 44911,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/docs/DEVELOPMENT.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/docs/DEVELOPMENT.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjXw",
+      "kind": "updated/new",
+      "content_hash": "f96dbc535653a76d8525aa7732c50ca1186c7c5cecc4a9185b9626b1fbb44942",
+      "size": 17681,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/docs/DEVELOPMENT.backup-2026-10-01-02.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/docs/DEVELOPMENT.backup-2026-10-01-02.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjAw",
+      "kind": "backup",
+      "content_hash": "56802af3d6ee806dfcd5adaf5022bca3c9906eccdc15d6e0c9a935b4296818bd",
+      "size": 16495,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/docs/architecture.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/docs/architecture.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjYA",
+      "kind": "updated/new",
+      "content_hash": "aa38026b50d3516c0dac072653b3c57eed884f456512424323c5d5bbca645bda",
+      "size": 25771,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/docs/architecture.backup-2026-10-01-02.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/docs/architecture.backup-2026-10-01-02.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjAg",
+      "kind": "backup",
+      "content_hash": "1b9e56b4cc1523e9dc2db64107ef08928c909a2a93dfd42940629d355337b761",
+      "size": 24717,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/README.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/README.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjYQ",
+      "kind": "updated/new",
+      "content_hash": "fe589e53e42263950a865788310cdc38a33fa8f91bd9ba6fd4ec3af695f19190",
+      "size": 18339,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/README.backup-2026-10-01-02.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/README.backup-2026-10-01-02.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKi_g",
+      "kind": "backup",
+      "content_hash": "8378a25d375c106f69d921df78caea24a9ded2d30aec47fec6ea7eeff82adaf3",
+      "size": 17241,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/CHANGELOG.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/CHANGELOG.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjYg",
+      "kind": "updated/new",
+      "content_hash": "0cfbd4d61145b503dcccf9d4259b81461c0eebd5f12ed1ff2e2aba2772d19365",
+      "size": 7042,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/CHANGELOG.backup-2026-10-01-02.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/CHANGELOG.backup-2026-10-01-02.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjBA",
+      "kind": "backup",
+      "content_hash": "33bac0bc40b92979b678832b100dc1ce7cc02f60fe30ef18b3a94c56992f6870",
+      "size": 6237,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/docs/STAGE6_PHYSICAL_DEVICE_CHECK.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/docs/STAGE6_PHYSICAL_DEVICE_CHECK.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjYw",
+      "kind": "updated/new",
+      "content_hash": "cea37c505b364367c5cbb0e15edf46d26a2325cdcbcce436156e6ea71340c00d",
+      "size": 7432,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/docs/STAGE6_PHYSICAL_DEVICE_CHECK.backup-2026-10-01-03.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/docs/STAGE6_PHYSICAL_DEVICE_CHECK.backup-2026-10-01-03.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjQQ",
+      "kind": "backup",
+      "content_hash": "873bc1ca8255c7b546d6a8f1a56d181705b4267bcf65b5a9cf8b1e223b72a70c",
+      "size": 4787,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/media/main.js",
+      "path": "ns:466153749//www/studio/character-relationship-chart/media/main.js",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjZA",
+      "kind": "updated/new",
+      "content_hash": "beff49cc519ba0b585a81440e644d3e2cc55642a6e85f39ceaa88b3e86989984",
+      "size": 30103,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/media/main.backup-2026-10-01-02.js",
+      "path": "ns:466153749//www/studio/character-relationship-chart/media/main.backup-2026-10-01-02.js",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKi-g",
+      "kind": "backup",
+      "content_hash": "d2aa5463ec0fc8feca1aa4be0a08e623c486b5266bfcf4f747abbf4348c0a604",
+      "size": 29611,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/.vscodeignore",
+      "path": "ns:466153749//www/studio/character-relationship-chart/.vscodeignore",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjZQ",
+      "kind": "updated/new",
+      "content_hash": "e545fe80b07236f6d5ee8f11c7c7e2716fd5c01c5e5d1fca4f1f5e0d83b4b638",
+      "size": 1514,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/.vscodeignore.backup-2026-10-01-02",
+      "path": "ns:466153749//www/studio/character-relationship-chart/.vscodeignore.backup-2026-10-01-02",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKi_Q",
+      "kind": "backup",
+      "content_hash": "b62f2d651277469a92df32f6f0d74dd0b4ea1d7eaf56b5be2c3c3bb22d82d035",
+      "size": 1383,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/test/stage6-vscode-redisplay-dom-check.js",
+      "path": "ns:466153749//www/studio/character-relationship-chart/test/stage6-vscode-redisplay-dom-check.js",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjZg",
+      "kind": "updated/new",
+      "content_hash": "aef569d5aaaed5c4c18b650af20047fdfa6b7215fdc5241ccaf57aa20b1c1ae4",
+      "size": 10015,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/test/stage6-vscode-redisplay-browser-check.js",
+      "path": "ns:466153749//www/studio/character-relationship-chart/test/stage6-vscode-redisplay-browser-check.js",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjZw",
+      "kind": "updated/new",
+      "content_hash": "dbde5d43bed5bd60e1fdbf7b1d77ba19b092e8b3254911bb546b80a1a3708b10",
+      "size": 9261,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/dist/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01.vsix",
+      "path": "ns:466153749//www/studio/character-relationship-chart/dist/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01.vsix",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjaA",
+      "kind": "updated/new",
+      "content_hash": "0ecb0087185584f99f5214822e5d021ca79042a910a34c6718f0919530caf5df",
+      "size": 429005,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/dist/character-relationship-chart-web-stage6-vscode-redisplay-fix-2026-10-01.zip",
+      "path": "ns:466153749//www/studio/character-relationship-chart/dist/character-relationship-chart-web-stage6-vscode-redisplay-fix-2026-10-01.zip",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjaQ",
+      "kind": "updated/new",
+      "content_hash": "641984f25336187e98f2ee21f7f9c49620469de7d64a62b0ea7aee62f576b6d2",
+      "size": 60372,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/dist/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-SHA256SUMS.txt",
+      "path": "ns:466153749//www/studio/character-relationship-chart/dist/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-SHA256SUMS.txt",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjag",
+      "kind": "updated/new",
+      "content_hash": "6c826530bd2c84abdb0894bfbc0ce35924d65e1dc183045f7677604bd278ab16",
+      "size": 281,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/verification/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01.zip",
+      "path": "ns:466153749//www/studio/character-relationship-chart/verification/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01.zip",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjaw",
+      "kind": "updated/new",
+      "content_hash": "5307002c2d74ce6b5dae3dfa2935f55e774c00ad11b91411697e200c61274393",
+      "size": 458503,
+      "verified": true
+    },
+    {
+      "path_display": "/www/studio/character-relationship-chart/change-details/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-ja.md",
+      "path": "ns:466153749//www/studio/character-relationship-chart/change-details/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-ja.md",
+      "file_id": "id:pdXqx4wRBdMAAAAAAAKjbA",
+      "kind": "updated/new",
+      "content_hash": "116b97942cc9db300cd0a1fbc52cde2ed8ef0b9d45ee3f3d22f71259afca95d0",
+      "size": 18146,
+      "verified": true
+    }
+  ],
+  "self_verification": {
+    "relative_path": "change-details/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-dropbox-receipt.json",
+    "method": "After upload completion, independently compare this receipt's saved Dropbox content_hash and size with the local file; report completion only when they match.",
+    "self_hash_embedded": false,
+    "reason": "Avoid a circular self-referential hash."
+  },
+  "not_performed": [
+    "Windows recheck of corrected VSIX",
+    "Actual VS Code Extension Host automated execution",
+    "Git commit or push",
+    "HTTPS site deployment",
+    "Stage 7 implementation"
+  ],
+  "evidence_archive": "verification/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01.zip",
+  "fix_record": "change-details/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-ja.md"
+}

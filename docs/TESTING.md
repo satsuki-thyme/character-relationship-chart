@@ -1,50 +1,5 @@
 # 検証結果と実機確認手順
 
-## 第6段階・VS Code直接保存後の再表示修正（2026-10-01 JST）
-
-現在は **修正済み・実機再確認待ち**。前回の実機結果はWeb3項目ok、VS Codeの配置復元ok／直接保存後の復元ng／連続ドラッグok。正本 `docs/STAGE6_PHYSICAL_DEVICE_CHECK.md` の本文結果を採用し、初回報告と前回修正記録を保持する。以下の旧記録にある未受領・未反映という判定は当時のもの。
-
-| 今回実行した検証 | 結果と限界 |
-| --- | --- |
-| 構文 `npm run check` | 19本番JS成功。新規テスト2本の構文も別途確認 |
-| 通常 `npm test` | 116件成功、失敗・取消・スキップ0。保存・競合・編集・SVGの模擬VS Codeを含む |
-| 共有UI／Web／回帰DOM | 40件成功（12＋19＋5＋新規4）。Web19件は重複加算しない |
-| 新規再表示DOM | 4件は上記40件に含む。実アダプター＋実拡張＋模擬VS Codeで、全座標保存、パネル状態通知、同一設定通知、表示ファイルを開く、再保存、開き直し、再読込、未反映フォーム、固定座標、ID変更・削除、配置切替・リセット |
-| 原コードとの比較 | DOM4件中2件が配置の差で失敗、2件成功。実ブラウザ3操作群中2群が同じ配置の差で失敗、1群成功。入力コードは今回取得したmain.jsとハッシュ一致 |
-| 新規実Chromium | 3操作群成功。全人物の描画座標と実保存JSON、再通知、表示ファイルを開く、再保存、閉じて開き直し、再読込、配置変更、連続ドラッグ。VS Code APIとファイルは模擬。実Extension Hostではない |
-| 既存実Chromium | 表示データ7、設定保存5、前回回帰3の計15操作群成功。Webの復元・直接保存・連続ドラッグ・競合・障害・退避・オフライン。直接保存成功は模擬ハンドル |
-| 本番互換性 | core・schema・src・VS Codeホスト・manifest・lockfileは取得時と同じ。形式version1、アプリ0.1.0を維持 |
-
-Linux／Node.js v24.19.0／jsdom26.1.0／Playwright／Chromium153.0.8010.0。検証用依存・フォントはプロジェクト外。標準Playwrightブラウザの取得は不完全ZIPで失敗したため、検証用Headless153を使用。single-process環境で最後のcontextを閉じるとブラウザが終了するため、前回回帰試験のcontext破棄をブラウザ終了時へ遅らせた検証専用ラッパーを使用した。元テストの全assertionを維持し、失敗した最初の環境ログも証跡へ含める。Webセキュリティは無効化していない。
-
-実Extension Host、修正版VSIXのWindowsインストール／再確認、実Undo、今回のOS picker・ネイティブ表示書込成功は自動環境で未実施。前回の利用者によるWeb保存okを今回の自動成功として数えない。対象GitのHEAD/ref/indexを読み、取得した追跡66ファイルのうち23ファイルにindexとの差を確認した。未取得15ファイルとHEAD全treeとの差・staged状態は未確認。ユーザー差分を保護しGitは更新しない。
-
-配布・バックアップ・実際のDropbox反映は [追加修正記録](change-details/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-ja.md) と同名の `-dropbox-receipt.json`、根拠ログは `verification/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01.zip` を参照する。
-
-## 第6段階の不具合修正（2026-10-01 JST、実機再確認待ち）
-
-正の実機報告は `docs/STAGE6_PHYSICAL_DEVICE_CHECK.md`。Windows 11 26H2 / Chrome 154.0.8037.59 / HTTPSで初回1〜5はok、6の対応名の勘違いは解決。配置復元と連続ドラッグの不具合を今回修正した。第1〜5段階の完了を維持し、第6段階は修正版の実機再確認待ち、第7段階は未着手。
-
-現行Dropboxの93ファイルと261 Git情報ファイルを取得し内容ハッシュを照合。Git HEAD `e215aee59bc38acfbe17276722b8fdda78a271bc` / main、変更22・未追跡12の状態を保護し、旧ソースは再適用しない。core・schema・src・ホスト保存処理・manifest・lockfileは着手時と同じ。`git diff --check` の末尾空白2件は着手時のMGMTと工程表のユーザー差分に既に存在するため、勝手に削除していない。
-
-| 今回の検証 | 結果・範囲 |
-| --- | --- |
-| `npm run check` | 19本番JS成功 |
-| `npm test` | 116件成功、失敗・スキップなし。VS Code模擬APIの保存・編集・Undo境界・競合・SVGを含む |
-| `npm run test:web` | 19件成功 |
-| 共有UI／Web／新規DOM | 36件成功（12＋19＋5）。Web19件は追加計上しない |
-| 新規実Chromium | 3操作群成功。実ダウンロードJSONの全座標と描画状態、倍率／カメラ中心、auto/circle、詳細／focus、ネイティブcapture喪失、A/B/C連続操作、パン、タブ／ページ復帰。VS Code本番UI・実アダプター・模擬拡張の保存／復元も確認 |
-| 既存実Chromium | 8＋5＋7の20操作群成功。GUI／ID・複数所属／JSONC／設定保存と表示保存の独立管理／競合・権限・write/close/照合失敗／退避／390px／オフライン／CSP |
-| ネイティブAPI | 実ファイル読込・拒否時保持は成功。OS pickerはAbortError、readwriteはdenied。今回のネイティブ表示書込成功は未確認 |
-
-原コードを初回Dropboxハッシュに一致する隔離環境で検証すると、全座標保存不足、取得喪失後のdrag残留、VS Code側の未移動人物の復元差分でブラウザ3群が失敗した。修正版で同じ3群が成功。通常の連続ドラッグは原コードのLinux Chromiumでは成功し、利用者のWindows現象そのものは厳密には再現できていない。中断／取得喪失の実装上の原因まで再現し修正したという範囲で報告する。実機再確認を省略しない。
-
-環境はLinux／Node v24.19.0／npm11.9.0／jsdom26.1.0／Playwright／Chromium Headless153.0.8010.0。検証専用の日本語フォントと依存はプロジェクト外。Webセキュリティを無効にする引数は除外して実行した。テスト用UI／注入した保存障害／模擬ハンドルと、実OS選択・Extension Hostを区別する。fontなしの初期キャプチャや不適切なfixtureの試行は採用せず、最終ログを根拠にする。
-
-根拠ログ: `verification/stage6-fixes/` の `check.log`、`tests.log`、`test-web.log`、`dom.log`、`regression-browser-original.json`、`stage6-regression-browser-check.json`、`web-*-check-final.json`。配布物生成・内容照合は同ディレクトリの `build-web.log`、`package.log`、`artifact-contents.json`、`artifact-smoke.json`。変更明細にも保存先・バックアップ・判定を記録する。
-
-再確認は報告書末尾の必須3項目（復元／直接保存後の復元／連続ドラッグとページ復帰）だけに絞る。実VS Codeは可能なら共有UIを確認する。下記各節は過去の検証記録として保持し、以前の「未受領／未反映」を現在の状態へ流用しない。
-
 ## 第6段階（2026-10-01 JST、実装・自動検証済み／実機確認待ち）
 
 第5段階は利用者の通常保存・再読込・競合停止の報告を照合して2026-09-28 JSTに完了済み。開始時にDropbox現行82ソースを取得し、第5段階完了版27対象中25対象が一致、残るMGMTと工程表はユーザー更新であることを確認した。Git HEADは `e215aee59bc38acfbe17276722b8fdda78a271bc`。`.gitignore`、MGMT、工程表の未コミット差分と未追跡 `prompt/STAGE6_PROMPT.md` を保持した。

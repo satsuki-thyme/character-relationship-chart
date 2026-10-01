@@ -88,3 +88,10 @@ Marketplace公開は別作業です。現在のpublisherは手動VSIX配布用�
 - `npm run package` 後のVSIXを `dist/character-relationship-chart-stage5-completed.vsix` とする。Webファイル・検証依存・工程表・受入手順を除外し、表示名・拡張ID・版数を維持する。
 - ZIPを別の場所へ展開し、全エントリーのバイト一致、オフライン起動を確認する。VSIXの実行コードを検証済みソースと照合する。ハッシュは変更明細に記録し、古い配布物と区別する。
 - 利用者の実機で通常保存・再読込と外部変更時の警告・保存停止を確認し、第5段階の完了判定を記録した。初回の `stage5` 配布物は保存し、今回の `stage5-completed` 配布物とはハッシュで区別する。実行コードは同じで、配布READMEの完了記録だけが変わる。OS・ブラウザ版数と未提示の個別試験を確認済みへ読み替えない。
+
+## 第6段階の配布物（2026-10-01 JST、実機確認待ち）
+
+- `npm run build:web` の9ファイルを `dist/character-relationship-chart-web-stage6.zip` へ格納し、展開後の全バイト一致・オフライン・設定と表示の実ダウンロード／再読込を検証する。
+- `npm run package` の結果を `dist/character-relationship-chart-stage6.vsix` とする。実行コードとソースを照合し、Web・prompt・test・verification・開発依存を除外する。識別子と0.1.0は維持。
+- 配布物の生成は実機受入完了を意味しない。ネイティブ表示データ書込の成功は第6段階受入で確認する。第5段階の完了版・過去記録を置き換えない。
+- commit/push・公開・デプロイは今回の対象外。反映用パッケージは取得時差分と各SHA-256を守り、`.git` を要求する。バックアップ作成・ユーザー差分の強制置換はしない。

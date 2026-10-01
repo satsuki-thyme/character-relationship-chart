@@ -5,6 +5,7 @@
 .web-heading strong { font-size: 15px; }
 .web-heading span { font-size: 11px; color: var(--accent); }
 .web-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.web-view-actions { margin-top: 7px; }
 .web-note, #web-file { color: var(--muted); font-size: 11px; line-height: 1.6; margin: 7px 0 0; overflow-wrap: anywhere; }
 #web-file { max-height: 2.5em; overflow: auto; }
 header.toolbar { position: static; flex: 0 0 auto; width: auto; }

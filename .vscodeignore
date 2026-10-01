@@ -5,6 +5,7 @@ node_modules/**
 test/**
 scripts/**
 web/**
+prompt/**
 .vscode/**
 .github/**
 .git/**
@@ -39,6 +40,8 @@ docs/DEVELOPMENT.md
 docs/PROCESS_CHART.md
 docs/STAGE5_ACCEPTANCE.md
 docs/STAGE6_PROMPT.md
+docs/STAGE6_ACCEPTANCE.md
+docs/STAGE7_PROMPT.md
 .gitignore
 .vscodeignore
 .env
@@ -60,3 +63,12 @@ docs/STAGE6_PROMPT.md
 # Legacy dated backups
 **/*.[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9][0-9]*.*
 **/*.[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9][0-9]*
+
+# Stage 6 acceptance reports and execution-only documents
+docs/STAGE6_PHYSICAL_DEVICE_CHECK.md
+docs/STAGE6_DEFECT_INVESTIGATION_AND_CORRECTION_EXECUTION_PROMPT*.md
+docs/TESTING.md
+docs/images/stage6-phisycal-device-check*.png
+
+# User physical-device comparisons are verification inputs, not runtime assets.
+docs/images/stage6-physical-extension-host-*.png

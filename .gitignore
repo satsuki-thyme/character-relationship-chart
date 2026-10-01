@@ -46,3 +46,6 @@ Thumbs.db
 /*.relations.json
 /*.view.json
 /*.svg
+
+# Backup file created upon file update.
+*.backup-*

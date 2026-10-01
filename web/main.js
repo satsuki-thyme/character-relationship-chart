@@ -1,6 +1,6 @@
 'use strict';
 const { createWebHost } = require('./host');
-const { supportsDirectSave } = require('./file-access');
+const { supportsDirectSave, supportsViewSaveAs } = require('./file-access');
 const sample = require('../examples/characters.relations.jsonc');
 window.RelationsGraph = require('../packages/core/graph');
 require('../media/editor');
@@ -8,26 +8,42 @@ require('../media/main');
 
 const $ = id => document.getElementById(id);
 const directSave = supportsDirectSave(window);
-const host = createWebHost({ confirmReplace: () => !hasChanges() || window.confirm('このページには編集した内容があります。必要な内容を反映・保存またはダウンロード済みか確認してください。破棄して別の設定を開きますか？') });
+const viewSaveAs = supportsViewSaveAs(window);
+const host = createWebHost({ confirmReplace: scope => scope === 'view'
+  ? !host.hasViewEdits() || window.confirm('配置・倍率・表示状態に未保存の変更があります。表示データをダウンロード済みか確認してください。変更を破棄して表示データを読み込みますか？')
+  : !hasChanges() || window.confirm('このページには編集した設定・表示データ・入力があります。必要な内容を反映・保存またはダウンロード済みか確認してください。破棄して別の設定を開きますか？') });
 const ui = window.RelationsUi(host);
-function hasChanges() { return host.hasEdits() || ui.hasPendingEdits() || host.getSaveState().saving; }
+function hasChanges() { return host.hasEdits() || host.hasViewEdits() || ui.hasPendingEdits() || host.getSaveState().saving; }
 function warnOnLeave(event) { if (hasChanges()) { event.preventDefault(); event.returnValue = ''; } }
 function syncLeaveWarning() {
   window.removeEventListener('beforeunload', warnOnLeave);
   if (hasChanges()) window.addEventListener('beforeunload', warnOnLeave);
 }
-host.onConfig(message => { $('web-download').disabled = !message.config; syncLeaveWarning(); });
+host.onConfig(message => { $('web-download').disabled = $('web-view-download').disabled = !message.config; syncLeaveWarning(); });
 function syncSave() {
   const state = host.getSaveState();
   $('web-direct-open').hidden = $('web-save').hidden = !directSave;
   $('web-save').disabled = !state.available || state.saving;
   $('web-save').textContent = state.saving ? '保存中…' : '保存';
-  for (const id of ['web-open', 'web-direct-open', 'web-sample']) $(id).disabled = state.saving;
+  for (const id of ['web-open', 'web-direct-open', 'web-sample', 'web-open-view', 'web-direct-view-open']) $(id).disabled = state.saving;
   $('web-save-note').textContent = state.blocked
     ? '直接保存を停止しています。編集結果をダウンロードして退避し、元ファイルを確認して開き直してください。'
     : state.available ? '「保存」は開いた元ファイルを更新します。「設定をダウンロード」は編集結果のコピーを出力します。'
       : directSave ? '元ファイルを更新するには「直接保存用に開く」を使ってください。通常の読込・ドロップ・サンプルではダウンロードを使えます。'
         : 'この環境では直接保存を利用できません。「設定をダウンロード」で編集結果を保存できます。';
+  const view = host.getViewSaveState(), loaded = !!view.fileName;
+  $('web-direct-view-open').hidden = $('web-view-save').hidden = !directSave;
+  $('web-view-save-as').hidden = !viewSaveAs;
+  $('web-open-view').disabled = $('web-direct-view-open').disabled = !loaded || state.saving;
+  $('web-view-save').disabled = !view.available || state.saving;
+  $('web-view-save').textContent = view.saving ? '表示データを保存中…' : '表示データを保存';
+  $('web-view-save-as').disabled = !loaded || state.saving;
+  $('web-view-status').textContent = loaded ? `表示データ: ${view.fileName} — ${view.dirty ? '未保存の変更あり' : view.hasFile ? '読込・保存時から変更なし' : 'まだファイルへ保存していません'}` : '';
+  $('web-view-note').textContent = view.blocked
+    ? '表示データの直接保存を停止しています。表示データをダウンロードして退避し、保存先を確認して開き直してください。設定本体の保存状態は別です。'
+    : view.available ? '「表示データを保存」は選択済みの表示データだけを更新します。設定本体は別に保存してください。'
+      : directSave || viewSaveAs ? '表示データはダウンロードできます。既存ファイルは直接保存用に開き、新規保存先には同名の空ファイルを選びます。設定の隣のファイルを自動探索しません。'
+        : '表示データはダウンロードで保存できます。設定本体と対応する名前で一緒に保管してください。';
   syncLeaveWarning();
 }
 host.onSaveState(syncSave); syncSave();
@@ -57,6 +73,44 @@ $('web-direct-open').addEventListener('click', async () => {
   } finally { syncSave(); }
 });
 $('web-open-view').addEventListener('click', () => $('web-view').click());
+$('web-direct-view-open').addEventListener('click', async () => {
+  if (host.getSaveState().saving) return;
+  $('web-direct-view-open').disabled = true;
+  try {
+    const [handle] = await window.showOpenFilePicker({ multiple: false,
+      types: [{ description: '相関図の表示データ（.view.json）', accept: { 'application/json': ['.json'] } }] });
+    if (handle) opened(await host.openViewHandle(handle));
+  } catch (error) {
+    if (error.name !== 'AbortError') $('web-message').textContent = '表示データを直接保存用に開けませんでした。現在の設定・配置・入力は保持しています。ダウンロードでも退避できます。';
+  } finally { syncSave(); }
+});
+function viewResult(result) {
+  if (result.status === 'cancelled') { syncSave(); return; }
+  $('web-message').classList.toggle('danger', !result.ok);
+  $('web-message').textContent = result.ok
+    ? `「${result.fileName}」を保存し、内容を確認しました。${result.dirty ? '保存中の新しい表示変更は未保存です。' : ''} 設定本体と未反映の入力は別に扱います。`
+    : `${result.message || '表示データを保存できませんでした。'} 設定・配置・入力はこのページに残っています。「表示データをダウンロード」で退避できます。`;
+  syncSave();
+}
+$('web-view-save').addEventListener('click', async () => {
+  const captured = ui.captureView();
+  viewResult(captured?.ok === false ? captured : await host.saveView());
+});
+$('web-view-save-as').addEventListener('click', async () => {
+  const captured = ui.captureView();
+  if (captured?.ok === false) { viewResult(captured); return; }
+  viewResult(await host.saveViewAs(suggestedName => window.showSaveFilePicker({ suggestedName,
+    types: [{ description: '相関図の表示データ（.view.json）', accept: { 'application/json': ['.json'] } }] })));
+});
+$('web-view-download').addEventListener('click', async () => {
+  const captured = ui.captureView();
+  const result = captured?.ok === false ? captured : await host.downloadView();
+  $('web-message').classList.toggle('danger', !result.ok);
+  $('web-message').textContent = result.ok
+    ? `「${result.fileName}」のダウンロードを開始しました。保存先を確認してください。設定本体・未反映の入力は含めません。`
+    : `表示データをダウンロードできませんでした: ${result.message} 配置・設定・入力は保持しています。`;
+  syncLeaveWarning();
+});
 $('web-save').addEventListener('click', async () => {
   const result = await host.saveConfig();
   $('web-message').classList.toggle('danger', !result.ok);
