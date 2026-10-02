@@ -17,7 +17,7 @@
 
 **第5段階は完了しました（2026-09-28 JST）。** 自動試験に加え、利用者の実機で直接保存・再読込と、外部変更時の競合警告・保存停止を確認しました。Linux Headless Chromiumでの書込拒否の記録は別の検証結果として残し、利用者のOS・ブラウザ版数や未実施の個別試験を推測で補っていません。直接保存は `showOpenFilePicker` と書込APIを利用できる安全なコンテキストが必要です。APIの非対応・拒否時はダウンロード方式を使えます。外部アプリとの完全な同時書込み排除は保証せず、保存操作中の他アプリでの書込みは避けてください。[実機確認手順](docs/STAGE5_ACCEPTANCE.md) と [検証記録](TESTING.md) を参照してください。
 
-**第6段階は実機報告に基づく不具合修正済み・実機再確認待ちです（2026-10-01 JST）。** [第6段階の確認手順](docs/STAGE6_ACCEPTANCE.md) を参照してください。第5段階の完了判定は維持し、第7段階はまだ開始しません。
+**第6段階は完了しました（2026-10-02 JST）。** Webの報告済み3項目とVS Code追加3項目のokを既存自動検証と照合し、追加試験が今回の修正版VSIXの導入・Windowリロード後の結果であることを利用者に確認しました。 [第6段階の確認手順](docs/STAGE6_ACCEPTANCE.md) を参照してください。第5段階の完了判定は維持し、第7段階はまだ開始しません。
 
 ソースから作る場合は `npm ci` → `npm run build:web` を実行し、`dist/web/index.html` を開きます。
 
@@ -174,4 +174,4 @@ VS Code版の `.view.json` は表示を操作した約0.7秒後に自動保存�
 
 表示データの直接保存後、表示ファイルを開いたり相関図パネルを切り替えたりすると、人物同士の配置が変わる不具合を修正しました。同じ設定の再表示では現在の配置を保ち、設定変更・固定座標・人物ID変更・配置切替・リセットは従来どおり使えます。
 
-配布物は `dist/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01.vsix`。同じ0.1.0の再配布なので、このファイルからインストールし、開いていた相関図を閉じてからVS Codeの「Developer: Reload Window」を実行してください。今回の `media/main.js` のSHA-256は `1bad960562dc60ce8d5ca1b413bfda83f0ceaec6d9e460e07cd563cdd68ad3a9` です。導入確認と短い実機手順は [追加修正記録](change-details/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-ja.md)、記入先は `docs/STAGE6_PHYSICAL_DEVICE_CHECK.md` の末尾です。現在は修正済み・実機再確認待ちです。
+配布物は `dist/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01.vsix`。同じ0.1.0の再配布なので、このファイルからインストールし、開いていた相関図を閉じてからVS Codeの「Developer: Reload Window」を実行してください。今回の `media/main.js` のSHA-256は `1bad960562dc60ce8d5ca1b413bfda83f0ceaec6d9e460e07cd563cdd68ad3a9` です。導入確認と短い実機手順は [追加修正記録](change-details/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-ja.md)、記入先は `docs/STAGE6_PHYSICAL_DEVICE_CHECK.md` の末尾です。2026-10-02 JSTに追加3項目のokを原ログと照合しました。その後、指定修正版VSIXの導入・Windowリロード後の試験だったと利用者が確認し、第6段階を完了と記録しました。ここに記載したハッシュは導入判別の案内であり、利用者環境での実測値ではありません。最新の判定は [受入資料](docs/STAGE6_ACCEPTANCE.md) を参照してください。
