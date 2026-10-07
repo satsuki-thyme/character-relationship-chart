@@ -28,7 +28,7 @@
       const e = document.createElement(tag); if (className) e.className = className;
       if (text !== undefined) e.textContent = text; return e;
     };
-    function save(initialize = false) {
+    function save(initialize = false, record = true) {
       const rect = svg.getBoundingClientRect();
       state.version = 1; state.camera = { ...camera };
       if (rect.width > 0 && rect.height > 0) Object.assign(state.camera, { width: rect.width, height: rect.height });
@@ -43,7 +43,7 @@
       }
       const snapshot = { ...state, positions };
       if (capabilities.viewStorage) return host.updateView(snapshot);
-      if (capabilities.viewCapture) return host.updateView(snapshot, { initialize });
+      if (capabilities.viewCapture) return host.updateView(snapshot, { initialize, record });
     }
     function applyUi() {
       state.ui ||= { details: false, focus: false };
@@ -347,7 +347,7 @@
       state = message.viewState || { version: 1 };
       $('storage-file').textContent = message.fileName || '';
       applyUi(); restoreCamera();
-      if (graph) { positioned = G.layout(graph, state.layout || graph.layout, state.positions); render(); }
+      if (graph && !message.deferLayout) { positioned = G.layout(graph, state.layout || graph.layout, state.positions); render(); }
     });
     if (capabilities.viewStorage) host.onStorage(message => {
       $('storage-error').hidden = message.status !== 'error';
@@ -387,13 +387,13 @@
       $('title').textContent = graph.title; $('title').title = graph.title; $('description').textContent = graph.description;
       $('empty').hidden = graph.nodes.length !== 0;
       $('legend').replaceChildren(...graph.groups.map(g => badge(g.label, g.color)));
-      if (!sameGraph || previousLayout !== state.layout) positioned = G.layout(graph, state.layout, state.positions);
+      if (message.restoreView || !sameGraph || previousLayout !== state.layout) positioned = G.layout(graph, state.layout, state.positions);
       render(); describeSelection();
       if (!hasCamera) requestAnimationFrame(() => { if (!hasCamera) fit(false); });
       else if (capabilities.viewCapture) save(first || initializingView);
       initializingView = false;
     });
     describeSelection(); host.ready();
-    return { hasPendingEdits: () => editor?.hasPendingChanges() || false, captureView: () => save() };
+    return { hasPendingEdits: () => editor?.hasPendingChanges() || false, captureView: () => save(false, false), finishInteraction: () => cancelDrag() };
   };
 })();

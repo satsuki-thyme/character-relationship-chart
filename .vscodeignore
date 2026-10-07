@@ -24,6 +24,9 @@ exports/**
 *.vsix
 *.zip
 *.tgz
+**/*.vsix
+**/*.zip
+**/*.tgz
 *.log
 /*.jsonc
 /*.relations.json
@@ -72,3 +75,10 @@ docs/images/stage6-phisycal-device-check*.png
 
 # User physical-device comparisons are verification inputs, not runtime assets.
 docs/images/stage6-physical-extension-host-*.png
+
+
+# Stage 7 review/acceptance documents and historical execution receipts are not runtime assets.
+docs/STAGE7_*.md
+docs/STAGE6_PROCESS_PROMPT_*.md
+docs/character-relationship-chart-stage6-*.md
+docs/*-dropbox-receipt.json

@@ -175,3 +175,33 @@ node test/stage6-vscode-redisplay-browser-check.js
 ```
 
 DOMは検証用jsdom、ブラウザは検証用Playwright／Chromiumを外部に用意する。既存の `CRC_BROWSER_EXECUTABLE` / `CRC_BROWSER_ARGS` / `CRC_CAPTURE_DIR` を使用可能。ブラウザ試験の `CRC_SHARED_UI_MAIN` は原コードとの比較用であり製品オプションではない。実Chromiumと実Extension Host／Windows実機を区別する。配布と同版数導入確認は [追加修正記録](../change-details/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-ja.md)。
+
+
+## 第7段階の開発・検証（2026-10-04 JST）
+
+現行はメモリーUndo/Redo実装・自動検証済み、利用者の最終確認待ち。第1〜6段階の完了を維持する。上記の各段階の待機／バックアップを行わない記述は当時の履歴であり、現在の更新手順ではない。
+
+`package.json` のcheckへ `web/history.js` を追加。本番／開発依存・lockfile・名称・manifest 0.1.0は維持。通常試験は132件。新規 `web-history.test.js` 16件、`stage7-history-dom-check.js` 6件、`stage7-history-browser-check.js` 7操作群を含む。共有UIの関連回帰として第6段階の配置・再表示試験も実行する。単なる第6段階完了判定の再試験ではない。
+
+```sh
+npm run check
+npm test
+npm run test:web
+node --test --test-isolation=none --test-reporter=tap test/*.test.js
+node --test --test-isolation=none --test-reporter=tap test/ui-dom-check.js test/web-dom-check.js test/stage6-regression-dom-check.js test/stage6-vscode-redisplay-dom-check.js test/stage7-history-dom-check.js
+node test/stage7-history-browser-check.js
+node test/web-browser-check.js
+node test/web-save-browser-check.js
+node test/web-view-browser-check.js
+node test/stage6-regression-browser-check.js
+node test/stage6-vscode-redisplay-browser-check.js
+node test/web-view-native-check.js
+npm run build:web
+npm run package
+```
+
+今回のNodeは24.19.0、npm11.9.0、jsdom26.1.0。PlaywrightとChromium143.0.7499.0はプロジェクト外の検証用。`--test-isolation=none` は今回の環境で個々の件数をTAPに出す補助実行で、上記npmコマンドも実行している。Chromium標準ダウンロードが壊れたZIPを返したため、検証専用の配布バイナリーを使用。single-processで最後のcontextを閉じると終了する制約は、配置回帰試験のcontext後処理をbrowser終了まで遅らせて解決。製品コード・試験の判定条件は緩めない。同名ファイル再読込の既存試験は、変わらないファイル名でなく読込後の人物IDを待つよう修正した。
+
+`CRC_WEB_DIR` は第7段階履歴試験と配置回帰で展開済み配布物を指定可能。Web ZIPはビルドの9ファイルを格納し、VSIXは `npm run package` の生成物を第7段階名でも保存する。実物とソースのSHA-256は変更明細・監査JSONを参照。ネイティブ保存・模擬API・実Extension Hostの範囲を混同しない。
+
+既存ファイルを変更する場合は、完成内容の準備→同じディレクトリのバックアップ確認→直前の内容・版照合→元ファイル自体を `stem.backup-YYYY-MM-DD-NN.ext` へ改名→改名と原文保全確認→元パスへ新規作成→検証とする。日付はAsia/Tokyo、未使用01以降。コピーによるバックアップ・直接上書きは禁止。外部差分なら停止する。生成済みのdistも再ビルドで直接上書きせず、新しい一時出力を完成させてから同じ手順で置換する。製品の利用者データ保存にこのバックアップ手順を追加しない。

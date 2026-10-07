@@ -18,7 +18,8 @@ Character Relationship Chart
     - [x] 第6段階: 表示データ保存・復元と追加不具合修正の受入完了（2026-10-02 JST）。Web3項目・VS Code追加3項目のokと既存自動検証を照合し、利用者が指定修正版VSIXの導入・Windowリロード後の試験だったと確認。詳細は `docs/STAGE6_ACCEPTANCE.md`。
       - 過去の検証記録の更新: 原ログ・ソース・配布物を照合し、`TESTING.md` に根拠と検証範囲、`docs/STAGE6_ACCEPTANCE.md` に未受領の実機報告欄を追記。詳細は `change-details/character-relationship-chart-stage6-verification-2026-10-01-ja.md`。反映用成果物の更新であり、Dropboxへの反映完了とは区別する。
       - 過去の修正: `change-details/character-relationship-chart-stage6-fixes-2026-10-01-ja.md`。現在のソースとユーザー差分を保護し、旧実装は再適用しない。前回の実機結果は `docs/STAGE6_PHYSICAL_DEVICE_CHECK.md` に保持。追加修正は `change-details/character-relationship-chart-stage6-vscode-redisplay-fix-2026-10-01-ja.md`。追加3項目のokは受領済み。導入確認前の照合・反映結果は `change-details/character-relationship-chart-stage6-records-review-2026-10-02-ja.md`。導入確認受領後の完了記録は `change-details/character-relationship-chart-stage6-completed-2026-10-02-ja.md`。
-    - [n] 第7段階: 未着手・利用者の次の実行指示待ち。推奨は高性能モデル／高推論、実行指示は `docs/STAGE7_PROMPT.md`。
+    - [n] 第7段階: Undo/Redoの実装・自動検証済み、利用者の最終確認と下書き保存の採否待ち（2026-10-04 JST）。確認は `docs/STAGE7_ACCEPTANCE.md`、設計は `docs/STAGE7_DRAFT_DESIGN.md`。次は高性能モデル／高推論で `docs/STAGE7_ACCEPTANCE_PROMPT.md` を実行する。第8段階は未着手。反映・配布物の実績は `change-details/character-relationship-chart-stage7-implementation-2026-10-04-ja.md`。
+      - 進行中 
     - [x] プロジェクトを、IDADを参照して進めるよう書き直す内容をChatGPTに作ってもらう
     - [x] ChatGPTに行程表（`Dropbox\www\studio\character-relationship-chart\docs\PROCESS_CHART.md`）を出してもらう
     - [x] [第6段階](/docs/STAGE6_*.md)

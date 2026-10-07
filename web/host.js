@@ -3,6 +3,7 @@ const { parseConfig, LIMITS } = require('../packages/core/config');
 const { editConfig: editText } = require('../packages/core/edit');
 const { parseState, normalizeState, encodeState, VIEW_LIMITS } = require('../packages/core/view-state');
 const { writableHandle, openOriginal, writeOriginal } = require('./file-access');
+const { createHistory } = require('./history');
 
 function readLocalFile(file) {
   return new Promise((resolve, reject) => {
@@ -30,8 +31,10 @@ function downloadLocalFile(text, fileName) {
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
-function createWebHost({ readText = readLocalFile, downloadText = downloadLocalFile, confirmReplace = () => true } = {}) {
+function createWebHost({ readText = readLocalFile, downloadText = downloadLocalFile, confirmReplace = () => true, canTravel = () => true } = {}) {
   const configListeners = new Set(), viewListeners = new Set(), saveListeners = new Set(), viewSaveListeners = new Set();
+  const history = createHistory(), historyListeners = new Set();
+  let groupingHistory = false;
   let serial = 0, version = 0, current = null, disposed = false;
   let documentText = '', originalText = '';
   let target = null, saving = false;
@@ -55,7 +58,48 @@ function createWebHost({ readText = readLocalFile, downloadText = downloadLocalF
   function saveState() { return { available: !!target && !target.blocked, saving: busy(), blocked: !!target?.blocked }; }
   function viewSaveState() { return { available: !!viewTarget && !viewTarget.blocked, saving: viewSaving, busy: busy(),
     blocked: !!viewTarget?.blocked, dirty: viewDirty, hasFile: viewHasFile, fileName: viewName() }; }
-  const notifySave = () => { emit(saveListeners, saveState()); emit(viewSaveListeners, viewSaveState()); };
+  const snapshot = () => ({ text: documentText, view: encodeState(viewState) });
+  function sameView(a, b) {
+    const left = JSON.parse(a), right = JSON.parse(b), x = left.camera, y = right.camera;
+    // Screen dimensions are restoration metadata. Compare the preserved
+    // centre with subpixel roundoff tolerance; never round stored coordinates.
+    if (x?.width && x?.height && y?.width && y?.height) {
+      if (Math.abs((x.x - x.width / 2) - (y.x - y.width / 2)) > 1e-7
+        || Math.abs((x.y - x.height / 2) - (y.y - y.height / 2)) > 1e-7) return false;
+      for (const key of ['x', 'y', 'width', 'height']) { delete x[key]; delete y[key]; }
+    }
+    return JSON.stringify(left) === JSON.stringify(right);
+  }
+  function recordSnapshot(before) {
+    const after = snapshot();
+    if (before.text !== after.text || !sameView(before.view, after.view)) history.record(before, after);
+  }
+  function historyState() {
+    const state = history.state();
+    return { ...state, busy: busy(), canUndo: !disposed && !busy() && state.undoCount > 0,
+      canRedo: !disposed && !busy() && state.redoCount > 0 };
+  }
+  const notifySave = () => { emit(saveListeners, saveState()); emit(viewSaveListeners, viewSaveState()); emit(historyListeners, historyState()); };
+  function travel(direction) {
+    if (disposed || !current) return { ok: false, message: '先に設定を開いてください。' };
+    if (busy()) return { ok: false, message: '保存中は取り消し・やり直しできません。完了を待ってください。' };
+    if (!canTravel()) return { ok: false, message: '未反映の入力があります。反映するか、編集画面で破棄を選んでから操作してください。入力は保持しています。' };
+    const previous = history[direction]();
+    if (!previous) return { ok: false, message: '戻せる履歴がありません。' };
+    // Versions and pending-read tokens only move forward. Saving destinations,
+    // raw bytes, saved snapshots and blocked states are never history entries.
+    serial++; version++; documentText = previous.text;
+    viewState = parseState(previous.view); initializingView = false;
+    current = { ...parseConfig(documentText), fileName: current.fileName, documentVersion: version, dirty: documentText !== originalText };
+    viewDirty = !sameView(encodeState(viewState), originalView);
+    groupingHistory = true;
+    try {
+      emit(viewListeners, { viewState: normalizeState(viewState), fileName: viewHasFile ? viewName() : '', deferLayout: true });
+      emit(configListeners, { ...current, restoreView: true });
+    } finally { groupingHistory = false; }
+    notifySave();
+    return { ok: true, documentVersion: version };
+  }
   async function checkViewTarget(handle, snapshot) {
     if (!writableHandle(handle)) throw new Error('この表示データの保存先は直接保存に対応していません。');
     if (handle === target?.handle || (target && typeof handle.isSameEntry === 'function' && await handle.isSameEntry(target.handle))) {
@@ -105,6 +149,7 @@ function createWebHost({ readText = readLocalFile, downloadText = downloadLocalF
       }
       viewState = loadedView; originalView = encodeState(viewState); viewDirty = false; viewHasFile = !!view;
       viewTarget = viewSnapshot ? { handle: viewHandle, baseline: viewSnapshot.bytes, blocked: false } : null;
+      history.clear(); // A validated source or sidecar read starts a new history scope.
       initializingView = true;
       // The UI may enrich/prune its copy; never share mutable host state.
       emit(viewListeners, { viewState: normalizeState(viewState), fileName: view?.name || '', reset: !!source });
@@ -121,6 +166,7 @@ function createWebHost({ readText = readLocalFile, downloadText = downloadLocalF
       if (disposed || !current) throw new Error('先に設定ファイルを読み込んでください。');
       if (!Number.isSafeInteger(baseVersion) || baseVersion !== version) throw new Error('画面の設定が変更されています。入力を確認してから再読込してください。');
       if (!operation || JSON.stringify(operation).length > 100000) throw new Error('編集内容が不正です。');
+      const before = snapshot();
       const next = editText(documentText, operation), parsed = parseConfig(next.text);
       // Commit only a validated result. Successful edits supersede pending reads.
       documentText = next.text; serial++;
@@ -132,8 +178,12 @@ function createWebHost({ readText = readLocalFile, downloadText = downloadLocalF
       const ids = new Set(current.config.nodes.map(node => node.id));
       for (const id of Object.keys(positions)) if (!ids.has(id)) delete positions[id];
       viewState = normalizeState({ ...viewState, positions });
-      viewDirty = encodeState(viewState) !== originalView;
-      emit(configListeners, { ...current, rename: next.rename });
+      viewDirty = !sameView(encodeState(viewState), originalView);
+      // The synchronous UI capture includes the resulting layout in this edit.
+      groupingHistory = true;
+      try { emit(configListeners, { ...current, rename: next.rename }); }
+      finally { groupingHistory = false; }
+      recordSnapshot(before);
       notifySave();
       return { ok: true, config: current.config, documentVersion: version, index: next.index };
     } catch (error) { return { ok: false, message: String(error.message || error) }; }
@@ -165,13 +215,15 @@ function createWebHost({ readText = readLocalFile, downloadText = downloadLocalF
       return { ok: true, fileName, dirty: current.dirty };
     } finally { saving = false; if (!disposed) notifySave(); }
   }
-  function updateView(value, { initialize = false } = {}) {
+  function updateView(value, { initialize = false, record = true } = {}) {
     try {
       if (disposed || !current) throw new Error('先に設定ファイルを読み込んでください。');
+      const before = snapshot(), initial = initialize && initializingView;
       const next = normalizeState(value), text = encodeState(next);
-      if (initialize && initializingView) originalView = text;
+      if (initial) originalView = text;
       else if (text !== encodeState(viewState)) serial++; // supersede slow reads, not saves
-      initializingView = false; viewState = next; viewDirty = text !== originalView;
+      initializingView = false; viewState = next; viewDirty = !sameView(text, originalView);
+      if (!initial && !groupingHistory && record) recordSnapshot(before);
       notifySave(); return { ok: true };
     } catch (error) { return { ok: false, message: String(error.message || error) }; }
   }
@@ -189,7 +241,7 @@ function createWebHost({ readText = readLocalFile, downloadText = downloadLocalF
     if (disposed) return { ok: false, status: 'disposed' };
     if (!result.ok) { savingTarget.blocked = !!result.blocked; return result; }
     savingTarget.baseline = result.bytes; originalView = text; viewHasFile = true;
-    viewDirty = encodeState(viewState) !== text;
+    viewDirty = !sameView(encodeState(viewState), text);
     return { ok: true, fileName: viewName(), dirty: viewDirty };
   }
   async function saveView() {
@@ -227,6 +279,8 @@ function createWebHost({ readText = readLocalFile, downloadText = downloadLocalF
     onSaveState: callback => subscribe(saveListeners, callback),
     onViewSaveState: callback => subscribe(viewSaveListeners, callback),
     getSaveState: saveState,
+    getHistoryState: historyState, onHistoryState: callback => subscribe(historyListeners, callback),
+    undo: () => travel('undo'), redo: () => travel('redo'),
     getViewSaveState: viewSaveState, getViewState: () => normalizeState(viewState),
     ready() {}, openFiles: input => openFiles(input), openHandle: handle => openFiles(null, handle),
     openViewHandle: handle => openFiles(null, null, handle), editConfig, downloadConfig, saveConfig,
@@ -234,6 +288,7 @@ function createWebHost({ readText = readLocalFile, downloadText = downloadLocalF
     hasEdits: () => !!current?.dirty,
     hasViewEdits: () => viewDirty,
     dispose() { disposed = true; serial++; configListeners.clear(); viewListeners.clear(); saveListeners.clear(); viewSaveListeners.clear();
+      history.clear(); historyListeners.clear();
       current = target = viewTarget = null; documentText = originalText = ''; viewState = normalizeState({ version: 1 }); }
   };
 }

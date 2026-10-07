@@ -1,5 +1,48 @@
 # 検証結果と実機確認手順
 
+## 第7段階・実装と自動検証（2026-10-04 JST）
+
+**Undo/Redoの実装・自動検証済み。利用者の最終確認と下書き保存の採否待ち。** 第1〜6段階の完了を維持し、第8段階は未着手。以下の第6段階以前の待機記述は各時点の履歴として保持する。今回の原ログは `verification/stage7/`、監査と取得時／反映後の対応は [変更明細](change-details/character-relationship-chart-stage7-implementation-2026-10-04-ja.md) を参照する。
+
+再開時に現行Git HEAD `9257b65ba87ae298421188e7ca79803b74930a62` と取得時に未コミット差分がないこと、第6段階修正版VSIXの実装22対象と現行ソースの一致を確認した。第6段階Web ZIP／VSIXのSHA-256と完了記録も一致した。第6段階の完了判定を再実行するための試験は行わず、以下は第7段階の変更と共有UI回帰のための実行である。以前の実機試験日や導入先ハッシュは未記載のまま維持する。
+
+| 検証 | 結果・原ログ | 範囲と限界 |
+| --- | --- | --- |
+| `npm run check` | 成功。`check-final.log` | 本番JS20ファイルの構文確認 |
+| `npm test` | 成功。`unit-final.log`、個別結果 `unit-final.tap` 132件成功 | 新規履歴16件を含む。VS Code連携は模擬API。今回の環境で個別件数を出すため `--test-isolation=none --test-reporter=tap` も実行 |
+| `npm run test:web`、共有UI/Web DOM | Web19件を含む合計46件成功。`web-dom-final.log`、`dom-final.tap` | 12共有UI＋19Web＋5配置回帰＋4VS Code再表示＋6履歴。Web19件を二重計上しない |
+| 実Chromium：Webの基本・設定保存・表示保存 | 8＋5＋7操作群成功。`web-browser-final.log`、`save-browser-final.log`、`view-browser-final2.log` | 実描画・入力・ダウンロード。保存成功／故障は模擬ハンドル |
+| 実Chromium：配置・VS Code再表示 | 3＋3操作群成功。`layout-browser-final2.log`、`vscode-browser-final.log` | 実共有UI／アダプター／拡張コードを模擬VS Code APIと接続。実Extension Hostではない |
+| 実Chromium：履歴 | 7操作群成功。`history-browser-final.log` | 人物ドラッグ、ID・所属・参照・コメント、独立した保存基準、未反映入力、保存中拒否、競合停止、別作品分離・390px・オフライン |
+| ネイティブファイルAPI | 実ファイル読込・書込拒否時の保護に成功。`native-view-final.log` | CDPドロップで選択だけ橋渡し。getFile／permission／writeはネイティブ。OS pickerはAbortError、readwriteはdenied。直接保存成功は未確認 |
+| `npm run build:web`、`npm run package` | 成功。`build-web.log`、`package-final2.log` | 現行ソースのWeb9項目、VSIX53項目。元の0.1.0、依存と識別子を維持 |
+| 配布物監査 | `artifact-audit.json`。VSIX実装22対象一致、保護対象16ファイル不変、Web独立再ビルド全9項目一致 | 入れ子ZIP／VSIX・バックアップ・検証専用依存を除外。配布名とSHA-256は変更明細 |
+| 展開した最終Web ZIP | `artifact-browser-final.log` 7操作群再確認、日本語フォントで390px画像も確認 | 上の履歴7群の配布物確認であり、新規7群として合計へ加算しない |
+
+Node24.19.0／npm11.9.0／jsdom26.1.0／Linux Headless Chromium143.0.7499.0。実ブラウザ合計33操作群、ページの通常操作でHTTP(S)要求ゼロ、オフラインのfile URL起動・編集・出力を確認。VS Code fixtureのローカルHTTP通信は検証用で、Web製品の通信とは分ける。CSPの接続禁止、永続保存への書込なしを確認。検証専用のPlaywright、Chromium、Noto日本語フォントは製品へ含めない。
+
+### 履歴・保存・復旧の検証対象
+
+全体／人物／グループ／関係の反映と削除、BOM・CRLF・JSONCコメント、IDと接続関係・複数所属、全人物配置・固定座標署名・配置方式・カメラ・uiの往復を確認した。同期UI配置更新は設定編集と一操作。新規設定／表示編集でRedoを破棄し、同値捕捉・失敗・ダウンロードは破棄しない。画面寸法だけの補正と小数カメラでもRedo・保存済み表示判定を維持する。
+
+Undo/Redoは最新の読込／照合済み保存内容と比較して設定／表示のdirtyを独立計算し、明示選択ハンドル・生バイト基準・保存スナップショット・競合／結果不明の停止を戻さない。設定／表示／新規表示保存中は履歴操作を拒否し、保存中の追加編集は残る。古い設定版と遅い設定／表示読込応答の無効化、同名別設定、表示だけの正常読込による履歴境界、失敗／取消時の履歴・フォーム保持、100操作／概算16MiB上限も検証した。
+
+### 途中で検出した問題と扱い
+
+- 出力捕捉時の画面寸法補正が新規編集扱いとなりRedoを消す問題を修正。`history-browser-initial.log` の失敗後、最終履歴試験と小数寸法の追加Node試験に成功。
+- ページ終了後の遅いUI通知によるDOM例外を修正。初回ログを残し、最終Web19件・全DOM46件に成功。
+- 既存表示ブラウザ試験が、同名のため変わらないファイルラベルを読込完了条件にしていた。人物IDの実反映と描画フレームを待つよう修正し、実ドラッグの変化も明示確認した。
+- 検証用single-process Chromiumが最後のcontext終了で落ちる制約には、試験だけcontextの後処理をbrowser終了まで遅らせた。アプリや判定条件は変更していない。
+- サンドボックスでvsceの子プロセス出力が空になった初回package失敗は、承認レビューを通した同じpackageコマンドで解消。入れ子の旧Web ZIP混入を監査で検出し、`.vscodeignore` の除外を補って再生成。旧資料自体は保全した。
+- 利用上限による自動承認レビュー失敗で一度ブラウザ再試験が未実行となった。その後の再開で正式に実行し、失敗を成功結果として代用していない。
+
+### 未確認と次の判定
+
+この第7段階版のWindows／macOS・他ブラウザ、OS pickerでの通常選択、ネイティブ直接保存成功、実VSIXの導入・実Extension Host／実Undoは今回未確認。以前の第6段階の利用者okを第7段階の実機結果に転用しない。確認は [STAGE7_ACCEPTANCE.md](docs/STAGE7_ACCEPTANCE.md) の1〜6に限定して依頼する。
+
+ローカル下書き常時保存は未実装で試験対象外。[設計書](docs/STAGE7_DRAFT_DESIGN.md) は復元・破棄・機微データ・元ファイルとの識別・上限・失敗時保持を整理した提案である。ブラウザ保存APIに原子的な比較付き確定がない制限を維持し、最終比較後の外部同時更新を完全に防ぐとは扱わない。
+
+
 ## 第6段階・完了判定（2026-10-02 JST）
 
 **第6段階完了**。利用者は同日06:39 JSTに、指定修正版VSIXについて「導入してWindowのリロードをしてからやったよ。」と回答し、追加3項目が対象版の導入・Windowリロード後の結果だと確認した。前回Web3項目とVS Code追加3項目の本文ok、既存原ログの通常116件・DOM40件・実Chromium18操作群、現行ソースと配布物の照合を合わせ、残る必須確認は解消した。

@@ -51,9 +51,11 @@ const { parseConfig } = require('../packages/core/config'), { parseState } = req
     const download = async (id, modal = false) => { const pending = page.waitForEvent('download'); if (modal) await page.locator('#' + id).dispatchEvent('click'); else await page.locator('#' + id).click(); const file = await pending; return { name: file.suggestedFilename(), text: await fs.readFile(await file.path(), 'utf8') }; };
     const data = '{ // untouched\n"nodes":[{"id":"a","label":"A"},{"id":"b","label":"B"}],"edges":[{"from":"a","to":"b","shape":"straight"}]}';
     await page.locator('#web-files').setInputFiles(input('cast.jsonc', data)); await untilFile('cast.jsonc');
-    const node = page.locator('.node').first(), box = await node.boundingBox();
+    await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
+    const node = page.locator('.node').first(), beforeDrag = await node.getAttribute('transform'), box = await node.boundingBox();
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await page.mouse.down();
     await page.mouse.move(box.x + box.width / 2 + 60, box.y + box.height / 2 + 40, { steps: 6 }); await page.mouse.up();
+    assert.notEqual(await node.getAttribute('transform'), beforeDrag, 'pointer gesture changed the node position');
     await page.locator('#more-menu summary').click(); await page.locator('#zoom-in').click(); await page.locator('#more-menu summary').click();
     await page.locator('#toggle-details').click();
     const dragged = await node.getAttribute('transform'); const viewDownload = await download('web-view-download'), state = parseState(viewDownload.text);
@@ -67,6 +69,9 @@ const { parseConfig } = require('../packages/core/config'), { parseState } = req
     assert.ok(parseState(renamedView.text).positions.hero); assert.equal(parseState(renamedView.text).positions.a, undefined);
     assert.equal(parseConfig(renamedConfig.text).config.edges[0].from, 'hero'); assert.match(renamedConfig.text, /untouched/);
     discard(); await page.locator('#web-files').setInputFiles(input('cast.jsonc', data)); await untilFile('cast.jsonc');
+    // Same-name reads are asynchronous: the unchanged file label cannot signal
+    // completion. Wait for the renamed ID to actually return to the source ID.
+    await page.waitForFunction(() => document.querySelector('.node .group-name')?.textContent === 'a');
     assert.notEqual(await node.getAttribute('transform'), dragged); assert.equal(await page.locator('#web-view-save').isEnabled(), false);
     await page.locator('#web-files').setInputFiles([input(renamedConfig.name, renamedConfig.text), input(renamedView.name, renamedView.text)]); await untilFile('cast.jsonc + cast.jsonc.view.json');
     assert.equal(await node.getAttribute('transform'), dragged); assert.equal(await page.locator('#details').isVisible(), true);

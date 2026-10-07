@@ -2,7 +2,7 @@
 
 [日本語](README-ja.md)
 
-This is the implemented and automatically tested Stage 6 Web editor (2026-10-01 JST). View download and explicit view-file saving are included; the user reported successful main save operations on Windows 11 / Chrome 154 / HTTPS, while layout restoration and consecutive dragging fixes still need desktop rechecking. Stage 5 config saving, reopening and external-change blocking remain completed based on user reports. Extract the entire distribution ZIP and open `index.html` in a desktop browser with JavaScript, FileReader, ResizeObserver, dialog and Blob-download support. Keep the included files together. VS Code, Node.js, a Web server and an Internet connection are not required to use the built application.
+This is the Stage 7 implementation and automated verification build (2026-10-04 JST), adding in-page Undo/Redo. Stages 1–6 remain complete; Stage 6 was accepted on 2026-10-02. Desktop acceptance of this Stage 7 build is pending. Extract the entire ZIP and open `index.html` in a desktop browser supporting JavaScript, FileReader, ResizeObserver, dialog and Blob downloads. Keep the included files together. VS Code, Node.js, a Web server and an Internet connection are not required.
 
 The sample opens on startup. Choose **設定を開く** to read one UTF-8 `.jsonc` or `.json` file, or drop it onto the page. You may select/drop its matching display file at the same time. To load display data later, choose **表示データを開く**. The display filename must be the complete source filename plus `.view.json`, for example `cast.jsonc.view.json` for `cast.jsonc`. Files in sibling folders are never read automatically. Choose the same file again to reload changes made outside the application.
 
@@ -14,7 +14,7 @@ Search, click a node or edge for details, drag nodes or the canvas, zoom, switch
 
 Invalid data, read errors and invalid edits keep the last valid chart and preserve form input. Source and optional display data are accepted together only when both are valid. Multiple sources, mismatched display filenames and oversized inputs are rejected. Failed downloads retain the in-memory document for retry. A source replacement asks before discarding applied edits or an open form draft. This confirmation remains relevant after a download, because the application cannot verify that the browser saved it. Page closing/reloading requests a browser warning when edits remain, but browsers do not always show it. Confirm direct-save completion or the download destination before leaving.
 
-There is no SVG download, Web Undo/Redo, continuous file watching, localStorage or IndexedDB persistence. Content stays in page memory until explicitly saved or downloaded and is not uploaded. The application includes no external resources, telemetry or network requests. Its Content Security Policy also blocks network connections. Refreshing starts with the sample again.
+There is no SVG download, continuous file watching, localStorage or IndexedDB persistence. Content stays in page memory until explicitly saved or downloaded and is not uploaded. The application includes no external resources, telemetry or network requests. Its Content Security Policy also blocks network connections. Refreshing starts with the sample again.
 
 ## Direct saving in supported environments
 
@@ -49,10 +49,21 @@ Config and view targets, byte baselines and dirty states are independent. Source
 
 View writes reuse Stage 5 raw-byte comparisons before commit and byte-exact readback verification. Conflicts/permissions/write failures keep config, view and input available for download. Uncertain close/readback stops that target; there is no automatic resend. A verified snapshot clears only its matching view changes; newer changes remain dirty. A download never clears dirty state. The two files are not saved as one transaction. Compare-and-commit is not atomic; the final comparison/close window cannot exclude external writers. No autosave, handle persistence or browser storage is added. Unsupported browsers retain both downloads and shared editing.
 
-Initial Stage 6 verification: 116 Node tests, 31 DOM tests, 7 real-browser view groups and 13 existing browser groups passed. Handle-double success/fault tests do not certify native disk writing. Native external-file reading and denial protection passed; headless native pickers returned AbortError and write permission was denied. Desktop native view save/reopen/conflict acceptance remains pending.
+Initial Stage 6 verification: 116 Node tests, 31 DOM tests, 7 real-browser view groups and 13 existing browser groups passed. Handle-double success/fault tests do not certify native disk writing. Native external-file reading and denial protection passed; headless native pickers returned AbortError and write permission was denied. Subsequent user reports completed Stage 6 acceptance on 2026-10-02, including confirmation that the specified fixed VSIX was installed and its Window reloaded before the additional checks. Exact test dates and installed-file hashes were not supplied.
 
 References: [save picker](https://developer.mozilla.org/en-US/docs/Web/API/Window/showSaveFilePicker), [file identity](https://developer.mozilla.org/en-US/docs/Web/API/FileSystemHandle/isSameEntry), [File System Access specification](https://wicg.github.io/file-system-access/).
 
 ## Stage 6 fixes (2026-10-01 JST)
 
-View snapshots retain every rendered person position, including automatic placement. Version 1, names and keys are unchanged, and older sparse position files remain readable. Positions absent from an old file cannot be recovered: arrange the chart and save it again with this build. Capture loss, tab changes and page exit finish node/canvas gestures without activating a click. After renaming person IDs, save the view file separately as well. Stage 7 remains unstarted.
+View snapshots retain every rendered person position, including automatic placement. Version 1, names and keys are unchanged, and older sparse position files remain readable. Positions absent from an old file cannot be recovered: arrange the chart and save it again with this build. Capture loss, tab changes and page exit finish node/canvas gestures without activating a click. After renaming person IDs, save the view file separately as well. Stage 7 retains these behaviors.
+
+
+## Undo and Redo (Stage 7)
+
+**取り消し** and **やり直し** restore applied JSONC and its view together. One apply/delete, complete drag, layout change, zoom event, fit, reset, details or chart-only toggle is one operation. ID references, memberships, incident relations, comments and position keys round-trip together. Search, selection and unapplied forms are outside history. Wheel events are individual zoom steps.
+
+Outside text controls, use Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z or Ctrl+Y. Text controls keep native text Undo. Unapplied forms and in-flight saves block page history; input is retained until explicitly applied or discarded. New edits discard Redo. Successful source or view-only reads clear both stacks; failed/cancelled reads retain them. View-only reads retain the config and form draft. Identical filenames never carry history into another document.
+
+History stays in page memory, capped at 100 operations and approximately 16 MiB of UTF-16 snapshot strings. Older entries are removed with a notice, including any single oversized operation. Reloading/closing loses history. Saves and downloads retain it. Undo/Redo never writes files and never rewinds selected handles, raw byte baselines, verified saved snapshots or conflict/uncertain-result blocks. Config and view dirty states compare independently with the latest loaded/verified saved content. Redo back to that content clears the corresponding dirty state; download does not. Viewport resize compensation alone is not an edit.
+
+Browser draft persistence is not implemented; its opt-in design awaits the user's choice. Save/download config and view separately before leaving. Stage 7 verification: 132 Node tests, 46 shared/Web DOM tests and 33 real Chromium 143 operation groups. Simulated handles/VS Code APIs do not certify native disk writes or Extension Host. Native read and permission-denial protection passed; native save success in this automated environment remains unverified.

@@ -9,10 +9,45 @@ require('../media/main');
 const $ = id => document.getElementById(id);
 const directSave = supportsDirectSave(window);
 const viewSaveAs = supportsViewSaveAs(window);
-const host = createWebHost({ confirmReplace: scope => scope === 'view'
+const host = createWebHost({ canTravel: () => !ui.hasPendingEdits(), confirmReplace: scope => scope === 'view'
   ? !host.hasViewEdits() || window.confirm('配置・倍率・表示状態に未保存の変更があります。表示データをダウンロード済みか確認してください。変更を破棄して表示データを読み込みますか？')
   : !hasChanges() || window.confirm('このページには編集した設定・表示データ・入力があります。必要な内容を反映・保存またはダウンロード済みか確認してください。破棄して別の設定を開きますか？') });
 const ui = window.RelationsUi(host);
+let pageDisposed = false;
+function syncHistory() {
+  if (pageDisposed) return;
+  const state = host.getHistoryState(), pending = ui.hasPendingEdits();
+  $('web-undo').disabled = !state.canUndo || pending;
+  $('web-redo').disabled = !state.canRedo || pending;
+  $('web-history-note').textContent = pending
+    ? '未反映の入力を保持しています。反映するか、編集画面で破棄を選んでから取り消し・やり直しできます。'
+    : state.busy ? '保存が終わるまで取り消し・やり直しを待ってください。'
+      : `取り消し ${state.undoCount} ／ やり直し ${state.redoCount}。ページ内の履歴です。${state.limited ? '上限に達した古い履歴は除外しました。' : ''}`;
+}
+function travel(direction) {
+  // Finish an active gesture, but do not turn viewport compensation or an
+  // output-only capture into a new edit (which would discard Redo).
+  if (!ui.hasPendingEdits() && !host.getHistoryState().busy) ui.finishInteraction();
+  const result = host[direction]();
+  $('web-message').classList.toggle('danger', !result.ok);
+  $('web-message').textContent = result.ok
+    ? `${direction === 'undo' ? '取り消し' : 'やり直し'}ました。実ファイルは変更していません。必要な設定・表示データを保存してください。`
+    : result.message;
+  syncHistory(); syncLeaveWarning();
+}
+host.onHistoryState(() => queueMicrotask(syncHistory));
+for (const [id, direction] of [['web-undo', 'undo'], ['web-redo', 'redo']]) $(id).addEventListener('click', () => travel(direction));
+for (const type of ['input', 'change', 'click', 'submit']) $('config-editor').addEventListener(type, () => queueMicrotask(syncHistory));
+document.addEventListener('keydown', event => {
+  // Text controls keep their browser-native text Undo, including IME input.
+  if (event.defaultPrevented || event.isComposing || event.altKey || !(event.ctrlKey || event.metaKey)
+    || event.target.closest('input, textarea, select, [contenteditable]')) return;
+  const key = event.key.toLowerCase();
+  if (key === 'z' || (key === 'y' && !event.shiftKey)) {
+    event.preventDefault(); travel(key === 'y' || event.shiftKey ? 'redo' : 'undo');
+  }
+});
+syncHistory();
 function hasChanges() { return host.hasEdits() || host.hasViewEdits() || ui.hasPendingEdits() || host.getSaveState().saving; }
 function warnOnLeave(event) { if (hasChanges()) { event.preventDefault(); event.returnValue = ''; } }
 function syncLeaveWarning() {
@@ -145,5 +180,5 @@ document.addEventListener('drop', event => {
   if (files.length) { event.preventDefault(); void open(files); }
 });
 // Closing the page releases the only in-memory document. Nothing is persisted.
-window.addEventListener('pagehide', event => { if (!event.persisted) host.dispose(); });
+window.addEventListener('pagehide', event => { if (!event.persisted) { pageDisposed = true; host.dispose(); } });
 void open([sampleFile()]);

@@ -27,6 +27,11 @@
       <button id="web-view-download" type="button" disabled>表示データをダウンロード</button>
       <input id="web-view" type="file" accept=".view.json" hidden aria-label="対応する表示データを選択">
     </div>
+    <div class="web-actions" role="group" aria-label="ページ内の編集履歴">
+      <button id="web-undo" type="button" disabled title="Ctrl / Cmd + Z（文字入力中を除く）">取り消し</button>
+      <button id="web-redo" type="button" disabled title="Ctrl / Cmd + Shift + Z、Ctrl + Y（文字入力中を除く）">やり直し</button>
+      <span id="web-history-note" class="web-note" aria-live="polite"></span>
+    </div>
     <p class="web-note">JSONC / JSONと、対応する .view.json を選択、または画面へドロップ。設定は「編集」→「反映」の後に保存・ダウンロードします。<br>配置・倍率・表示状態は表示データへ保存します。未反映のフォーム入力は保存しません。内容は外部へ送信しません。</p>
     <p id="web-save-note" class="web-note"></p>
     <p id="web-view-note" class="web-note"></p>

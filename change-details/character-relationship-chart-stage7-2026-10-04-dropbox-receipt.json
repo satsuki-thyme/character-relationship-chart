@@ -1,0 +1,1035 @@
+{
+  "stage": 7,
+  "recorded_at": "2026-10-04T08:28:12.355764+09:00",
+  "status": "implementation_automated_verification_and_dropbox_application_completed; user_acceptance_and_draft_choice_pending",
+  "root": "/www/studio/character-relationship-chart",
+  "git_head": "9257b65ba87ae298421188e7ca79803b74930a62",
+  "prior_stages": "1-6 completed; Stage 6 accepted 2026-10-02 JST; no inferred test dates or installed hashes",
+  "changed_files": [
+    {
+      "path": ".vscodeignore",
+      "at_acquisition": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKjZQ",
+        "size": 1514,
+        "sha256": "95d1258ecc85862f331a60724320f96e7a73aeaa14c23fadb0d443f64cfd3c0c",
+        "content_hash": "e545fe80b07236f6d5ee8f11c7c7e2716fd5c01c5e5d1fca4f1f5e0d83b4b638"
+      },
+      "before_rename": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKjZQ",
+        "sha256": "95d1258ecc85862f331a60724320f96e7a73aeaa14c23fadb0d443f64cfd3c0c",
+        "content_hash": "e545fe80b07236f6d5ee8f11c7c7e2716fd5c01c5e5d1fca4f1f5e0d83b4b638",
+        "size": 1514,
+        "path": "ns:466153749//www/studio/character-relationship-chart/.vscodeignore",
+        "relative_path": ".vscodeignore",
+        "rev": "65cbfb20899211bc8f115",
+        "server_modified": "2026-10-01T04:17:35Z"
+      },
+      "backup": {
+        "relative_path": ".vscodeignore",
+        "backup": ".vscodeignore.backup-2026-10-04-01",
+        "id": "id:pdXqx4wRBdMAAAAAAAKjZQ",
+        "size": 1514,
+        "content_hash": "e545fe80b07236f6d5ee8f11c7c7e2716fd5c01c5e5d1fca4f1f5e0d83b4b638",
+        "preserved": true
+      },
+      "after": {
+        "relative_path": ".vscodeignore",
+        "id": "id:pdXqx4wRBdMAAAAAAAKrDA",
+        "content_hash": "b79a781e5e6ced51904c24e9a9c98b69817e01fc9e9696e1a34a64024dbbeb49",
+        "size": 1763,
+        "sha256": "504faedea39885ebdc316985b69c45848f529a25d5ea4c6cc1c98022e9eb2a4a",
+        "match": true,
+        "rev": "65cf7c7f2a9e21bc8f115",
+        "server_modified": "2026-10-03T23:12:21Z",
+        "path_display": "/www/studio/character-relationship-chart/.vscodeignore"
+      }
+    },
+    {
+      "path": "CHANGELOG.md",
+      "at_acquisition": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKjYg",
+        "size": 7042,
+        "sha256": "cc6c04392b310dc80896938e8b2b31e8a7a46e733c59e2f4dc6384133a2292c8",
+        "content_hash": "0cfbd4d61145b503dcccf9d4259b81461c0eebd5f12ed1ff2e2aba2772d19365"
+      },
+      "before_rename": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKjYg",
+        "sha256": "cc6c04392b310dc80896938e8b2b31e8a7a46e733c59e2f4dc6384133a2292c8",
+        "content_hash": "0cfbd4d61145b503dcccf9d4259b81461c0eebd5f12ed1ff2e2aba2772d19365",
+        "size": 7042,
+        "path": "ns:466153749//www/studio/character-relationship-chart/CHANGELOG.md",
+        "relative_path": "CHANGELOG.md",
+        "rev": "65cbfb0a0171c1bc8f115",
+        "server_modified": "2026-10-01T04:17:12Z"
+      },
+      "backup": {
+        "relative_path": "CHANGELOG.md",
+        "backup": "CHANGELOG.backup-2026-10-04-01.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKjYg",
+        "size": 7042,
+        "content_hash": "0cfbd4d61145b503dcccf9d4259b81461c0eebd5f12ed1ff2e2aba2772d19365",
+        "preserved": true
+      },
+      "after": {
+        "relative_path": "CHANGELOG.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKrDQ",
+        "content_hash": "e396ac877c76de00a8fb17b1799b1577318ecbcad6580385cf9185e7799348b4",
+        "size": 7924,
+        "sha256": "64bad4883c97465cef41fef130025184bbac948dff3032c9b63fe8089327a8fd",
+        "match": true,
+        "rev": "65cf7c83dbf3c1bc8f115",
+        "server_modified": "2026-10-03T23:12:26Z",
+        "path_display": "/www/studio/character-relationship-chart/CHANGELOG.md"
+      }
+    },
+    {
+      "path": "MGMT.md",
+      "at_acquisition": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKkdg",
+        "size": 4110,
+        "sha256": "21a22961caf978106a88661d88a5165d4e3c16bc4a3aa2d21cabefb39c6b5496",
+        "content_hash": "1093e6c5590d350ba7d49462bb3201c3a320cd74706ff9a29aebfe75b5e7ef14"
+      },
+      "before_rename": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKkdg",
+        "sha256": "1b63b647bdb29d2bc39d0bb467191ee6f8e9891164e830a574a8b8d3029af866",
+        "content_hash": "185ab360b4c208ebdf84f1de0dd14691692f7f24c3e13f5edca94b9dab689771",
+        "size": 4129,
+        "path": "ns:466153749//www/studio/character-relationship-chart/MGMT.md",
+        "relative_path": "MGMT.md",
+        "rev": "65cf7b83e22451bc8f115",
+        "server_modified": "2026-10-03T23:07:58Z"
+      },
+      "backup": {
+        "relative_path": "MGMT.md",
+        "backup": "MGMT.backup-2026-10-04-01.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKkdg",
+        "size": 4129,
+        "content_hash": "185ab360b4c208ebdf84f1de0dd14691692f7f24c3e13f5edca94b9dab689771",
+        "preserved": true
+      },
+      "after": {
+        "relative_path": "MGMT.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKrDg",
+        "content_hash": "4282d7c11431f72369c8572e409bc1b7c2fd3ae0679ef80fcb15738337454dce",
+        "size": 4434,
+        "sha256": "f0750b6ae9de5765af66c0695cb8b18802f4d5343c0baebc56cb730aa69e33ed",
+        "match": true,
+        "rev": "65cf7c879dbec1bc8f115",
+        "server_modified": "2026-10-03T23:12:30Z",
+        "path_display": "/www/studio/character-relationship-chart/MGMT.md"
+      }
+    },
+    {
+      "path": "README.md",
+      "at_acquisition": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKkew",
+        "size": 18885,
+        "sha256": "bfd2d99a9ce6a781b7086a0adadcdb8e3e21c6158d91438ad8d6fb12bd98404d",
+        "content_hash": "e39ff740dfa28beee1102cdd3f5878dddae1034fe511ae617598c788f7afa540"
+      },
+      "before_rename": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKkew",
+        "sha256": "bfd2d99a9ce6a781b7086a0adadcdb8e3e21c6158d91438ad8d6fb12bd98404d",
+        "content_hash": "e39ff740dfa28beee1102cdd3f5878dddae1034fe511ae617598c788f7afa540",
+        "size": 18885,
+        "path": "ns:466153749//www/studio/character-relationship-chart/README.md",
+        "relative_path": "README.md",
+        "rev": "65cd2657e5c181bc8f115",
+        "server_modified": "2026-10-02T02:36:15Z"
+      },
+      "backup": {
+        "relative_path": "README.md",
+        "backup": "README.backup-2026-10-04-01.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKkew",
+        "size": 18885,
+        "content_hash": "e39ff740dfa28beee1102cdd3f5878dddae1034fe511ae617598c788f7afa540",
+        "preserved": true
+      },
+      "after": {
+        "relative_path": "README.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKrDw",
+        "content_hash": "f9ef94436d51f67a019cab8dcef528d6d0883ef40c4c3ff2d2d1f887d5f19dfc",
+        "size": 19719,
+        "sha256": "062f8a291bde9df51cb6535078aea47f05eed81961097d4782e5ac351ee7e27a",
+        "match": true,
+        "rev": "65cf7c8d529c31bc8f115",
+        "server_modified": "2026-10-03T23:12:36Z",
+        "path_display": "/www/studio/character-relationship-chart/README.md"
+      }
+    },
+    {
+      "path": "TESTING.md",
+      "at_acquisition": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKkeg",
+        "size": 54192,
+        "sha256": "c815b995a01ef70d380f89145b2f08073b90c5dbc9b57e8d861f7bb7e4a04af2",
+        "content_hash": "1fcc168abf73699757e94fd110a36460c5d56f439ff2be763eea14feb5b02317"
+      },
+      "before_rename": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKkeg",
+        "sha256": "c815b995a01ef70d380f89145b2f08073b90c5dbc9b57e8d861f7bb7e4a04af2",
+        "content_hash": "1fcc168abf73699757e94fd110a36460c5d56f439ff2be763eea14feb5b02317",
+        "size": 54192,
+        "path": "ns:466153749//www/studio/character-relationship-chart/TESTING.md",
+        "relative_path": "TESTING.md",
+        "rev": "65cd264fd34441bc8f115",
+        "server_modified": "2026-10-02T02:36:07Z"
+      },
+      "backup": {
+        "relative_path": "TESTING.md",
+        "backup": "TESTING.backup-2026-10-04-01.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKkeg",
+        "size": 54192,
+        "content_hash": "1fcc168abf73699757e94fd110a36460c5d56f439ff2be763eea14feb5b02317",
+        "preserved": true
+      },
+      "after": {
+        "relative_path": "TESTING.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKrEA",
+        "content_hash": "0a4c3ce2795372593eaa9f90230398041468e0c7c52e2ec0c40b8c759f6cfbd9",
+        "size": 61279,
+        "sha256": "bdecfb130416c129e67f384a17a17c004ff2db7e8b435078ef46bcf63ee61eaa",
+        "match": true,
+        "rev": "65cf7c9150b841bc8f115",
+        "server_modified": "2026-10-03T23:12:40Z",
+        "path_display": "/www/studio/character-relationship-chart/TESTING.md"
+      }
+    },
+    {
+      "path": "docs/DATA_FORMAT.md",
+      "at_acquisition": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKjAQ",
+        "size": 11278,
+        "sha256": "f5c49a7d97e05285992a0ae10885b8ab3f9786403b9644ac2d4c9461942593d1",
+        "content_hash": "b4bc3a958732103d8c95ebbaa1aa1a159088dd50c9e23217b86f4f9840587988"
+      },
+      "before_rename": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKjAQ",
+        "sha256": "f5c49a7d97e05285992a0ae10885b8ab3f9786403b9644ac2d4c9461942593d1",
+        "content_hash": "b4bc3a958732103d8c95ebbaa1aa1a159088dd50c9e23217b86f4f9840587988",
+        "size": 11278,
+        "path": "ns:466153749//www/studio/character-relationship-chart/docs/DATA_FORMAT.md",
+        "relative_path": "docs/DATA_FORMAT.md",
+        "rev": "65cbcd6b278ea1bc8f115",
+        "server_modified": "2026-10-01T00:53:05Z"
+      },
+      "backup": {
+        "relative_path": "docs/DATA_FORMAT.md",
+        "backup": "docs/DATA_FORMAT.backup-2026-10-04-01.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKjAQ",
+        "size": 11278,
+        "content_hash": "b4bc3a958732103d8c95ebbaa1aa1a159088dd50c9e23217b86f4f9840587988",
+        "preserved": true
+      },
+      "after": {
+        "relative_path": "docs/DATA_FORMAT.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKrEQ",
+        "content_hash": "2089bdaab21a9f02ff682675da8ff81c3a6ee6345c9d9038688ad6bf4abc66ef",
+        "size": 12531,
+        "sha256": "77529291966057d0a16b7e37d1077dde285428ac24b65f2705d872c4ae5a8f69",
+        "match": true,
+        "rev": "65cf7c95394181bc8f115",
+        "server_modified": "2026-10-03T23:12:44Z",
+        "path_display": "/www/studio/character-relationship-chart/docs/DATA_FORMAT.md"
+      }
+    },
+    {
+      "path": "docs/DEVELOPMENT.md",
+      "at_acquisition": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKjXw",
+        "size": 17681,
+        "sha256": "33b9059daa9ede5017f7c3d5c6d2df59cc8f0e53c0163ee773f162905808c9a4",
+        "content_hash": "f96dbc535653a76d8525aa7732c50ca1186c7c5cecc4a9185b9626b1fbb44942"
+      },
+      "before_rename": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKjXw",
+        "sha256": "33b9059daa9ede5017f7c3d5c6d2df59cc8f0e53c0163ee773f162905808c9a4",
+        "content_hash": "f96dbc535653a76d8525aa7732c50ca1186c7c5cecc4a9185b9626b1fbb44942",
+        "size": 17681,
+        "path": "ns:466153749//www/studio/character-relationship-chart/docs/DEVELOPMENT.md",
+        "relative_path": "docs/DEVELOPMENT.md",
+        "rev": "65cbfaf400d411bc8f115",
+        "server_modified": "2026-10-01T04:16:48Z"
+      },
+      "backup": {
+        "relative_path": "docs/DEVELOPMENT.md",
+        "backup": "docs/DEVELOPMENT.backup-2026-10-04-01.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKjXw",
+        "size": 17681,
+        "content_hash": "f96dbc535653a76d8525aa7732c50ca1186c7c5cecc4a9185b9626b1fbb44942",
+        "preserved": true
+      },
+      "after": {
+        "relative_path": "docs/DEVELOPMENT.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKrEg",
+        "content_hash": "fb381165b13a6b6410170a61e7b73e3c872d71f26d812a33699459485e409b4a",
+        "size": 20834,
+        "sha256": "9a76ce014836218800049f537ce1161b938c91fbb8887f46bc6027b28272b1be",
+        "match": true,
+        "rev": "65cf7c99345e41bc8f115",
+        "server_modified": "2026-10-03T23:12:48Z",
+        "path_display": "/www/studio/character-relationship-chart/docs/DEVELOPMENT.md"
+      }
+    },
+    {
+      "path": "docs/PROCESS_CHART.md",
+      "at_acquisition": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKkdw",
+        "size": 31104,
+        "sha256": "a301298380594ab755d48e3b3dee3fe9f15b0c6428e2530f178548a68dc62d3d",
+        "content_hash": "6054d9d65a1d93491e0f38e370dd976684ab4b1cfbd4cf9961a0db5f9dbdf249"
+      },
+      "before_rename": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKkdw",
+        "sha256": "a301298380594ab755d48e3b3dee3fe9f15b0c6428e2530f178548a68dc62d3d",
+        "content_hash": "6054d9d65a1d93491e0f38e370dd976684ab4b1cfbd4cf9961a0db5f9dbdf249",
+        "size": 31104,
+        "path": "ns:466153749//www/studio/character-relationship-chart/docs/PROCESS_CHART.md",
+        "relative_path": "docs/PROCESS_CHART.md",
+        "rev": "65cd26341e2f91bc8f115",
+        "server_modified": "2026-10-02T02:35:38Z"
+      },
+      "backup": {
+        "relative_path": "docs/PROCESS_CHART.md",
+        "backup": "docs/PROCESS_CHART.backup-2026-10-04-01.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKkdw",
+        "size": 31104,
+        "content_hash": "6054d9d65a1d93491e0f38e370dd976684ab4b1cfbd4cf9961a0db5f9dbdf249",
+        "preserved": true
+      },
+      "after": {
+        "relative_path": "docs/PROCESS_CHART.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKrEw",
+        "content_hash": "f3c077975bf8ae474f2fe561e99abcf6cae584cd140506ec2031beeb3edf01ec",
+        "size": 33011,
+        "sha256": "53136fa55c0d801b94be2b0f6a1a68de790327684b9404c374af8292b18b6fbe",
+        "match": true,
+        "rev": "65cf7c9d75e661bc8f115",
+        "server_modified": "2026-10-03T23:12:53Z",
+        "path_display": "/www/studio/character-relationship-chart/docs/PROCESS_CHART.md"
+      }
+    },
+    {
+      "path": "docs/architecture.md",
+      "at_acquisition": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKjYA",
+        "size": 25771,
+        "sha256": "c79c30c46b69595eb8b6084df9564138086a106f5f607656414e516cf12b79f3",
+        "content_hash": "aa38026b50d3516c0dac072653b3c57eed884f456512424323c5d5bbca645bda"
+      },
+      "before_rename": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKjYA",
+        "sha256": "c79c30c46b69595eb8b6084df9564138086a106f5f607656414e516cf12b79f3",
+        "content_hash": "aa38026b50d3516c0dac072653b3c57eed884f456512424323c5d5bbca645bda",
+        "size": 25771,
+        "path": "ns:466153749//www/studio/character-relationship-chart/docs/architecture.md",
+        "relative_path": "docs/architecture.md",
+        "rev": "65cbfafa851721bc8f115",
+        "server_modified": "2026-10-01T04:16:55Z"
+      },
+      "backup": {
+        "relative_path": "docs/architecture.md",
+        "backup": "docs/architecture.backup-2026-10-04-01.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKjYA",
+        "size": 25771,
+        "content_hash": "aa38026b50d3516c0dac072653b3c57eed884f456512424323c5d5bbca645bda",
+        "preserved": true
+      },
+      "after": {
+        "relative_path": "docs/architecture.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKrFA",
+        "content_hash": "d15faa2a38d7c3219779c0be53c270317d2176d9536f33abe5650a6baceb2391",
+        "size": 29185,
+        "sha256": "b306dfe4a65825c78ad94ae0966d1dd0de14447a86ea53601a33add812ae5b6e",
+        "match": true,
+        "rev": "65cf7ca1ef0f71bc8f115",
+        "server_modified": "2026-10-03T23:12:57Z",
+        "path_display": "/www/studio/character-relationship-chart/docs/architecture.md"
+      }
+    },
+    {
+      "path": "media/main.js",
+      "at_acquisition": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKjZA",
+        "size": 30103,
+        "sha256": "1bad960562dc60ce8d5ca1b413bfda83f0ceaec6d9e460e07cd563cdd68ad3a9",
+        "content_hash": "beff49cc519ba0b585a81440e644d3e2cc55642a6e85f39ceaa88b3e86989984"
+      },
+      "before_rename": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKjZA",
+        "sha256": "1bad960562dc60ce8d5ca1b413bfda83f0ceaec6d9e460e07cd563cdd68ad3a9",
+        "content_hash": "beff49cc519ba0b585a81440e644d3e2cc55642a6e85f39ceaa88b3e86989984",
+        "size": 30103,
+        "path": "ns:466153749//www/studio/character-relationship-chart/media/main.js",
+        "relative_path": "media/main.js",
+        "rev": "65cbfb19905b21bc8f115",
+        "server_modified": "2026-10-01T04:17:28Z"
+      },
+      "backup": {
+        "relative_path": "media/main.js",
+        "backup": "media/main.backup-2026-10-04-01.js",
+        "id": "id:pdXqx4wRBdMAAAAAAAKjZA",
+        "size": 30103,
+        "content_hash": "beff49cc519ba0b585a81440e644d3e2cc55642a6e85f39ceaa88b3e86989984",
+        "preserved": true
+      },
+      "after": {
+        "relative_path": "media/main.js",
+        "id": "id:pdXqx4wRBdMAAAAAAAKrFQ",
+        "content_hash": "970f78a98019b9dd30dec297c52b62d8c7c393f0288eafa5e7c8296bf99441f4",
+        "size": 30224,
+        "sha256": "fd8d2e97829bdbff0941d1dead322ead7efb437e80117ee7214a7556d3e08122",
+        "match": true,
+        "rev": "65cf7ca6493b21bc8f115",
+        "server_modified": "2026-10-03T23:13:02Z",
+        "path_display": "/www/studio/character-relationship-chart/media/main.js"
+      }
+    },
+    {
+      "path": "package.json",
+      "at_acquisition": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKVsg",
+        "size": 3791,
+        "sha256": "972481c5774b607bac64848ce1468d679abb5ec66ca6f7d84c37f28e54c98f5e",
+        "content_hash": "90b2ea8105c26ab87d9d7a4d42f138eeedc35491da726f221d39711a61da5137"
+      },
+      "before_rename": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKVsg",
+        "sha256": "972481c5774b607bac64848ce1468d679abb5ec66ca6f7d84c37f28e54c98f5e",
+        "content_hash": "90b2ea8105c26ab87d9d7a4d42f138eeedc35491da726f221d39711a61da5137",
+        "size": 3791,
+        "path": "ns:466153749//www/studio/character-relationship-chart/package.json",
+        "relative_path": "package.json",
+        "rev": "65c846f64a7611bc8f115",
+        "server_modified": "2026-09-28T05:35:34Z"
+      },
+      "backup": {
+        "relative_path": "package.json",
+        "backup": "package.backup-2026-10-04-01.json",
+        "id": "id:pdXqx4wRBdMAAAAAAAKVsg",
+        "size": 3791,
+        "content_hash": "90b2ea8105c26ab87d9d7a4d42f138eeedc35491da726f221d39711a61da5137",
+        "preserved": true
+      },
+      "after": {
+        "relative_path": "package.json",
+        "id": "id:pdXqx4wRBdMAAAAAAAKrFg",
+        "content_hash": "1bee3e6d640bcddf9dd4e189ba91eec19adbd7baee0c6daa3a4d91525301d88e",
+        "size": 3822,
+        "sha256": "111f2810ed1abdfe8ef9f63ee78db4772430f6a7332392aa38d91f1303c46e9a",
+        "match": true,
+        "rev": "65cf7caa5fb701bc8f115",
+        "server_modified": "2026-10-03T23:13:06Z",
+        "path_display": "/www/studio/character-relationship-chart/package.json"
+      }
+    },
+    {
+      "path": "test/web-view-browser-check.js",
+      "at_acquisition": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKivg",
+        "size": 13028,
+        "sha256": "d29651c08c5717ce328b4615efa0ec765503cadc527e316392623121aa63e7ff",
+        "content_hash": "e489f77af8311c8d98c0ce42ec720c6b8cccbc3e0a14137b87a804ed2d1608c9"
+      },
+      "before_rename": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKivg",
+        "sha256": "d29651c08c5717ce328b4615efa0ec765503cadc527e316392623121aa63e7ff",
+        "content_hash": "e489f77af8311c8d98c0ce42ec720c6b8cccbc3e0a14137b87a804ed2d1608c9",
+        "size": 13028,
+        "path": "ns:466153749//www/studio/character-relationship-chart/test/web-view-browser-check.js",
+        "relative_path": "test/web-view-browser-check.js",
+        "rev": "65cbbd03f6e4c1bc8f115",
+        "server_modified": "2026-09-30T23:39:42Z"
+      },
+      "backup": {
+        "relative_path": "test/web-view-browser-check.js",
+        "backup": "test/web-view-browser-check.backup-2026-10-04-01.js",
+        "id": "id:pdXqx4wRBdMAAAAAAAKivg",
+        "size": 13028,
+        "content_hash": "e489f77af8311c8d98c0ce42ec720c6b8cccbc3e0a14137b87a804ed2d1608c9",
+        "preserved": true
+      },
+      "after": {
+        "relative_path": "test/web-view-browser-check.js",
+        "id": "id:pdXqx4wRBdMAAAAAAAKrFw",
+        "content_hash": "ba9c8f4d166b0ed72f15489a4a877de902896d011dcca52966c31b6b46e451b3",
+        "size": 13563,
+        "sha256": "0770bcec5d8357c54b114656b86ea7def82c4882570ec0b37011e82877c4d10b",
+        "match": true,
+        "rev": "65cf7caf7970d1bc8f115",
+        "server_modified": "2026-10-03T23:13:12Z",
+        "path_display": "/www/studio/character-relationship-chart/test/web-view-browser-check.js"
+      }
+    },
+    {
+      "path": "web/README-ja.md",
+      "at_acquisition": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKi_w",
+        "size": 14641,
+        "sha256": "cf32d074990eb6918784411e9ab0c75599df1348b3c2c96332d6779a4f4151f2",
+        "content_hash": "c1f6b171289a849ea80345e3fe73580d41d1ea30806fbeac76cbc3edde21af4a"
+      },
+      "before_rename": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKi_w",
+        "sha256": "cf32d074990eb6918784411e9ab0c75599df1348b3c2c96332d6779a4f4151f2",
+        "content_hash": "c1f6b171289a849ea80345e3fe73580d41d1ea30806fbeac76cbc3edde21af4a",
+        "size": 14641,
+        "path": "ns:466153749//www/studio/character-relationship-chart/web/README-ja.md",
+        "relative_path": "web/README-ja.md",
+        "rev": "65cbcd608c9ee1bc8f115",
+        "server_modified": "2026-10-01T00:52:54Z"
+      },
+      "backup": {
+        "relative_path": "web/README-ja.md",
+        "backup": "web/README-ja.backup-2026-10-04-01.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKi_w",
+        "size": 14641,
+        "content_hash": "c1f6b171289a849ea80345e3fe73580d41d1ea30806fbeac76cbc3edde21af4a",
+        "preserved": true
+      },
+      "after": {
+        "relative_path": "web/README-ja.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKrGA",
+        "content_hash": "53d0bfcf83d9acf35ebf272f7599202568d85f4ea14a452aa21eb777d3ee99c0",
+        "size": 17346,
+        "sha256": "c43f08501af1044b4c810670b2fa185d8ffaa23a09b9700422bf024ac62c590c",
+        "match": true,
+        "rev": "65cf7cb3d98091bc8f115",
+        "server_modified": "2026-10-03T23:13:16Z",
+        "path_display": "/www/studio/character-relationship-chart/web/README-ja.md"
+      }
+    },
+    {
+      "path": "web/README.md",
+      "at_acquisition": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKjAA",
+        "size": 10866,
+        "sha256": "f9ba095f03664bac4f2d89a31cf36fbbda09b0599532e7465dac3c1ada9e7fbe",
+        "content_hash": "a97236ad3f49873abd11eb23f43db41b547b0efd6bbb0df6e55e4fe481e86163"
+      },
+      "before_rename": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKjAA",
+        "sha256": "f9ba095f03664bac4f2d89a31cf36fbbda09b0599532e7465dac3c1ada9e7fbe",
+        "content_hash": "a97236ad3f49873abd11eb23f43db41b547b0efd6bbb0df6e55e4fe481e86163",
+        "size": 10866,
+        "path": "ns:466153749//www/studio/character-relationship-chart/web/README.md",
+        "relative_path": "web/README.md",
+        "rev": "65cbcd66042221bc8f115",
+        "server_modified": "2026-10-01T00:53:00Z"
+      },
+      "backup": {
+        "relative_path": "web/README.md",
+        "backup": "web/README.backup-2026-10-04-01.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKjAA",
+        "size": 10866,
+        "content_hash": "a97236ad3f49873abd11eb23f43db41b547b0efd6bbb0df6e55e4fe481e86163",
+        "preserved": true
+      },
+      "after": {
+        "relative_path": "web/README.md",
+        "id": "id:pdXqx4wRBdMAAAAAAAKrGQ",
+        "content_hash": "311bab5739c864d74b3098d65d5dee328b0469c03a978c6e23d230610fed0774",
+        "size": 12777,
+        "sha256": "b4aef0c4afaf9aeac427daaf30257fc9cd2031d98993b4a9610decac34714b67",
+        "match": true,
+        "rev": "65cf7cb86e1351bc8f115",
+        "server_modified": "2026-10-03T23:13:21Z",
+        "path_display": "/www/studio/character-relationship-chart/web/README.md"
+      }
+    },
+    {
+      "path": "web/host.js",
+      "at_acquisition": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKWGg",
+        "size": 16853,
+        "sha256": "c5ebb48de9b2769cae68a2d348d2f3d738d048f92497419e05d539093a5cc860",
+        "content_hash": "be88e5c90d825bd00285c99c3727203f4dd7171befa7b57489444882f020dbaf"
+      },
+      "before_rename": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKWGg",
+        "sha256": "c5ebb48de9b2769cae68a2d348d2f3d738d048f92497419e05d539093a5cc860",
+        "content_hash": "be88e5c90d825bd00285c99c3727203f4dd7171befa7b57489444882f020dbaf",
+        "size": 16853,
+        "path": "ns:466153749//www/studio/character-relationship-chart/web/host.js",
+        "relative_path": "web/host.js",
+        "rev": "65cbc3f4513501bc8f115",
+        "server_modified": "2026-10-01T00:10:45Z"
+      },
+      "backup": {
+        "relative_path": "web/host.js",
+        "backup": "web/host.backup-2026-10-04-01.js",
+        "id": "id:pdXqx4wRBdMAAAAAAAKWGg",
+        "size": 16853,
+        "content_hash": "be88e5c90d825bd00285c99c3727203f4dd7171befa7b57489444882f020dbaf",
+        "preserved": true
+      },
+      "after": {
+        "relative_path": "web/host.js",
+        "id": "id:pdXqx4wRBdMAAAAAAAKrGg",
+        "content_hash": "3f23552e734127eb50734e4f80fffcf97957e9bad2abad5f2e8da1edb8da99fa",
+        "size": 20324,
+        "sha256": "c5cfa6da6fd55f713e7e05cd61cef2136c0fd922a443b7eed2460b1c32f2edb0",
+        "match": true,
+        "rev": "65cf7cbcbd0691bc8f115",
+        "server_modified": "2026-10-03T23:13:26Z",
+        "path_display": "/www/studio/character-relationship-chart/web/host.js"
+      }
+    },
+    {
+      "path": "web/index.html",
+      "at_acquisition": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKWGw",
+        "size": 2848,
+        "sha256": "90bce2991e70662ae53ee6b00c8a2c268dcc3ee97d91360ffb4df65a5f9420be",
+        "content_hash": "4b6b56e78df239b06fac986ebd6bb7786fa5fdbb130d2ea7d6e1b2bacbef139a"
+      },
+      "before_rename": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKWGw",
+        "sha256": "90bce2991e70662ae53ee6b00c8a2c268dcc3ee97d91360ffb4df65a5f9420be",
+        "content_hash": "4b6b56e78df239b06fac986ebd6bb7786fa5fdbb130d2ea7d6e1b2bacbef139a",
+        "size": 2848,
+        "path": "ns:466153749//www/studio/character-relationship-chart/web/index.html",
+        "relative_path": "web/index.html",
+        "rev": "65cbc3f39737a1bc8f115",
+        "server_modified": "2026-10-01T00:10:44Z"
+      },
+      "backup": {
+        "relative_path": "web/index.html",
+        "backup": "web/index.backup-2026-10-04-01.html",
+        "id": "id:pdXqx4wRBdMAAAAAAAKWGw",
+        "size": 2848,
+        "content_hash": "4b6b56e78df239b06fac986ebd6bb7786fa5fdbb130d2ea7d6e1b2bacbef139a",
+        "preserved": true
+      },
+      "after": {
+        "relative_path": "web/index.html",
+        "id": "id:pdXqx4wRBdMAAAAAAAKrGw",
+        "content_hash": "e2433de6302db8ec409b0bca298afe5061bf0c4b369e74d99a99c503fa821a99",
+        "size": 3292,
+        "sha256": "885cc92baf79db1134ebc543f80b192fc37d4a5dd80b7cb97c1fcde4341ba669",
+        "match": true,
+        "rev": "65cf7cc1e89fd1bc8f115",
+        "server_modified": "2026-10-03T23:13:31Z",
+        "path_display": "/www/studio/character-relationship-chart/web/index.html"
+      }
+    },
+    {
+      "path": "web/main.js",
+      "at_acquisition": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKWHA",
+        "size": 10933,
+        "sha256": "3310420d333638ccd8e7472375f464a2ef25cfd007a9c6a0e208c64430d09b9f",
+        "content_hash": "cb32a63ff63b04a8231f72bbf9f8996e5306afcf9bfb885f9250212cd634dcb1"
+      },
+      "before_rename": {
+        "id": "id:pdXqx4wRBdMAAAAAAAKWHA",
+        "sha256": "3310420d333638ccd8e7472375f464a2ef25cfd007a9c6a0e208c64430d09b9f",
+        "content_hash": "cb32a63ff63b04a8231f72bbf9f8996e5306afcf9bfb885f9250212cd634dcb1",
+        "size": 10933,
+        "path": "ns:466153749//www/studio/character-relationship-chart/web/main.js",
+        "relative_path": "web/main.js",
+        "rev": "65cbc3f39737b1bc8f115",
+        "server_modified": "2026-10-01T00:10:44Z"
+      },
+      "backup": {
+        "relative_path": "web/main.js",
+        "backup": "web/main.backup-2026-10-04-01.js",
+        "id": "id:pdXqx4wRBdMAAAAAAAKWHA",
+        "size": 10933,
+        "content_hash": "cb32a63ff63b04a8231f72bbf9f8996e5306afcf9bfb885f9250212cd634dcb1",
+        "preserved": true
+      },
+      "after": {
+        "relative_path": "web/main.js",
+        "id": "id:pdXqx4wRBdMAAAAAAAKrHA",
+        "content_hash": "5ba9decc6639da151cc0f515b22987b50dffd4c89e8c455357f9cac9b028dff6",
+        "size": 13235,
+        "sha256": "4bfb3feb2dd05bf7de1c61adeee73e06ac5ade6557740a559cff396f090d70fc",
+        "match": true,
+        "rev": "65cf7cc6247a81bc8f115",
+        "server_modified": "2026-10-03T23:13:35Z",
+        "path_display": "/www/studio/character-relationship-chart/web/main.js"
+      }
+    }
+  ],
+  "new_files": [
+    {
+      "relative_path": "web/history.js",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrHQ",
+      "size": 1358,
+      "content_hash": "d6c2f7e44ab76a5cfd86276293fecb1010f37c4d804d4f981f164e2a579fc180",
+      "sha256": "8fb2d3de64a3c58b3ae7a13c2ee37e375e0434324b0f4542da20a124bb4e2005",
+      "match": true,
+      "rev": "65cf7d05e46a31bc8f115",
+      "server_modified": "2026-10-03T23:14:42Z",
+      "path_display": "/www/studio/character-relationship-chart/web/history.js"
+    },
+    {
+      "relative_path": "docs/STAGE7_ACCEPTANCE.md",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrHg",
+      "size": 3996,
+      "content_hash": "9e9f76d6bc0263a71c58441919bbaa8e87b91f937eca180be9be7284aa3ddaeb",
+      "sha256": "c86003cc36a23be04aab04277bef7e95b4ccaaeb340a5057464a7dfc52077e5e",
+      "match": true,
+      "rev": "65cf7d0994fb41bc8f115",
+      "server_modified": "2026-10-03T23:14:46Z",
+      "path_display": "/www/studio/character-relationship-chart/docs/STAGE7_ACCEPTANCE.md"
+    },
+    {
+      "relative_path": "docs/STAGE7_ACCEPTANCE_PROMPT.md",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrHw",
+      "size": 3507,
+      "content_hash": "d787ddc54c81b8f641b7d73daa7c144d39baabf8d9eb0cc7ca46156274655957",
+      "sha256": "3be94fb2f30a2fbf0a0b897293585d5af17415bb1485a247cc2bd712d8844725",
+      "match": true,
+      "rev": "65cf7d0e417131bc8f115",
+      "server_modified": "2026-10-03T23:14:51Z",
+      "path_display": "/www/studio/character-relationship-chart/docs/STAGE7_ACCEPTANCE_PROMPT.md"
+    },
+    {
+      "relative_path": "docs/STAGE7_DRAFT_DESIGN.md",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrIA",
+      "size": 7154,
+      "content_hash": "87f0e182caedc8744cc156dd974b1a7bcec2c1ed22b308391217a747351541c1",
+      "sha256": "bc7a9ff08088b41b26c348651d9c29009b8b5268f50c46e3776a47d203e1e0f9",
+      "match": true,
+      "rev": "65cf7d12ba5621bc8f115",
+      "server_modified": "2026-10-03T23:14:56Z",
+      "path_display": "/www/studio/character-relationship-chart/docs/STAGE7_DRAFT_DESIGN.md"
+    },
+    {
+      "relative_path": "test/stage7-history-browser-check.js",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrIQ",
+      "size": 11346,
+      "content_hash": "5971611b314125df9031a4057154b3eb5e8f793b20cd01b1c7eddf40d527357b",
+      "sha256": "cb46968d78a0b3f0704715a26717a9f7da5cb21642d86c5f51e60aacbdbcd3e1",
+      "match": true,
+      "rev": "65cf7d17149d71bc8f115",
+      "server_modified": "2026-10-03T23:15:00Z",
+      "path_display": "/www/studio/character-relationship-chart/test/stage7-history-browser-check.js"
+    },
+    {
+      "relative_path": "test/stage7-history-dom-check.js",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrIg",
+      "size": 8256,
+      "content_hash": "35318048282832c541f2f953cc10d57e0e17ece1aa61b73068ae6609d09b391d",
+      "sha256": "43aa70283b47fd20c2fc1ea064830950bc00e478ece8e4a79f2d294ac667fe4e",
+      "match": true,
+      "rev": "65cf7d1b00bcf1bc8f115",
+      "server_modified": "2026-10-03T23:15:04Z",
+      "path_display": "/www/studio/character-relationship-chart/test/stage7-history-dom-check.js"
+    },
+    {
+      "relative_path": "test/web-history.test.js",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrIw",
+      "size": 13733,
+      "content_hash": "49bc7f18f71bfe8af9b7a16a7f91b37d593fbf0b83d447164a1a644fd6030fd9",
+      "sha256": "dc3ac7300ff1bad27ffb41079a1b473180e71962aea2ccde748f1ffc54f28819",
+      "match": true,
+      "rev": "65cf7d1fc274c1bc8f115",
+      "server_modified": "2026-10-03T23:15:09Z",
+      "path_display": "/www/studio/character-relationship-chart/test/web-history.test.js"
+    },
+    {
+      "relative_path": "dist/character-relationship-chart-stage7-2026-10-04.vsix",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrJA",
+      "size": 430373,
+      "content_hash": "21f40877882cfc8a244f1b368c123b20d74a06799d659369c26d4cf1c7a244a2",
+      "sha256": "e0f6f677ceaefdc24259e4253d679936307e1fbe8ee39544e06ef8e6b795ef5c",
+      "match": true,
+      "rev": "65cf7d26a39f71bc8f115",
+      "server_modified": "2026-10-03T23:15:17Z",
+      "path_display": "/www/studio/character-relationship-chart/dist/character-relationship-chart-stage7-2026-10-04.vsix"
+    },
+    {
+      "relative_path": "verification/stage7/check-final.log",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrJg",
+      "size": 827,
+      "content_hash": "e6fc92590eef6779a006dd6cd7798e45a594ad9af24fe7a2d469782311ec30a2",
+      "sha256": "7e71111ff24c36f16417e4ae2ab5de28bf3d694a91729332e02cdf869b339bd7",
+      "match": true,
+      "rev": "65cf7dacbdab31bc8f115",
+      "server_modified": "2026-10-03T23:17:37Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/check-final.log"
+    },
+    {
+      "relative_path": "verification/stage7/unit-final.log",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrJw",
+      "size": 722,
+      "content_hash": "7b0b3ea6b1ab0624afb117ac6d86a7d9d30103a62dc1d0cafdb1f286840bcd14",
+      "sha256": "db3aaadbcb4e6479bc250536e2286cb7935404bae7acebd0ad2fc20009c493e8",
+      "match": true,
+      "rev": "65cf7db0f7a661bc8f115",
+      "server_modified": "2026-10-03T23:17:42Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/unit-final.log"
+    },
+    {
+      "relative_path": "verification/stage7/unit-final.tap",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrKA",
+      "size": 29028,
+      "content_hash": "c9d4c910f7f790fa6fdb30ca2c03e5a6018b5f93896334ed29c8a0e8b058cb6a",
+      "sha256": "67a4b261d93280d64ab5c89454c8add5871e3317002abcb664c8a84926af270f",
+      "match": true,
+      "rev": "65cf7db5242ab1bc8f115",
+      "server_modified": "2026-10-03T23:17:46Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/unit-final.tap"
+    },
+    {
+      "relative_path": "verification/stage7/web-dom-final.log",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrKQ",
+      "size": 341,
+      "content_hash": "b73a32c7323271069c65a3cc9a1e74a93956a0ef7e8aba1508e1a64e1d08821d",
+      "sha256": "eec3e3876cbea09168e456ec19efee2682d138c673855391f0230e2b29d298ec",
+      "match": true,
+      "rev": "65cf7dba741d01bc8f115",
+      "server_modified": "2026-10-03T23:17:52Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/web-dom-final.log"
+    },
+    {
+      "relative_path": "verification/stage7/dom-final.tap",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrKg",
+      "size": 11682,
+      "content_hash": "27a30d08f1147debae2adbda6096458d2da6b1831dee91ee98bf1f0e70f8a078",
+      "sha256": "4678144d3e051b218e501c9db8734526f571a3f6c5415533b9593841adb248e0",
+      "match": true,
+      "rev": "65cf7dc068df21bc8f115",
+      "server_modified": "2026-10-03T23:17:58Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/dom-final.tap"
+    },
+    {
+      "relative_path": "verification/stage7/web-browser-final.log",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrKw",
+      "size": 724,
+      "content_hash": "5389cbf41c1b4138dba9a8240918ba692e3d27024aea7e3d9b4cdd44b31ef195",
+      "sha256": "4b659818210369760029692fdb3109c952fddaa49baf515aa41b82d5d97d08ad",
+      "match": true,
+      "rev": "65cf7dc495a3b1bc8f115",
+      "server_modified": "2026-10-03T23:18:02Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/web-browser-final.log"
+    },
+    {
+      "relative_path": "verification/stage7/save-browser-final.log",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrLA",
+      "size": 592,
+      "content_hash": "25499508c7be49d38910e7c3e06f7365698d9eabc8ad473fcad539f48ce9cbe8",
+      "sha256": "2731d3be3d0f733162b99f5f7471a3a13ec4fc8751d5a4858188f47db7334fc4",
+      "match": true,
+      "rev": "65cf7dc9141f41bc8f115",
+      "server_modified": "2026-10-03T23:18:07Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/save-browser-final.log"
+    },
+    {
+      "relative_path": "verification/stage7/view-browser-final2.log",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrLQ",
+      "size": 876,
+      "content_hash": "fe6906abf6980bf899e486185f3719db81ccad0a9c9a9ccbd4ed07ce67a776ab",
+      "sha256": "dda26b8a8829b23b431055dc4c90e14cfcd29ac74303bfe73e848196a10a6245",
+      "match": true,
+      "rev": "65cf7dcd12c4f1bc8f115",
+      "server_modified": "2026-10-03T23:18:11Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/view-browser-final2.log"
+    },
+    {
+      "relative_path": "verification/stage7/layout-browser-final2.log",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrLg",
+      "size": 460,
+      "content_hash": "b8eebcc97ed47c690dbeb641eaa20c510ad0ca4a93482d06e5ed4a27dce911d2",
+      "sha256": "4136ecf7e26123e2d6c89f52e287da5f281ebdff710561009f952bc9cb93c04c",
+      "match": true,
+      "rev": "65cf7dd2503221bc8f115",
+      "server_modified": "2026-10-03T23:18:17Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/layout-browser-final2.log"
+    },
+    {
+      "relative_path": "verification/stage7/vscode-browser-final.log",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrLw",
+      "size": 3106,
+      "content_hash": "d5bc979713667cdf043c6a19aae0374a674f5b678830a262a2249dbc19014346",
+      "sha256": "ed4643b09df12c64f22f8cb218ec5fff565dbf4cc783a0887869a4ebd04849a5",
+      "match": true,
+      "rev": "65cf7dd8085881bc8f115",
+      "server_modified": "2026-10-03T23:18:23Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/vscode-browser-final.log"
+    },
+    {
+      "relative_path": "verification/stage7/history-browser-final.log",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrMA",
+      "size": 795,
+      "content_hash": "4c84b1e2d7c242ebd029b3527977dbc5f5af81713fcad45eb1b7363c4eae9e64",
+      "sha256": "7abb2c31257647f74bf0d20b2d8e34a8721c5df8dec1e5aa676cf3c641d7f482",
+      "match": true,
+      "rev": "65cf7ddc3b3281bc8f115",
+      "server_modified": "2026-10-03T23:18:27Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/history-browser-final.log"
+    },
+    {
+      "relative_path": "verification/stage7/native-view-final.log",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrMQ",
+      "size": 1091,
+      "content_hash": "cef9eebffe64dff76007ab6cc9cc137cbfd47cedd6bfb05237454bd6407fb6cd",
+      "sha256": "7ed4694f73d57ddf52f1371dc1a263d1b613910de1d85f3461759224a0ede731",
+      "match": true,
+      "rev": "65cf7ddfe03911bc8f115",
+      "server_modified": "2026-10-03T23:18:31Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/native-view-final.log"
+    },
+    {
+      "relative_path": "verification/stage7/build-web.log",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrMg",
+      "size": 237,
+      "content_hash": "21d8ad3f66d5aa39e92b474b59bae194e4f28378e19a6cd1b90746e4ed406be7",
+      "sha256": "dd46a673cfe085f92cc2563b6e1556cff1146da771f5deec9aab352927d00ca2",
+      "match": true,
+      "rev": "65cf7de4f436b1bc8f115",
+      "server_modified": "2026-10-03T23:18:36Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/build-web.log"
+    },
+    {
+      "relative_path": "verification/stage7/package-final2.log",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrMw",
+      "size": 1015,
+      "content_hash": "2de5a337ba9a6ac2e7d2966705c60dd530cbd56b207d7db23be1766d1a789ec9",
+      "sha256": "32181d1a82049280351086a3f5c53a67bdd4a977fe7728e115dc7e0185686747",
+      "match": true,
+      "rev": "65cf7de8b70aa1bc8f115",
+      "server_modified": "2026-10-03T23:18:40Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/package-final2.log"
+    },
+    {
+      "relative_path": "verification/stage7/artifact-audit.json",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrNA",
+      "size": 36944,
+      "content_hash": "03fc5d96fa208ec66f48d2205a5d6e45a394f09aae2010fe2acd0f525fbd98be",
+      "sha256": "0e23e5b7006318301838407153283ac05d99624465ece4d6660d20cccf9bbbee",
+      "match": true,
+      "rev": "65cf7ded89a991bc8f115",
+      "server_modified": "2026-10-03T23:18:45Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/artifact-audit.json"
+    },
+    {
+      "relative_path": "verification/stage7/artifact-browser-final.log",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrNQ",
+      "size": 795,
+      "content_hash": "4c84b1e2d7c242ebd029b3527977dbc5f5af81713fcad45eb1b7363c4eae9e64",
+      "sha256": "7abb2c31257647f74bf0d20b2d8e34a8721c5df8dec1e5aa676cf3c641d7f482",
+      "match": true,
+      "rev": "65cf7df1b67041bc8f115",
+      "server_modified": "2026-10-03T23:18:50Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/artifact-browser-final.log"
+    },
+    {
+      "relative_path": "verification/stage7/local-backups.json",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrNg",
+      "size": 7233,
+      "content_hash": "75099984df0d67a4bb647b4d7991c04c900cd3c609fb4f565629d7beb865cefc",
+      "sha256": "947f2550392eddbc123a17a8f99b2090706feb620e6acfe99e0cd4c5230a8d77",
+      "match": true,
+      "rev": "65cf7df5c803e1bc8f115",
+      "server_modified": "2026-10-03T23:18:54Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/local-backups.json"
+    },
+    {
+      "relative_path": "verification/stage7/remote-preflight.json",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrNw",
+      "size": 31804,
+      "content_hash": "c4a95274aa4f9f42a024dcc770cd4e0a9238867212811c524a888573afc86003",
+      "sha256": "9884462663ae45ce720bf7b4146eb820dc2c07d88b9e6e104b83d6f62c02169d",
+      "match": true,
+      "rev": "65cf7dfae4a981bc8f115",
+      "server_modified": "2026-10-03T23:18:59Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/remote-preflight.json"
+    },
+    {
+      "relative_path": "verification/stage7/final-source-manifest.json",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrOA",
+      "size": 31951,
+      "content_hash": "1380d04225cdec342ad7d9f0ce90dfd047e399b091f3adb2e739e988db980a38",
+      "sha256": "3e68fd35bbfa6348ff7d76acf1705be5a69adf73ab1bb74b6a7b32507b5a56b9",
+      "match": true,
+      "rev": "65cf7e01283291bc8f115",
+      "server_modified": "2026-10-03T23:19:06Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/final-source-manifest.json"
+    },
+    {
+      "relative_path": "verification/stage7/stage7-narrow.png",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrOQ",
+      "size": 68531,
+      "content_hash": "fbe40b1680a27a52def30c306df47e39ff073dbc323847d3b6d9836f9698d14c",
+      "sha256": "5c5f2b3c7316d315a788032e8de2cb60b645b3e0dca7a62fd0ddb47b65ac76b7",
+      "match": true,
+      "rev": "65cf7e05bdea11bc8f115",
+      "server_modified": "2026-10-03T23:19:11Z",
+      "path_display": "/www/studio/character-relationship-chart/verification/stage7/stage7-narrow.png"
+    },
+    {
+      "relative_path": "dist/character-relationship-chart-web-stage7-2026-10-04.zip",
+      "content_hash": "5b51c6fba2517f95ddbc18a0335b13ff0036ca02c9c83724e5de93522c43186b",
+      "expiration_in_sec": 600,
+      "id": "id:pdXqx4wRBdMAAAAAAAKrCw",
+      "name": "character-relationship-chart-web-stage7-2026-10-04.zip",
+      "path": "ns:466153749//www/studio/character-relationship-chart/dist/character-relationship-chart-web-stage7-2026-10-04.zip",
+      "path_display": "/www/studio/character-relationship-chart/dist/character-relationship-chart-web-stage7-2026-10-04.zip",
+      "size": 63671,
+      "rev": "65cf7b16927271bc8f115",
+      "server_modified": "2026-10-03T23:06:03Z",
+      "sha256": "579cc161bba31b70202923a625c0c876d6f1ba48dbff4ec9ee0a3095425f0acc"
+    },
+    {
+      "relative_path": "verification/character-relationship-chart-stage7-2026-10-04.zip",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrOg",
+      "size": 433239,
+      "content_hash": "cc374d720697b71d197a3d02d796c1afcda29d9c9f3c638bad9fd45c2e9eddc0",
+      "sha256": "51c8408519ceddebf60be9ec116ae23e78317ed2847dc6c566896639869a20ca",
+      "match": true
+    },
+    {
+      "relative_path": "dist/character-relationship-chart-stage7-2026-10-04-SHA256SUMS.txt",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrOw",
+      "size": 379,
+      "content_hash": "3421d2641f57014cc5a5b76fd52b7d56001ebaeb5c3afa69a15100dd04ecf5d4",
+      "sha256": "70e2344dcb2c4c3272f694690d9b375a14ddd053110e57c98772504d48bf79ee",
+      "match": true
+    },
+    {
+      "relative_path": "change-details/character-relationship-chart-stage7-implementation-2026-10-04-ja.md",
+      "id": "id:pdXqx4wRBdMAAAAAAAKrPA",
+      "rev": "65cf8007e60b91bc8f115",
+      "server_modified": "2026-10-03T23:28:10Z",
+      "path_display": "/www/studio/character-relationship-chart/change-details/character-relationship-chart-stage7-implementation-2026-10-04-ja.md",
+      "size": 13143,
+      "content_hash": "254ee2d80387486adca1b221b6c24d31f6b1985bbc6784b22cbb46f6573a45ff",
+      "sha256": "11fec97bc1c309572d42fb211898d0f7c72e630e5f91acf8394ba418a0f7a55c",
+      "match": true
+    }
+  ],
+  "verified_files_excluding_this_receipt": 49,
+  "preserved_originals": 17,
+  "post_application_source_check": {
+    "matched": 123,
+    "includes": [
+      "120 source/document files",
+      "Git HEAD, index and refs/heads/main"
+    ],
+    "details": "verification/stage7/final-source-manifest.json"
+  },
+  "external_change_handling": {
+    "file": "MGMT.md",
+    "action": "stopped before rename, fetched latest exact bytes, confirmed stable revision, retained user-added 進行中 line, replaced only Stage 7 progress line",
+    "other_source_changes": 0
+  },
+  "tests": {
+    "node": 132,
+    "dom": 46,
+    "browser_groups": 33,
+    "browser": "143.0.7499.0",
+    "native": "read and denial protection passed; native pickers AbortError and write permission denied; native save success not verified",
+    "vscode": "production UI/adapter/extension with simulated API; real Extension Host unverified"
+  },
+  "draft_persistence": "design only; not implemented; awaits choice",
+  "stage8": "not started; pending acceptance and draft choice",
+  "commit_push_publish_deploy": false,
+  "verification_method": "upload lifecycle completed; matching byte size and Dropbox SHA-256 block content hash; SHA-256 values computed from the verified local payloads; original ID/content hash preserved across rename",
+  "recovery": "preserve current version by rename to unused backup before restoring the verified original by rename; do not delete existing data; new-file deletion requires separate confirmation",
+  "receipt_self_check": "This receipt cannot contain its own hash. Its completed upload and matching content hash are confirmed separately after creation."
+}
