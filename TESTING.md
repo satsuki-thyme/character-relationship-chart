@@ -1,5 +1,23 @@
 # 検証結果と実機確認手順
 
+## 第7段階の正式受入完了（2026-10-09 JST）
+
+指定第7段階VSIXの導入・Windowリロードの利用者追加報告を受領し、受入項目1〜6の実機結果と既存自動検証を照合して、第7段階を正式完了と判定した。報告対象日は2026-10-09、実行時刻は未記載。環境はWindows 11 Pro 26H2（26300.9550）、Chrome 154.0.8037.98、VS Code 1.141.0（commit 2a59476c9bfcb90b3ddc372c36762471b7dfad1c）。報告されたWeb ZIP・VSIX・検証ZIPのSHA-256は実装記録の値に一致する。これは配布物のハッシュであり、VS Codeインストール先の実測ハッシュではない。
+
+項目5のフォーム破棄・履歴保護・別作品への混入防止は実機報告でok。モーダル編集中に表示データだけを再読込する動作は実機未実施で、フォーム保持は既存の自動試験による。項目6のUndoは事前に開いた `.jsonc` テキストタブで実施したもの（相関図Webview上のCtrl+Zとは別）。下書きの常時保存は「当面採用しない」。
+
+今回の作業は既存記録と追加報告の照合であり、自動テスト・実機試験の再実行はなし。以下の完了前の「保留／未受領」は当時の経緯として保持する。根拠は[受入確認](docs/STAGE7_ACCEPTANCE.md)、[追加報告](docs/Stage7-Report-on-the-Implementation-of-Designated-Stage7-VSIX-and-Window-Reloading.md)、[正式完了記録](change-details/character-relationship-chart-stage7-completed-2026-10-09-ja.md)。第8段階の実装は未着手。
+
+## 指定第7段階VSIXの導入とWindowリロードに関する報告（2026-10-09 JST）
+
+[指定第7段階VSIXの導入とWindowリロードに関する報告（2026-10-09 JST）](/docs/Stage7-Report-on-the-Implementation-of-Designated-Stage7-VSIX-and-Window-Reloading.md)
+
+## 第7段階・利用者の実機結果を受領（2026-10-09 JST）
+
+受入項目1〜4はWebでok。項目5は、未反映フォームでUndo/Redoが無効になること、明示的に「破棄して続ける」で編集画面を閉じられること、別設定で履歴・以前の配置が混ざらないことを利用者が確認した。表示データだけの再読込による未反映フォーム保持は既存のDOM・実ブラウザ自動試験で確認し、実機の直接操作とは区別する。項目6はVS Code版でGUI編集・保存・再表示・ドラッグがokで、`.jsonc` のテキストエディターを事前に開いたうえでCtrl+Zを試すと戻せたと報告された。Webview上のCtrl+ZをVS CodeのUndoと数えない。
+
+下書き保存は「当面採用しない」と決定。指定第7段階VSIXの導入とWindowリロードは今回の報告から確定できないため、正式完了は保留。利用者報告を受領した日付は実機試験日ではない。今回のAI作業で自動試験を再実行しておらず、以下の2026-10-04自動検証件数は過去の履歴。詳細は [第7段階の受入確認](docs/STAGE7_ACCEPTANCE.md) と [整理記録](change-details/character-relationship-chart-stage7-acceptance-review-2026-10-09-ja.md)。
+
 ## 第7段階・実装と自動検証（2026-10-04 JST）
 
 **Undo/Redoの実装・自動検証済み。利用者の最終確認と下書き保存の採否待ち。** 第1〜6段階の完了を維持し、第8段階は未着手。以下の第6段階以前の待機記述は各時点の履歴として保持する。今回の原ログは `verification/stage7/`、監査と取得時／反映後の対応は [変更明細](change-details/character-relationship-chart-stage7-implementation-2026-10-04-ja.md) を参照する。
