@@ -1,5 +1,42 @@
 # 検証結果と実機確認手順
 
+## 第8段階・実装と自動検証（2026-10-10 JST）
+
+**実装・自動検証済み／実機確認待ち。** 第1〜7段階の完了を維持する。対象配布物と必須4項目は `docs/STAGE8_ACCEPTANCE.md`、記入先は `docs/STAGE8_PHYSICAL_DEVICE_CHECK.md`。
+
+取得時の現行100ファイルをDropbox content hashと一致確認し、第7段階VSIXの実装・Schema・サンプル・manifest計23ファイルと取得ソースのSHA-256が一致した。第7段階Web ZIP/VSIXのSHA-256も完了記録と一致。Dropboxの現行ファイルを正本にし、古い作業コピーはハッシュが一致したバイト列だけを再利用した。`.git` オブジェクトは復元しておらず、今回のGit HEAD/未コミット差分を実測したとは扱わない。Git変更は行わず、既存差分は直前の原本照合と改名退避で保護する。
+
+原ログは `dist/character-relationship-chart-stage8-verification-2026-10-10.zip` 内の `verification/stage8/`。以下は今回実行した結果であり過去の合格の転記ではない。
+
+| 検証 | 結果 | 主な範囲と限界 |
+| --- | --- | --- |
+| `npm run check` | 成功。`check-final.log` | 本番JSの構文 |
+| `npm test` /個別TAP | **136件成功**。`npm-test.log`、`unit-final.tap` | 新規SVGホスト4件を含む。同じ集合の表示形式違いを二重計上しない。VS Code部分は模擬API |
+| `npm run test:web` | **19件成功**。`npm-test-web.log` | 下記46件にも含まれる |
+| 共有UI/Web DOM | **46件成功**。`dom-final.tap` | 12共有UI＋19Web＋5配置回帰＋4VS Code再表示＋6履歴 |
+| SVG実Chromium | **11操作群成功**。`svg-browser-final.log` | 実ファイルダウンロード、UTF-8/MIME/名前、XML/単体SVG再表示、各線種/矢印/自己・複数関係、特殊文字、長い題名、暗/明テーマ、全図・選択強調除外、編集・Undo/Redo・再読込、故障保持、320/390/768px、キーボード |
+| 既存Web・設定保存・表示保存・履歴 | **8＋5＋7＋7操作群成功**。`web-browser.log`、`save-browser-final.log`、`view-browser.log`、`history-browser.log` | 実ブラウザの入力・描画・ダウンロード。成功/競合/拒否/故障/取消のファイルハンドルは模擬 |
+| VS Code再表示・実描画 | **3操作群成功**。`vscode-browser.log` | 実共有UIと拡張コード＋模擬VS Code API。実Extension Hostではない |
+| `npm run build:web` / `npm run package` | 成功。`build-web.log`、`package-initial.log` | Web9ファイル、VSIX53項目。0.1.0と既存依存を維持 |
+| 配布物監査 | 成功。`artifact-audit.json` | VSIX50ファイルはバイト一致、READMEはvsceの相対リンク変換のみ。Web9ファイルが独立ビルドと一致。バックアップ・試験・Web・管理用資料はVSIXから除外 |
+| 展開した最終Web ZIP | 上記SVG11操作群を再確認。`artifact-browser.log` | 別の11件として合計へ加算しない。画像は `artifact/` |
+
+Node 24.19.0 / npm 11.9.0 / jsdom 26.1.0 / Playwright 1.62.1 / Linux Chromium 143.0.7499.0。実ブラウザは合計41操作群。Webの通常動作はfile URL・オフライン、HTTP(S)要求ゼロ。VS Code試験用のローカルサーバーは製品の通信と別。インストール済み依存は現行lockfileと同一の既存環境を複製して `npm ls --depth=0` で3件を確認し、今回 `npm ci` は行っていない。新依存の導入・lockfile変更なし。
+
+### 試験中の修正と区別
+
+- 新規ブラウザ試験の構文誤りと、CSS算出後の線種表記（`7px, 5px`等）を固定文字列と比較した誤りを修正。アプリの線種を変更したのではない。
+- 既存設定保存ブラウザ試験が旧ボタン名「保存」を待ってタイムアウトしたため、新表示「設定を保存」へ期待値を更新。保存状態/内容/競合の検証は維持し、再実行成功。初回ログを履歴として残す。
+- 長い題名の欠け、選択線の太さの混入を共通SVG出力で修正。保存通知にgraphがない場合も、保持中の有効な図から出力できるようボタン判定を修正した。
+- メニュー内のキーボードフォーカスをEscでsummaryへ戻す。自動検証で確認。
+
+### 未実施・残条件
+
+Windows/macOS、他ブラウザ、実VSIX導入/Extension Host、ネイティブOSピッカー/直接保存成功は今回未実施。過去の実機okを今回の結果へ転用しない。未反映モーダル背後への出力拒否は故障注入のdispatchで、実際にモーダル背後をクリックできたという意味ではない。ブラウザのダウンロード中止/保存完了をアプリで確定しない。フォントはSVGへ埋め込まない。
+
+正式完了は指定配布物を使った利用者4項目とVSIX導入/Windowリロード確認後。新たな問題がなければ自動検証を繰り返さず照合する。
+
+
 ## 第7段階の正式受入完了（2026-10-09 JST）
 
 指定第7段階VSIXの導入・Windowリロードの利用者追加報告を受領し、受入項目1〜6の実機結果と既存自動検証を照合して、第7段階を正式完了と判定した。報告対象日は2026-10-09、実行時刻は未記載。環境はWindows 11 Pro 26H2（26300.9550）、Chrome 154.0.8037.98、VS Code 1.141.0（commit 2a59476c9bfcb90b3ddc372c36762471b7dfad1c）。報告されたWeb ZIP・VSIX・検証ZIPのSHA-256は実装記録の値に一致する。これは配布物のハッシュであり、VS Codeインストール先の実測ハッシュではない。

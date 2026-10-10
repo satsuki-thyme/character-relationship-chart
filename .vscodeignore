@@ -82,3 +82,8 @@ docs/STAGE7_*.md
 docs/STAGE6_PROCESS_PROMPT_*.md
 docs/character-relationship-chart-stage6-*.md
 docs/*-dropbox-receipt.json
+
+# Stage 8 execution and physical-device records are not runtime assets.
+docs/STAGE8_*.md
+docs/STAGE9_*.md
+docs/Stage7-Report-on-the-Implementation-of-Designated-Stage7-VSIX-and-Window-Reloading.md

@@ -71,10 +71,11 @@ test('built Web page starts offline with shared editing UI and no direct or view
     assert.equal(f.w.acquireVsCodeApi, undefined); assert.equal(typeof f.w.RelationsEditor, 'function');
     assert.equal(f.$('edit-config').disabled, false); assert.equal(f.$('web-download').disabled, false);
     assert.equal(f.$('edit-save').textContent, '反映');
-    for (const id of ['save-view', 'reload-view', 'open-view', 'open-source', 'export', 'storage-status']) {
+    for (const id of ['save-view', 'reload-view', 'open-view', 'open-source', 'storage-status']) {
       assert.equal(f.$(id).hidden, true, id); assert.equal(f.w.getComputedStyle(f.$(id)).display, 'none', id);
       f.$(id).click();
     }
+    assert.equal(f.$('export').disabled, false); assert.equal(f.$('export').parentElement.id, 'web-svg-actions');
     assert.equal(f.assets.length, 3);
   } finally { f.close(); }
 });

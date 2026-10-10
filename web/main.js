@@ -12,7 +12,18 @@ const viewSaveAs = supportsViewSaveAs(window);
 const host = createWebHost({ canTravel: () => !ui.hasPendingEdits(), confirmReplace: scope => scope === 'view'
   ? !host.hasViewEdits() || window.confirm('配置・倍率・表示状態に未保存の変更があります。表示データをダウンロード済みか確認してください。変更を破棄して表示データを読み込みますか？')
   : !hasChanges() || window.confirm('このページには編集した設定・表示データ・入力があります。必要な内容を反映・保存またはダウンロード済みか確認してください。破棄して別の設定を開きますか？') });
-const ui = window.RelationsUi(host);
+const ui = window.RelationsUi(host, { onExportResult(result) {
+  if (pageDisposed) return;
+  $('web-message').classList.toggle('danger', !result.ok);
+  $('web-message').textContent = result.ok
+    ? `「${result.fileName}」のダウンロードを開始しました。ブラウザの保存先を確認してください。SVGは図の画像です。編集用の設定・表示データは別に保存してください。`
+    : `SVGをダウンロードできませんでした: ${result.message} 設定・配置・入力は保持しています。`;
+} });
+// Reuse the shared export control and renderer; keep three output purposes
+// visible together without a second, divergent SVG implementation.
+$('web-svg-actions').append($('export'));
+$('export').textContent = 'SVGをダウンロード';
+$('export').title = '図全体をSVG画像として出力（設定・表示データの保存とは別）';
 let pageDisposed = false;
 function syncHistory() {
   if (pageDisposed) return;
@@ -59,11 +70,11 @@ function syncSave() {
   const state = host.getSaveState();
   $('web-direct-open').hidden = $('web-save').hidden = !directSave;
   $('web-save').disabled = !state.available || state.saving;
-  $('web-save').textContent = state.saving ? '保存中…' : '保存';
+  $('web-save').textContent = state.saving ? '設定を保存中…' : '設定を保存';
   for (const id of ['web-open', 'web-direct-open', 'web-sample', 'web-open-view', 'web-direct-view-open']) $(id).disabled = state.saving;
   $('web-save-note').textContent = state.blocked
     ? '直接保存を停止しています。編集結果をダウンロードして退避し、元ファイルを確認して開き直してください。'
-    : state.available ? '「保存」は開いた元ファイルを更新します。「設定をダウンロード」は編集結果のコピーを出力します。'
+    : state.available ? '「設定を保存」は開いた元ファイルを更新します。「設定をダウンロード」は編集結果のコピーを出力します。'
       : directSave ? '元ファイルを更新するには「直接保存用に開く」を使ってください。通常の読込・ドロップ・サンプルではダウンロードを使えます。'
         : 'この環境では直接保存を利用できません。「設定をダウンロード」で編集結果を保存できます。';
   const view = host.getViewSaveState(), loaded = !!view.fileName;

@@ -1,7 +1,7 @@
 /* global RelationsGraph */
 (() => {
   'use strict';
-  window.RelationsUi = host => {
+  window.RelationsUi = (host, { onExportResult = () => {} } = {}) => {
     const G = RelationsGraph, NS = 'http://www.w3.org/2000/svg';
     const $ = id => document.getElementById(id);
     // Omitted capabilities retain the existing full-featured host contract.
@@ -284,8 +284,7 @@
       if (event.key.toLowerCase() === 'f') { event.preventDefault(); fit(); }
     });
 
-    function exportSvg() {
-      if (!capabilities.exportSvg || !graph || !positioned.length || issueMessages.length) return;
+    function buildSvg() {
       const box = G.bounds(positioned, paths), pad = 50, titleSpace = 54;
       const root = svgEl('svg', { width: Math.ceil(box.width + pad * 2), height: Math.ceil(box.height + pad * 2 + titleSpace), viewBox: `${box.x - pad} ${box.y - pad - titleSpace} ${box.width + pad * 2} ${box.height + pad * 2 + titleSpace}` });
       const bg = getComputedStyle(document.body).backgroundColor, fg = getComputedStyle(document.body).color;
@@ -302,13 +301,47 @@
             const value = css.getPropertyValue(prop);
             if (value && !value.includes('var(')) target.setAttribute(prop, value);
           }
+          if (original.classList.contains('edge-line')) target.setAttribute('stroke-width', '1.5');
           target.removeAttribute('class'); target.removeAttribute('tabindex'); target.removeAttribute('role'); target.removeAttribute('aria-pressed');
           target.removeAttribute('aria-label'); target.removeAttribute('aria-hidden'); target.removeAttribute('data-edge'); target.removeAttribute('id');
           if (original.classList.contains('selection') || original.classList.contains('edge-hit')) target.remove();
         });
         root.append(clone);
       }
-      host.exportSvg(new XMLSerializer().serializeToString(root));
+      // The graph bounds do not include the title. Measure the rendered title
+      // in an isolated hidden SVG so a long title is not clipped in either host.
+      root.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none';
+      document.body.append(root);
+      try {
+        const title = root.querySelector('text');
+        const width = typeof title.getBBox === 'function' ? title.getBBox().width : Array.from(graph.title).length * 30;
+        const fullWidth = Math.max(box.width + pad * 2, width + pad * 2);
+        root.setAttribute('width', Math.ceil(fullWidth));
+        root.setAttribute('viewBox', `${box.x - pad} ${box.y - pad - titleSpace} ${fullWidth} ${box.height + pad * 2 + titleSpace}`);
+        root.querySelector('rect').setAttribute('width', fullWidth);
+      } finally { root.remove(); root.removeAttribute('style'); }
+      return new XMLSerializer().serializeToString(root);
+    }
+    let exporting = false;
+    function syncExport() {
+      $('export').disabled = exporting || !capabilities.exportSvg || !graph?.nodes.length || issueMessages.length > 0;
+    }
+    async function exportSvg() {
+      if (exporting) return;
+      let result;
+      if (!capabilities.exportSvg || !graph || !positioned.length || issueMessages.length) {
+        result = { ok: false, message: '設定エラーがなく、人物のある図を開いてからSVGを出力してください。' };
+      } else if (capabilities.persistEdits === false && editor?.hasPendingChanges()) {
+        result = { ok: false, message: '未反映の入力があります。反映するか、編集画面で破棄を選んでからSVGを出力してください。入力は保持しています。' };
+      } else {
+        exporting = true; syncExport();
+        try { result = await host.exportSvg(buildSvg()); }
+        catch (error) { result = { ok: false, message: String(error.message || error) }; }
+        finally { exporting = false; syncExport(); }
+      }
+      // Legacy VS Code export is fire-and-forget and reports via the host UI.
+      // Do not interpret its undefined return value as a completed save.
+      if (result) onExportResult(result);
     }
     if (capabilities.openSource) $('open-source').addEventListener('click', () => host.openSource());
     $('fit').addEventListener('click', () => fit());
@@ -321,7 +354,7 @@
       $('save-view').addEventListener('click', () => { save(); host.saveView(); });
       $('reload-view').addEventListener('click', () => host.reloadView());
     }
-    document.addEventListener('keydown', e => { if ($('config-editor').open) return; if (e.key === 'Escape') { $('more-menu').open = false; if (state.ui?.focus) setUi('focus', false); } });
+    document.addEventListener('keydown', e => { if ($('config-editor').open) return; if (e.key === 'Escape') { const menu = $('more-menu'); if (menu.open && menu.contains(document.activeElement)) menu.querySelector('summary').focus(); menu.open = false; if (state.ui?.focus) setUi('focus', false); } });
     document.addEventListener('pointerdown', e => { if (!$('more-menu').contains(e.target)) $('more-menu').open = false; });
     $('zoom-in').addEventListener('click', () => zoom(1.2)); $('zoom-out').addEventListener('click', () => zoom(1 / 1.2));
     $('clear-selection').addEventListener('click', () => { $('search').value = ''; select(null); });
@@ -360,7 +393,7 @@
       $('error').textContent = issueMessages.length ? `${graph ? '直前の有効な図を表示中。' : ''} 設定を確認してください。\n` + issueMessages.slice(0, 5).map(e => `${e.line}行: ${e.message}`).join('\n') : '';
       statusText = issueMessages.length ? '設定エラー' : message.dirty ? '未保存の編集を反映中' : '設定を反映済み';
       $('status').textContent = statusText; $('status').title = message.fileName || '';
-      $('export').disabled = !capabilities.exportSvg || issueMessages.length > 0 || !message.graph?.nodes.length;
+      $('export').disabled = exporting || !capabilities.exportSvg || issueMessages.length > 0 || !(message.graph || graph)?.nodes.length;
       if (!message.graph) return;
       const first = !graph;
       // VS Code also republishes an unchanged config on panel visibility and

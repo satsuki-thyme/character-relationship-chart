@@ -16,9 +16,9 @@ test('Web host reads shared JSONC and exposes memory editing and explicit view c
   assert.equal(result.ok, true); assert.equal(result.fileName, input.name);
   assert.deepEqual(f.configs[0].graph, parseConfig(input.text).graph);
   assert.equal(f.views[0].reset, true); assert.deepEqual(input, original);
-  for (const key of ['reloadView', 'exportSvg', 'openSource', 'openView']) assert.equal(f.host[key], undefined);
+  for (const key of ['reloadView', 'openSource', 'openView']) assert.equal(f.host[key], undefined);
   assert.equal(typeof f.host.updateView, 'function'); assert.equal(typeof f.host.saveView, 'function');
-  assert.deepEqual(f.host.capabilities, { edit: true, persistEdits: false, viewStorage: false, viewCapture: true, openSource: false, exportSvg: false });
+  assert.deepEqual(f.host.capabilities, { edit: true, persistEdits: false, viewStorage: false, viewCapture: true, openSource: false, exportSvg: true });
 });
 test('Web source and matching view are validated atomically; invalid data retains the current document', async () => {
   const f = fixture(); await f.host.openFiles([file('old.jsonc', source)]);

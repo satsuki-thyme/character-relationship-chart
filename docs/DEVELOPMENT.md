@@ -205,3 +205,21 @@ npm run package
 `CRC_WEB_DIR` は第7段階履歴試験と配置回帰で展開済み配布物を指定可能。Web ZIPはビルドの9ファイルを格納し、VSIXは `npm run package` の生成物を第7段階名でも保存する。実物とソースのSHA-256は変更明細・監査JSONを参照。ネイティブ保存・模擬API・実Extension Hostの範囲を混同しない。
 
 既存ファイルを変更する場合は、完成内容の準備→同じディレクトリのバックアップ確認→直前の内容・版照合→元ファイル自体を `stem.backup-YYYY-MM-DD-NN.ext` へ改名→改名と原文保全確認→元パスへ新規作成→検証とする。日付はAsia/Tokyo、未使用01以降。コピーによるバックアップ・直接上書きは禁止。外部差分なら停止する。生成済みのdistも再ビルドで直接上書きせず、新しい一時出力を完成させてから同じ手順で置換する。製品の利用者データ保存にこのバックアップ手順を追加しない。
+
+## 第8段階の検証（2026-10-10 JST）
+
+新規 `test/web-svg.test.js` はMIME/名前、出力失敗、未反映入力、履歴・dirty・両競合停止の保持を検証する。`npm test` に含まれる。新規 `test/stage8-svg-browser-check.js` は配布相当のHTMLをオフラインで開き、実SVGダウンロードと再表示、長いタイトル・描画・特殊文字、編集/Undo/Redo/再読込、注入した故障、320/390/768px、Tab/Enter/Escを確認する。保存ハンドルは模擬API。
+
+```sh
+npm run check
+npm test
+npm run test:web
+node --test test/ui-dom-check.js test/web-dom-check.js test/stage6-regression-dom-check.js test/stage6-vscode-redisplay-dom-check.js test/stage7-history-dom-check.js
+node test/stage8-svg-browser-check.js
+npm run build:web
+npm run package
+```
+
+jsdom / Playwright / Chromiumは従来どおり検証専用の環境から供給し、実行時依存へ追加しない。ブラウザの実行ファイル等は既存 `CRC_BROWSER_EXECUTABLE` / `CRC_BROWSER_ARGS`、保存済みビルドの試験には `CRC_WEB_DIR`、画像保存には `CRC_CAPTURE_DIR` を使える。過去の件数と混同せず、今回の結果は `TESTING.md` を参照。
+
+出力の公式根拠: [HTML download処理](https://html.spec.whatwg.org/multipage/links.html#downloading-resources)、[File APIのBlob URL生成・解放](https://www.w3.org/TR/FileAPI/#creating-revoking)、[XMLSerializer](https://developer.mozilla.org/en-US/docs/Web/API/XMLSerializer/serializeToString)。2026-10-10 JST参照。アプリの案内はダウンロード開始までとし、完了・中止の確定をしない。

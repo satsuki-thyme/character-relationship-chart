@@ -250,3 +250,11 @@ graphまたは採用layoutが変わった場合は、人物IDの追従・不要I
 上限は100操作か前後文字列のUTF-16概算16MiB。超過する古い履歴を除外しlimitedを通知する。単独で上限を超える操作は履歴に残らない。現在の図・設定・保存基準は保持する。disposeで解放、再起動後の復元なし。ローカル下書き保存は [設計・選択](STAGE7_DRAFT_DESIGN.md) のみ。外部通信、本番依存、形式、識別子、manifest 0.1.0は変更しない。
 
 ブラウザの保存APIには原子的な比較付き確定がない。履歴を導入しても最終比較とcloseの間の外部変更を完全排除できるようにはならない。
+
+## 第8段階のSVG出力契約（2026-10-10 JST）
+
+- 共有 `media/main.js` が図全体を生成し、既存の `host.exportSvg(svg)` へ渡す。Webは `capabilities.exportSvg: true`、戻り値 `{ok, fileName?, message?}`。VS Codeの既存メッセージとvoid戻り値は維持し、保存成功を推測しない。
+- `RelationsUi(host, {onExportResult})` の任意コールバックでWeb側の開始/失敗表示を行う。未反映Webフォームと設定エラー・空図では停止。シリアライズ失敗も捕捉し入力を保持する。
+- `web/host.js` は既存Blob出力にMIME引数を追加し、SVGには `image/svg+xml;charset=utf-8` を使う。設定・表示データのJSON MIMEは維持。画像出力はview捕捉・JSONC変更・保存先書込・履歴追加・dirty解除・競合解除をしない。
+- SVGはグラフ全領域、線→ラベル→人物の順序、計算済みテーマ色を保持。長いタイトルの実測幅を領域へ含め、選択線の太さは通常値へ戻す。生成用の一時SVGは成功・失敗とも除去する。外部CSS/画像/フォントを参照せず、文字列はtextContent経由。
+- Webの既存共有出力ボタンを画像欄へ移動。VS Codeは従来の「⋯ → SVG保存」。上部操作欄をスクロール可能にし、追加操作メニューをEscで閉じるとsummaryへフォーカスを戻す。

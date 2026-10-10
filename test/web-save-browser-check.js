@@ -37,7 +37,7 @@ const { parseConfig } = require('../packages/core/config');
     await page.locator('#web-direct-open').click(); await page.waitForFunction(() => document.getElementById('web-file').textContent === '人物.jsonc');
     const tab = kind => page.locator(`[data-kind="${kind}"]`).click();
     const apply = async () => { await page.locator('#edit-save').click(); await page.waitForFunction(() => document.getElementById('edit-message').textContent.startsWith('相関図に反映しました')); };
-    const save = async () => { await page.locator('#web-save').click(); await page.waitForFunction(() => document.getElementById('web-save').textContent === '保存'); };
+    const save = async () => { await page.locator('#web-save').click(); await page.waitForFunction(() => document.getElementById('web-save').textContent === '設定を保存'); };
     await page.locator('#edit-config').click(); await page.locator('#field-title').fill('保存する相関図'); await apply();
     await tab('nodes'); await page.locator('#field-id').fill('hero'); await apply();
     await tab('groups'); await page.locator('#field-id').fill('crew'); await apply();

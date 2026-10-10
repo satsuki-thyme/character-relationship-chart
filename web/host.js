@@ -16,8 +16,8 @@ function readLocalFile(file) {
 }
 
 // Files and FileReader belong to this host; the core receives text only.
-function downloadLocalFile(text, fileName) {
-  const blob = new Blob([text], { type: 'application/json;charset=utf-8' });
+function downloadLocalFile(text, fileName, type = 'application/json;charset=utf-8') {
+  const blob = new Blob([text], { type });
   const url = URL.createObjectURL(blob);
   let link;
   try {
@@ -196,6 +196,20 @@ function createWebHost({ readText = readLocalFile, downloadText = downloadLocalF
       return { ok: true, fileName };
     } catch (error) { return { ok: false, message: String(error.message || error) }; }
   }
+  async function exportSvg(svg) {
+    try {
+      if (disposed || !current) throw new Error('先に設定ファイルを読み込んでください。');
+      if (!canTravel()) throw new Error('未反映の入力があります。反映するか、編集画面で破棄を選んでからSVGを出力してください。');
+      if (typeof svg !== 'string' || svg.length >= 8 * 1024 * 1024
+        || !svg.startsWith('<svg') || !svg.includes('http://www.w3.org/2000/svg')) throw new Error('SVGを生成できませんでした。');
+      const base = current.fileName.split(/[\\/]/).pop().replace(/[\u0000-\u001f\u007f]/g, '').replace(/\.jsonc?$/i, '');
+      const fileName = (base || 'characters.relations') + '.svg';
+      // Image output never captures a view, writes an original, records history,
+      // clears a conflict stop or marks either editable document as saved.
+      await downloadText(svg, fileName, 'image/svg+xml;charset=utf-8');
+      return { ok: true, fileName };
+    } catch (error) { return { ok: false, message: String(error.message || error) }; }
+  }
   async function saveConfig() {
     if (disposed || !current || !target) return { ok: false, message: '元ファイルへ保存できません。「設定をダウンロード」を使ってください。' };
     if (busy()) return { ok: false, message: '保存中です。完了を待ってください。' };
@@ -273,7 +287,7 @@ function createWebHost({ readText = readLocalFile, downloadText = downloadLocalF
     finally { viewSaving = false; if (!disposed) notifySave(); }
   }
   return {
-    capabilities: Object.freeze({ edit: true, persistEdits: false, viewStorage: false, viewCapture: true, openSource: false, exportSvg: false }),
+    capabilities: Object.freeze({ edit: true, persistEdits: false, viewStorage: false, viewCapture: true, openSource: false, exportSvg: true }),
     onConfig: callback => subscribe(configListeners, callback),
     onView: callback => subscribe(viewListeners, callback),
     onSaveState: callback => subscribe(saveListeners, callback),
@@ -283,7 +297,7 @@ function createWebHost({ readText = readLocalFile, downloadText = downloadLocalF
     undo: () => travel('undo'), redo: () => travel('redo'),
     getViewSaveState: viewSaveState, getViewState: () => normalizeState(viewState),
     ready() {}, openFiles: input => openFiles(input), openHandle: handle => openFiles(null, handle),
-    openViewHandle: handle => openFiles(null, null, handle), editConfig, downloadConfig, saveConfig,
+    openViewHandle: handle => openFiles(null, null, handle), editConfig, downloadConfig, saveConfig, exportSvg,
     updateView, downloadView, saveView, saveViewAs,
     hasEdits: () => !!current?.dirty,
     hasViewEdits: () => viewDirty,

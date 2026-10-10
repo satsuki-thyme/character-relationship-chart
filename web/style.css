@@ -23,3 +23,15 @@ body.file-drop main { outline: 3px dashed var(--accent); outline-offset: -5px; }
   #edit-add, .edit-item { white-space: normal; overflow-wrap: anywhere; }
 }
 #web-message.danger { color: var(--theme-errorForeground, #ed9292); font-weight: 600; }
+
+/* Keep every output reachable while leaving room for the chart on small screens. */
+body { height: 100dvh; }
+.web-bar { max-height: 46vh; overflow-y: auto; min-height: 0; }
+.web-actions + .web-actions { margin-top: 7px; }
+.web-action-label { align-self: center; min-width: 5.5em; font-weight: 600; font-size: 11px; }
+.web-actions button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+header.toolbar { flex-wrap: wrap; height: auto; min-height: 40px; }
+.menu-panel { max-height: calc(50vh - 65px); max-width: calc(100vw - 16px); }
+@media (max-width: 630px) {
+  .web-action-label { flex-basis: 100%; }
+}

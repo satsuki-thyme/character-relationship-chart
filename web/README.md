@@ -2,7 +2,9 @@
 
 [日本語](README-ja.md)
 
-This Stage 7 implementation and automated verification build was produced on 2026-10-04 JST and adds in-page Undo/Redo. **Stage 7 was formally accepted on 2026-10-09 JST** after the user reported main Web and VS Code checks, installation of the designated Stage 7 VSIX, and a VS Code Window reload. The three distribution/archive SHA-256 values match the Stage 7 implementation record; these are not measured hashes of the installed extension files. Stages 1–6 remain complete. Extract the full ZIP and open `index.html` in a desktop browser supporting JavaScript, FileReader, ResizeObserver, dialog and Blob downloads. Keep the included files together. VS Code, Node.js, a Web server and an Internet connection are not required.
+**Stage 8 build, 2026-10-10 JST: SVG output is implemented and automatically verified; user device acceptance is pending.**
+
+Previous-stage record: the Stage 7 implementation and automated verification build was produced on 2026-10-04 JST and adds in-page Undo/Redo. **Stage 7 was formally accepted on 2026-10-09 JST** after the user reported main Web and VS Code checks, installation of the designated Stage 7 VSIX, and a VS Code Window reload. The three distribution/archive SHA-256 values match the Stage 7 implementation record; these are not measured hashes of the installed extension files. Stages 1–6 remain complete. Extract the full ZIP and open `index.html` in a desktop browser supporting JavaScript, FileReader, ResizeObserver, dialog and Blob downloads. Keep the included files together. VS Code, Node.js, a Web server and an Internet connection are not required.
 
 The sample opens on startup. Choose **設定を開く** to read one UTF-8 `.jsonc` or `.json` file, or drop it onto the page. You may select/drop its matching display file at the same time. To load display data later, choose **表示データを開く**. The display filename must be the complete source filename plus `.view.json`, for example `cast.jsonc.view.json` for `cast.jsonc`. Files in sibling folders are never read automatically. Choose the same file again to reload changes made outside the application.
 
@@ -14,11 +16,25 @@ Search, click a node or edge for details, drag nodes or the canvas, zoom, switch
 
 Invalid data, read errors and invalid edits keep the last valid chart and preserve form input. Source and optional display data are accepted together only when both are valid. Multiple sources, mismatched display filenames and oversized inputs are rejected. Failed downloads retain the in-memory document for retry. A source replacement asks before discarding applied edits or an open form draft. This confirmation remains relevant after a download, because the application cannot verify that the browser saved it. Page closing/reloading requests a browser warning when edits remain, but browsers do not always show it. Confirm direct-save completion or the download destination before leaving.
 
-There is no SVG download, continuous file watching, localStorage or IndexedDB persistence. Content stays in page memory until explicitly saved or downloaded and is not uploaded. The application includes no external resources, telemetry or network requests. Its Content Security Policy also blocks network connections. Refreshing starts with the sample again.
+There is no continuous file watching, localStorage or IndexedDB persistence. Content stays in page memory until explicitly saved or downloaded and is not uploaded. The application includes no external resources, telemetry or network requests. Its Content Security Policy also blocks network connections. Refreshing starts with the sample again.
+
+## SVG image output (Stage 8)
+
+Choose **SVGをダウンロード** in the **画像** group to download the complete applied chart as a UTF-8 SVG image. `人物.jsonc` or `人物.json` suggests `人物.svg`; the browser may adjust the filename. Output includes every person and relation regardless of zoom, pan or search. Search fading, selection rings and selected-edge emphasis are omitted. Current positions, line styles, arrows, text and computed theme colors are included. The export bounds also include long titles. Fonts are not embedded, so another device may display different glyphs.
+
+| Purpose | Control and file |
+| --- | --- |
+| Edit people, groups and relations later | 設定を保存 (supported environments) / 設定をダウンロード → `.jsonc` / `.json` |
+| Restore positions, camera and display options | 表示データを保存 / 表示データをダウンロード → `<source filename>.view.json` |
+| Use the chart as an image | SVGをダウンロード → `.svg` |
+
+SVG is not a replacement for editable data. Export never changes config/view saved baselines, destinations, conflict stops or Undo/Redo history. Apply or explicitly discard form input before closing the editor. Unapplied input, configuration errors and empty charts block SVG output. Generation/download-start failures retain the chart and input for retry.
+
+The message confirms only that a download was started. Check the browser's destination: the application cannot confirm completion or cancellation. SVG output does not add direct overwrite or an OS save picker. Tab and Enter operate the output controls; on small screens, scroll the upper controls. Escape closes the additional-operations menu and returns focus to its summary.
 
 ## Direct saving in supported environments
 
-Choose **直接保存用に開く** to obtain a handle to the original JSONC/JSON file. After applying GUI edits, close the editor and choose **保存**. The browser may request write permission. The ordinary Open button, drag-and-drop and sample keep the download workflow. **保存** updates the selected original; **設定をダウンロード** exports a copy. Unapplied form input is never implicitly applied, and there is no autosave.
+Choose **直接保存用に開く** to obtain a handle to the original JSONC/JSON file. After applying GUI edits, close the editor and choose **設定を保存**. The browser may request write permission. The ordinary Open button, drag-and-drop and sample keep the download workflow. **設定を保存** updates the selected original; **設定をダウンロード** exports a copy. Unapplied form input is never implicitly applied, and there is no autosave.
 
 The host compares the current original bytes with the last verified baseline before creating the writable stream, after creating it, and immediately before closing it. Any change, including comments, whitespace or BOM, stops the write and preserves the document, chart and draft. Download your edits, inspect the original and reopen it. Nothing is automatically merged or chosen. Permission/read/write failures retain edits. Unknown commit results block further direct saves until reopening; there is no automatic resend.
 
